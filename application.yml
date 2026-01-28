@@ -1,0 +1,11 @@
+security:
+  # Required: Secret for internal service-to-service authentication
+  internal-secret: "your-secure-secret-key"
+
+  # Optional: Path prefix for internal endpoints (default: /internal/)
+  internal-path-prefix: "/internal/"
+
+  # Optional: Paths to exclude from security processing
+  excluded-paths:
+    - "/actuator/"
+    - "/health"
