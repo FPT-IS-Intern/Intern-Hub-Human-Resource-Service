@@ -1,41 +1,23 @@
 package com.fis.hrmservice.api.mapper;
 
 import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
+import com.fis.hrmservice.api.dto.response.UserResponse;
+import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.RegisterUserCommand;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Mapper to convert API DTOs to Domain Commands.
- * This is where Spring-specific types (like MultipartFile) are converted to plain data.
- */
-@Component
-public class UserApiMapper {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface UserApiMapper {
 
-    /**
-     * Convert RegisterUserRequest (API DTO with MultipartFile) to RegisterUserCommand (Domain Command)
-     */
-    public RegisterUserCommand toCommand(RegisterUserRequest request) {
-        MultipartFile cv = request.getCv();
-        MultipartFile avatar = request.getAvatar();
+    @Mapping(target = "cvFileName", expression = "java(getFileName(request.getCv()))")
+    @Mapping(target = "cvContentType", expression = "java(getContentType(request.getCv()))")
+    @Mapping(target = "cvSize", expression = "java(getFileSize(request.getCv()))")
+    @Mapping(target = "avatarFileName", expression = "java(getFileName(request.getAvatar()))")
+    @Mapping(target = "avatarContentType", expression = "java(getContentType(request.getAvatar()))")
+    @Mapping(target = "avatarSize", expression = "java(getFileSize(request.getAvatar()))")
+    RegisterUserCommand toCommand(RegisterUserRequest request);
 
-        return RegisterUserCommand.builder()
-                .email(request.getEmail())
-                .fullName(request.getFullName())
-                .idNumber(request.getIdNumber())
-                .birthDate(request.getBirthDate())
-                .address(request.getAddress())
-                .phoneNumber(request.getPhoneNumber())
-                .positionCode(request.getPositionCode())
-                .internshipStartDate(request.getInternshipStartDate())
-                .internshipEndDate(request.getInternshipEndDate())
-                // Extract file metadata (not the actual file stream)
-                .cvFileName(cv != null ? cv.getOriginalFilename() : null)
-                .cvContentType(cv != null ? cv.getContentType() : null)
-                .cvSize(cv != null ? cv.getSize() : 0)
-                .avatarFileName(avatar != null ? avatar.getOriginalFilename() : null)
-                .avatarContentType(avatar != null ? avatar.getContentType() : null)
-                .avatarSize(avatar != null ? avatar.getSize() : 0)
-                .build();
-    }
+    @Mapping(source = "companyEmail", target = "email")
+    UserResponse toResponse(UserModel model);
 }

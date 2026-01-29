@@ -1,31 +1,33 @@
-package com.fis.hrmservice.domain.usecase;
+package com.fis.hrmservice.domain.usecase.implement;
 
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
-import com.fis.hrmservice.domain.model.user.Position;
+import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.input.RegisterUserUseCase;
-import com.fis.hrmservice.domain.port.output.IdGeneratorPort;
 import com.fis.hrmservice.domain.port.output.PositionRepositoryPort;
 import com.fis.hrmservice.domain.port.output.UserRepositoryPort;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.RegisterUserCommand;
 import com.intern.hub.library.common.exception.ConflictDataException;
+import com.intern.hub.library.common.utils.Snowflake;
+
+import java.util.Optional;
 
 public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 
     private final UserRepositoryPort userRepository;
     private final PositionRepositoryPort positionRepository;
-    private final IdGeneratorPort idGenerator;
+    private final Snowflake snowflake;
     private final UserValidationService validationService;
 
     public RegisterUserUseCaseImpl(
             UserRepositoryPort userRepository,
             PositionRepositoryPort positionRepository,
-            IdGeneratorPort idGenerator,
+            Snowflake snowflake,
             UserValidationService validationService) {
         this.userRepository = userRepository;
         this.positionRepository = positionRepository;
-        this.idGenerator = idGenerator;
+        this.snowflake = snowflake;
         this.validationService = validationService;
     }
 
@@ -38,11 +40,10 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
         checkForDuplicates(command);
 
         // 3. Find position
-        Position position = positionRepository.findByCode(command.getPositionCode())
-                .orElseThrow(() -> new ConflictDataException("Position not found: " + command.getPositionCode()));
+        Optional<PositionModel> positionModel = positionRepository.findByCode(command.getPositionCode());
 
         // 4. Build user model
-        UserModel user = buildUserModel(command, position.getPositionId());
+        UserModel user = buildUserModel(command, positionModel.get().getPositionId());
 
         // 5. Save and return
         return userRepository.save(user);
@@ -60,7 +61,7 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 
     private UserModel buildUserModel(RegisterUserCommand command, Long positionId) {
         UserModel.UserModelBuilder builder = UserModel.builder()
-                .userId(idGenerator.generateId())
+                .userId(snowflake.next())
                 .positionId(positionId)
                 .fullName(command.getFullName())
                 .idNumber(command.getIdNumber())

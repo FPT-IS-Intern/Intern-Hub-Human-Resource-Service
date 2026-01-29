@@ -2,6 +2,7 @@ package com.fis.hrmservice.domain.port.output;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepositoryPort {
@@ -10,4 +11,5 @@ public interface UserRepositoryPort {
     Optional<UserModel> findByEmail(String email);
     boolean existsByEmail(String email);
     boolean existsByIdNumber(String idNumber);
+    List<UserModel> findAll();
 }

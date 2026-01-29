@@ -2,29 +2,26 @@ package com.fis.hrmservice.infra.persistence.adapter;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.UserRepositoryPort;
-import com.fis.hrmservice.infra.persistence.entity.UserEntity;
+import com.fis.hrmservice.infra.persistence.entity.User;
+import com.fis.hrmservice.infra.persistence.repository.PositionJpaRepository;
 import com.fis.hrmservice.infra.persistence.repository.UserJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Adapter implementation for UserRepositoryPort.
- * This class bridges the domain layer with the infrastructure (JPA) layer.
- */
 @Component
+@RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepositoryPort {
 
     private final UserJpaRepository userJpaRepository;
 
-    public UserRepositoryAdapter(UserJpaRepository userJpaRepository) {
-        this.userJpaRepository = userJpaRepository;
-    }
+    private final PositionJpaRepository positionJpaRepository;
 
     @Override
     public UserModel save(UserModel user) {
-        UserEntity entity = toEntity(user);
-        UserEntity savedEntity = userJpaRepository.save(entity);
+        User entity = toEntity(user);
+        User savedEntity = userJpaRepository.save(entity);
         return toModel(savedEntity);
     }
 
@@ -52,11 +49,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     // === Mapping methods ===
 
-    private UserEntity toEntity(UserModel model) {
-        UserEntity entity = new UserEntity();
-        entity.setUserId(model.getUserId());
-        entity.setPositionId(model.getPositionId());
-        entity.setMentorId(model.getMentorId());
+    private User toEntity(UserModel model) {
+        User entity = new User();
+        entity.setId(model.getUserId());
+        entity.setPosition(positionJpaRepository.findById((model.getPositionId())).get());
+        entity.setMentor(userJpaRepository.findMentorById((model.getMentorId())));
         entity.setFullName(model.getFullName());
         entity.setIdNumber(model.getIdNumber());
         entity.setDateOfBirth(model.getDateOfBirth());
@@ -69,11 +66,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return entity;
     }
 
-    private UserModel toModel(UserEntity entity) {
+    private UserModel toModel(User entity) {
         return UserModel.builder()
-                .userId(entity.getUserId())
-                .positionId(entity.getPositionId())
-                .mentorId(entity.getMentorId())
+                .userId(entity.getId())
+                .positionId(entity.getPosition().getId())
+                .mentorId(entity.getMentor().getId())
                 .fullName(entity.getFullName())
                 .idNumber(entity.getIdNumber())
                 .dateOfBirth(entity.getDateOfBirth())

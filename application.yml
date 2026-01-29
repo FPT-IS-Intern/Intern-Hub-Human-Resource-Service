@@ -12,3 +12,10 @@ security:
 
   snowflake:
     machine-id: 1
+
+
+spring:
+  autoconfigure:
+    exclude:
+      - com.intern.hub.library.common.autoconfig.snowflake.SnowflakeAutoConfiguration
+      - com.intern.hub.library.common.autoconfig.context.ContextAutoConfiguration

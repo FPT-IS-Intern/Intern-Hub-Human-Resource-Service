@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Entity
@@ -32,7 +34,7 @@ public class User {
     private String idNumber;
 
     @Column(name = "date_of_birth")
-    private Long dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Size(max = 100)
     @Column(name = "company_email", length = 100)
@@ -64,10 +66,10 @@ public class User {
     private String updatedBy;
 
     @Column(name = "internship_start_date")
-    private Long internshipStartDate;
+    private LocalDate internshipStartDate;
 
     @Column(name = "internship_end_date")
-    private Long internshipEndDate;
+    private LocalDate internshipEndDate;
 
     @NotNull
     @Column(name = "address", nullable = false, length = Integer.MAX_VALUE)

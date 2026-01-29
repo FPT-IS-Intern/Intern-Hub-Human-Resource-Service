@@ -8,10 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
-/**
- * Request DTO for user registration.
- * This stays in API layer and handles Spring-specific types like MultipartFile.
- */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterUserRequest {

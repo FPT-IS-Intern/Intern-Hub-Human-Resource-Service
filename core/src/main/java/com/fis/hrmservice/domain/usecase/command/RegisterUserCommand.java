@@ -7,10 +7,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
-/**
- * Command object for user registration.
- * This is a pure domain object without any framework dependencies.
- */
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
