@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
@@ -25,31 +27,18 @@ public interface UserMapper {
     @Mapping(target = "updatedBy", ignore = true)
     User toEntity(UserModel model);
 
-    /* ===================== CUSTOM MAPPINGS ===================== */
 
-    @Named("positionToId")
-    default Long positionToId(Position position) {
-        return position != null ? position.getId() : null;
-    }
-
-    @Named("mentorToId")
-    default Long mentorToId(User mentor) {
-        return mentor != null ? mentor.getId() : null;
-    }
-
-    @Named("idToPosition")
-    default Position idToPosition(Long positionId) {
-        if (positionId == null) return null;
-        Position position = new Position();
-        position.setId(positionId);
-        return position;
-    }
-
-    @Named("idToMentor")
-    default User idToMentor(Long mentorId) {
-        if (mentorId == null) return null;
-        User mentor = new User();
-        mentor.setId(mentorId);
-        return mentor;
-    }
+    @Mapping(target = "id", source = "userId")
+    @Mapping(target = "positionId", source = "position.id")
+    @Mapping(target = "mentorId", source = "mentor.id")
+    @Mapping(target = "fullName", source = "fullName")
+    @Mapping(target = "idNumber", source = "idNumber")
+    @Mapping(target = "dateOfBirth", source = "dateOfBirth")
+    @Mapping(target = "companyEmail", source = "companyEmail")
+    @Mapping(target = "phoneNumber", source = "phoneNumber")
+    @Mapping(target = "address", source = "address")
+    @Mapping(target = "internshipStartDate", source = "internshipStartDate")
+    @Mapping(target = "internshipEndDate", source = "internshipEndDate")
+    @Mapping(target = "sysStatus", source = "sysStatus")
+    List<UserModel> toResponseList(List<User> userEntity);
 }

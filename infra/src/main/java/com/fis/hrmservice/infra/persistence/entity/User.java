@@ -75,5 +75,6 @@ public class User {
     @Column(name = "address", nullable = false, length = Integer.MAX_VALUE)
     private String address;
 
-
+    @Column(name = "sys_status", length = 50)
+    private String sysStatus;
 }

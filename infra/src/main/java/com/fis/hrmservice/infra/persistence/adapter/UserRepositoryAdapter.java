@@ -2,6 +2,7 @@ package com.fis.hrmservice.infra.persistence.adapter;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.UserRepositoryPort;
+import com.fis.hrmservice.domain.usecase.command.FilterUserCommand;
 import com.fis.hrmservice.infra.mapper.UserMapper;
 import com.fis.hrmservice.infra.persistence.entity.User;
 import com.fis.hrmservice.infra.persistence.repository.PositionJpaRepository;
@@ -54,5 +55,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public List<UserModel> findAll() {
         return List.of();
+    }
+
+    @Override
+    public List<UserModel> filterUser(FilterUserCommand command) {
+        return userMapper.toResponseList(userJpaRepository.findAll());
     }
 }

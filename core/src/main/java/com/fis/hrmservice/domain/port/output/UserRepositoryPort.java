@@ -1,6 +1,7 @@
 package com.fis.hrmservice.domain.port.output;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.usecase.command.FilterUserCommand;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +13,5 @@ public interface UserRepositoryPort {
     boolean existsByEmail(String email);
     boolean existsByIdNumber(String idNumber);
     List<UserModel> findAll();
+    List<UserModel> filterUser(FilterUserCommand command);
 }
