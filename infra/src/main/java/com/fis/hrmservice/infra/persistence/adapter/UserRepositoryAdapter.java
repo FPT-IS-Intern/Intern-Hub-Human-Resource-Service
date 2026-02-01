@@ -9,11 +9,12 @@ import com.fis.hrmservice.infra.persistence.repository.PositionJpaRepository;
 import com.fis.hrmservice.infra.persistence.repository.UserJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Repository
 public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Autowired
@@ -59,6 +60,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public List<UserModel> filterUser(FilterUserCommand command) {
-        return userMapper.toResponseList(userJpaRepository.findAll());
+        return userMapper.toResponseList(userJpaRepository.filterUser(command));
     }
 }

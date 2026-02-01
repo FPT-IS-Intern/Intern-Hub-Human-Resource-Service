@@ -1,25 +1,26 @@
 package com.fis.hrmservice.infra.mapper;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.infra.persistence.entity.Position;
 import com.fis.hrmservice.infra.persistence.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    /* ===================== ENTITY -> MODEL ===================== */
+
     @Mapping(target = "userId", source = "id")
-    @Mapping(target = "positionId", source = "position", qualifiedByName = "positionToId")
-    @Mapping(target = "mentorId", source = "mentor", qualifiedByName = "mentorToId")
+    @Mapping(target = "mentor", qualifiedByName = "mentorToModel")
     UserModel toModel(User entity);
 
+    List<UserModel> toModelList(List<User> entities);
+
+    /* ===================== MODEL -> ENTITY ===================== */
+
     @Mapping(target = "id", source = "userId")
-    @Mapping(target = "position", source = "positionId", qualifiedByName = "idToPosition")
-    @Mapping(target = "mentor", source = "mentorId", qualifiedByName = "idToMentor")
+    @Mapping(target = "mentor", qualifiedByName = "mentorToEntity")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -27,18 +28,28 @@ public interface UserMapper {
     @Mapping(target = "updatedBy", ignore = true)
     User toEntity(UserModel model);
 
+    /* ===================== CUSTOM ===================== */
 
-    @Mapping(target = "id", source = "userId")
-    @Mapping(target = "positionId", source = "position.id")
-    @Mapping(target = "mentorId", source = "mentor.id")
-    @Mapping(target = "fullName", source = "fullName")
-    @Mapping(target = "idNumber", source = "idNumber")
-    @Mapping(target = "dateOfBirth", source = "dateOfBirth")
-    @Mapping(target = "companyEmail", source = "companyEmail")
-    @Mapping(target = "phoneNumber", source = "phoneNumber")
-    @Mapping(target = "address", source = "address")
-    @Mapping(target = "internshipStartDate", source = "internshipStartDate")
-    @Mapping(target = "internshipEndDate", source = "internshipEndDate")
-    @Mapping(target = "sysStatus", source = "sysStatus")
-    List<UserModel> toResponseList(List<User> userEntity);
+    /**
+     * Tránh loop mentor -> mentor -> mentor
+     * Chỉ map ID
+     */
+    @Named("mentorToModel")
+    default UserModel mentorToModel(User mentor) {
+        if (mentor == null) return null;
+        return UserModel.builder()
+                .userId(mentor.getId())
+                .fullName(mentor.getFullName())
+                .build();
+    }
+
+    @Named("mentorToEntity")
+    default User mentorToEntity(UserModel mentor) {
+        if (mentor == null || mentor.getUserId() == null) return null;
+        User user = new User();
+        user.setId(mentor.getUserId());
+        return user;
+    }
+
+    List<UserModel> toResponseList(List<User> users);
 }

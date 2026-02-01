@@ -1,7 +1,7 @@
 package com.fis.hrmservice.domain.model.attendance;
 
-import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
-import com.fis.hrmservice.domain.model.constant.SourceAttendance;
+import com.fis.hrmservice.domain.model.common.BaseDomain;
+import com.fis.hrmservice.domain.model.user.UserModel;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,17 +9,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Attendance {
+public class AttendanceLogModel extends BaseDomain {
+
     Long attendanceId;
-    Long userId;
+    UserModel user;
     LocalDate workDate;
     LocalDateTime checkInTime;
     LocalDateTime checkOutTime;
-    AttendanceStatus attendanceStatus;
-    SourceAttendance source;
-    String status;
+    String attendanceStatus;
+    String source;
 }

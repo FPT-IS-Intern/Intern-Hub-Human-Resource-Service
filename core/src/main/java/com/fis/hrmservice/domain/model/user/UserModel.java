@@ -1,26 +1,33 @@
 package com.fis.hrmservice.domain.model.user;
 
+import com.fis.hrmservice.domain.model.common.BaseDomain;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserModel {
+public class UserModel extends BaseDomain {
+
     Long userId;
-    Long positionId;
-    Long mentorId;
     String fullName;
-    String idNumber;
-    LocalDate dateOfBirth;
     String companyEmail;
     String phoneNumber;
+    String idNumber;
+    LocalDate dateOfBirth;
+
     String address;
+    String sysStatus;
+
     LocalDate internshipStartDate;
     LocalDate internshipEndDate;
-    String status;
+
+    PositionModel position;
+    UserModel mentor;
+
+    String avatarUrl;
+    String cvUrl;
 }

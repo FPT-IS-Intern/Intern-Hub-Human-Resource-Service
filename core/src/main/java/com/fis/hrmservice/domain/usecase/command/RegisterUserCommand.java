@@ -1,15 +1,12 @@
 package com.fis.hrmservice.domain.usecase.command;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-
-@Getter
+@Data
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterUserCommand {
 
     String email;

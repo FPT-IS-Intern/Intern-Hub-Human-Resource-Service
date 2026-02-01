@@ -6,11 +6,12 @@ import com.fis.hrmservice.domain.port.output.PositionRepositoryPort;
 import com.fis.hrmservice.infra.persistence.repository.PositionJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 
-@Component
+@Repository
 public class PositionRepositoryAdapter implements PositionRepositoryPort {
 
     @Autowired
@@ -33,7 +34,6 @@ public class PositionRepositoryAdapter implements PositionRepositoryPort {
                 .positionId(entity.getId())
                 .name(entity.getName())
                 .description(entity.getDescription())
-                .status(entity.getStatus())
                 .build();
     }
 }

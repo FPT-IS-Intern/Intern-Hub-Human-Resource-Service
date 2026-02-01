@@ -1,21 +1,34 @@
+server:
+  port: 8080
+
 security:
-  # Required: Secret for internal service-to-service authentication
   internal-secret: "your-secure-secret-key"
-
-  # Optional: Path prefix for internal endpoints (default: /internal/)
   internal-path-prefix: "/internal/"
-
-  # Optional: Paths to exclude from security processing
   excluded-paths:
-    - "/actuator/"
+    - "/actuator/**"
     - "/health"
 
   snowflake:
     machine-id: 1
-
 
 spring:
   autoconfigure:
     exclude:
       - com.intern.hub.library.common.autoconfig.snowflake.SnowflakeAutoConfiguration
       - com.intern.hub.library.common.autoconfig.context.ContextAutoConfiguration
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hrm_service
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # dev: update | prod: validate
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

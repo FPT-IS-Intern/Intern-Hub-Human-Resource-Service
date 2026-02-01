@@ -1,16 +1,15 @@
 package com.fis.hrmservice.domain.model.ticket;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import com.fis.hrmservice.domain.model.common.BaseDomain;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketTypeModel {
-    Long ticketTypeId;
-    String typeName;
-    String description;
-    String status;
+public class TicketTypeModel extends BaseDomain {
+    private Long ticketTypeId;
+    private String typeName;
+    private String description;
 }

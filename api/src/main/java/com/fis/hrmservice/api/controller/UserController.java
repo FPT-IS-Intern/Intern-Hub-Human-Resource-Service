@@ -2,34 +2,42 @@ package com.fis.hrmservice.api.controller;
 
 import com.fis.hrmservice.api.dto.request.FilterRequest;
 import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
+import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.port.input.FilterUserUseCase;
 import com.fis.hrmservice.domain.port.input.RegisterUserUseCase;
+import com.fis.hrmservice.domain.usecase.command.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.RegisterUserCommand;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
-import com.intern.hub.starter.security.annotation.EnableSecurity;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@EnableSecurity
-@RequiredArgsConstructor
 @EnableGlobalExceptionHandler
 @Slf4j
 @Tag(name = "User Management", description = "APIs for user registration and management")
 public class UserController {
 
     private final RegisterUserUseCase registerUserUseCase;
+    private final FilterUserUseCase filterUserUseCase;
     private final UserApiMapper userApiMapper;
+
+    public UserController(RegisterUserUseCase registerUserUseCase, FilterUserUseCase filterUserUseCase, UserApiMapper userApiMapper) {
+        this.registerUserUseCase = registerUserUseCase;
+        this.filterUserUseCase = filterUserUseCase;
+        this.userApiMapper = userApiMapper;
+    }
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseApi<?> registerUser(
@@ -69,9 +77,11 @@ public class UserController {
     }
 
     @GetMapping("/filter")
-    public ResponseApi<?> filterUsers(
+    public ResponseApi<List<FilterResponse>> filterUsers(
             @RequestBody FilterRequest request
             ){
-        return ResponseApi.ok(null);
+        FilterUserCommand filterUserCommand = userApiMapper.toCommand(request);
+        List<UserModel> userModelList = filterUserUseCase.filterUsers(filterUserCommand);
+        return ResponseApi.ok(userApiMapper.toFilterResponseList(userModelList));
     }
 }

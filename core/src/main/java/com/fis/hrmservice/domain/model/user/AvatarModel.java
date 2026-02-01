@@ -1,21 +1,19 @@
 package com.fis.hrmservice.domain.model.user;
 
-import lombok.AllArgsConstructor;
+import com.fis.hrmservice.domain.model.common.BaseDomain;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class AvatarModel {
+public class AvatarModel extends BaseDomain {
     Long avatarId;
-    Long userId;
+    UserModel user;
     String avatarUrl;
     String fileType;
-    String fileSize;
-    String avatarFileName;
+    Long fileSize;
+    String fileName;
+    String status;
 }

@@ -75,11 +75,11 @@ subprojects {
         //common lib
         implementation("com.github.FPT-IS-Intern:Intern-Hub-Common-Library:2.0.2")
 
-        //Security Starter Library
-        implementation("com.github.FPT-IS-Intern:Intern-Hub-Security-Starter:1.0.0")
-
         // Source: https://mvnrepository.com/artifact/org.springframework/spring-web
         implementation("org.springframework:spring-web:7.0.3")
+
+        // Update Security Starter Library to 1.0.1
+        implementation("org.springframework.boot:spring-boot-starter-security:3.2.2")
     }
 
     configure<SpotlessExtension> {

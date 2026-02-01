@@ -19,7 +19,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-
     Long userId;
     String fullName;
     String email;

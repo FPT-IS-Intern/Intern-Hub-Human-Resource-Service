@@ -1,18 +1,17 @@
 package com.fis.hrmservice.domain.model.user;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import com.fis.hrmservice.domain.model.common.BaseDomain;
+import lombok.Builder;
+import lombok.Data;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class CvModel {
+@Data
+public class CvModel extends BaseDomain {
     Long cvId;
-    Long userId;
+    UserModel user;
     String cvUrl;
     String fileType;
+    Long fileSize;
     String fileName;
-    String cvFileName;
+    String status;
 }

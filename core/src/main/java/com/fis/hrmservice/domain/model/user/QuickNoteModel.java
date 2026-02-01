@@ -6,13 +6,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class PositionModel extends BaseDomain {
-    Long positionId;
-    String name;
-    String description;
-    String type;
+public class QuickNoteModel extends BaseDomain {
+
+    private Long id;
+    private UserModel intern;
+    private UserModel writer;
+
+    private String content;
+    private LocalDateTime writeDate;
+    private Boolean isDeleted;
 }

@@ -1,5 +1,4 @@
-package com.fis.hrmservice.domain.model.ticket;
-
+package com.fis.hrmservice.domain.model.feedback;
 
 import com.fis.hrmservice.domain.model.common.BaseDomain;
 import com.fis.hrmservice.domain.model.user.UserModel;
@@ -9,17 +8,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketApprovalModel extends BaseDomain {
-    Long approvalId;
-    TicketModel ticket;
-    UserModel approver;
-    String action;
-    String comment;
-    LocalDate actionAt;
+public class FeedbackModel extends BaseDomain {
+
+    private Long feedbackId;
+    private FeedbackTypeModel feedbackType;
+    private String title;
+    private String content;
+    private UserModel creator;
 }
