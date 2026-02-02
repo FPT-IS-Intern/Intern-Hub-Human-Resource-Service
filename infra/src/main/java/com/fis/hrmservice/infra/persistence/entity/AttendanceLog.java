@@ -25,10 +25,10 @@ public class AttendanceLog {
     private LocalDate workDate;
 
     @Column(name = "check_in_time")
-    private Instant checkInTime;
+    private Long checkInTime;
 
     @Column(name = "check_out_time")
-    private Instant checkOutTime;
+    private Long checkOutTime;
 
     @Size(max = 20)
     @Column(name = "attendance_status", length = 20)

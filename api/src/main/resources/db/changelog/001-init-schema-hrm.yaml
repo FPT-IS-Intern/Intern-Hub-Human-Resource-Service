@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 001-init-schema-lms
+      id: 001-init-schema-hrm
       author: gwuy
       changes:
         - sql:

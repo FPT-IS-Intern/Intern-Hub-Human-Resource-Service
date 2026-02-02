@@ -34,7 +34,7 @@ public class User {
     private String idNumber;
 
     @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    private Long dateOfBirth;
 
     @Size(max = 100)
     @Column(name = "company_email", length = 100)
