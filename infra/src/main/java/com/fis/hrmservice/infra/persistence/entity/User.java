@@ -47,10 +47,6 @@ public class User extends AuditEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
     @Column(name = "created_at")
     private Long createdAt;
 

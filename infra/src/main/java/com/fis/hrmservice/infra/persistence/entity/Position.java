@@ -27,10 +27,6 @@ public class Position extends AuditEntity {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
     @Column(name = "created_at")
     private Long createdAt;
 

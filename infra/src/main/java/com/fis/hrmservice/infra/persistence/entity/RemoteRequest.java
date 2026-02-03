@@ -31,5 +31,16 @@ public class RemoteRequest extends AuditEntity {
     @Column(name = "end_time")
     private long endTime;
 
+    @Column(name = "created_at")
+    private Long createdAt;
+
+    @Column(name = "updated_at")
+    private Long updatedAt;
+
+    @Column(name = "created_by")
+    private Long createdBy;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
 
 }

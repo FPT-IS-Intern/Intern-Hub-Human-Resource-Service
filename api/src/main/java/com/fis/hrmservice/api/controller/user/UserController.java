@@ -1,4 +1,4 @@
-package com.fis.hrmservice.api.controller;
+package com.fis.hrmservice.api.controller.user;
 
 import com.fis.hrmservice.api.dto.request.FilterRequest;
 import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
@@ -6,13 +6,12 @@ import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
 import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.input.*;
+import com.fis.hrmservice.domain.port.input.user.*;
 import com.fis.hrmservice.domain.usecase.command.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.RegisterUserCommand;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

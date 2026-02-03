@@ -3,13 +3,11 @@ package com.fis.hrmservice.domain.usecase.implement;
 import com.fis.hrmservice.common.utils.UpdateHelper;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.input.UserProfileUseCase;
+import com.fis.hrmservice.domain.port.input.user.UserProfileUseCase;
 import com.fis.hrmservice.domain.port.output.UserRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.UpdateUserProfileCommand;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
-import com.intern.hub.starter.security.context.AuthContext;
-import com.intern.hub.starter.security.context.AuthContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +32,7 @@ public class UserProfileUseCaseImpl implements UserProfileUseCase {
     public UserModel updateProfileUser(UpdateUserProfileCommand command, long userId) {
 
         /*
-            TODO: khi nào bên auth làm xong mới dùng được
+            TODO: khi nào api gateway làm xong mới dùng được
          */
 
 //        AuthContext context = AuthContextHolder.get()

@@ -38,10 +38,6 @@ public class AttendanceLog extends AuditEntity {
     @Column(name = "source", length = 50)
     private String source;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
     @JoinColumn(name = "created_by")
     private Long createdBy;
 

@@ -31,10 +31,6 @@ public class AnonymousFeedback extends AuditEntity {
     @JoinColumn(name = "creator")
     private User creator;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
     @Column(name = "content", length = Integer.MAX_VALUE)
     private String content;
 

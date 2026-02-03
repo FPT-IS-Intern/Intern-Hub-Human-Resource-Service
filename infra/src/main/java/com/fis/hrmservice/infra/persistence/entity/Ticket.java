@@ -37,15 +37,16 @@ public class Ticket extends AuditEntity {
     @Column(name = "reason", length = Integer.MAX_VALUE)
     private String reason;
 
-    @Size(max = 20)
-    @Column(name = "status", length = 20)
-    private String status;
-
     @Column(name = "created_at")
     private Long createdAt;
 
     @Column(name = "updated_at")
     private Long updatedAt;
 
+    @Column(name = "created_by")
+    private Long createdBy;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
 
 }

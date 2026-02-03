@@ -2,7 +2,7 @@ package com.fis.hrmservice.domain.usecase.implement;
 
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.input.ApprovalUser;
+import com.fis.hrmservice.domain.port.input.user.ApprovalUser;
 import com.fis.hrmservice.domain.port.output.UserRepositoryPort;
 import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;

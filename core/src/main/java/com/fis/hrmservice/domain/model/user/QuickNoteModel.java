@@ -14,11 +14,10 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class QuickNoteModel extends BaseDomain {
 
-    private long id;
+    private Long id;
     private UserModel intern;
     private UserModel writer;
 
     private String content;
-    private long writeDate;
-    private Boolean isDeleted;
+    private LocalDateTime writeDate;
 }

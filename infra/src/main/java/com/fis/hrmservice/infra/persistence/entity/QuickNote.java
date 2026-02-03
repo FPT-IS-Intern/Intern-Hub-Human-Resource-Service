@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +17,6 @@ import java.time.Instant;
 @Table(name = "quick_notes", schema = "schema_hrm")
 public class QuickNote extends AuditEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
@@ -36,7 +36,7 @@ public class QuickNote extends AuditEntity {
 
     @NotNull
     @Column(name = "write_date", nullable = false)
-    private Instant writeDate;
+    private LocalDateTime writeDate;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
@@ -45,10 +45,6 @@ public class QuickNote extends AuditEntity {
     @Column(name = "updated_at")
     private Long updatedAt;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
     @Size(max = 255)
     @Column(name = "created_by")
     private Long createdBy;
@@ -56,10 +52,6 @@ public class QuickNote extends AuditEntity {
     @Size(max = 255)
     @Column(name = "updated_by")
     private Long updatedBy;
-
-    @ColumnDefault("false")
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
 
 
 }

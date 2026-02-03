@@ -45,9 +45,4 @@ public class FeedbackMessage extends AuditEntity {
     @Column(name = "updated_at")
     private Long updatedAt;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
-
 }

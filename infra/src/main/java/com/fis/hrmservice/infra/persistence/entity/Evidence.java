@@ -40,10 +40,6 @@ public class Evidence extends AuditEntity {
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
     @Column(name = "created_at")
     private Long createdAt;
 

@@ -36,9 +36,4 @@ public class Cv extends AuditEntity {
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
-
 }
