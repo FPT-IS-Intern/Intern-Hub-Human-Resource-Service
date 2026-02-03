@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "feedback_messages", schema = "schema_hrm")
-public class FeedbackMessage {
+public class FeedbackMessage extends AuditEntity {
     @Id
     @Column(name = "message_id", nullable = false)
     private Long id;
@@ -39,13 +40,10 @@ public class FeedbackMessage {
     private String message;
 
     @Column(name = "created_at")
-    private long createdAt;
+    private Long createdAt;
 
     @Column(name = "updated_at")
-    private long updatedAt;
-
-    @Column(name = "version")
-    private Integer version;
+    private Long updatedAt;
 
     @Size(max = 50)
     @Column(name = "status", length = 50)

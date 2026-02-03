@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "attendance_logs", schema = "schema_hrm")
-public class AttendanceLog {
+public class AttendanceLog extends AuditEntity {
     @Id
     @Column(name = "attendance_id", nullable = false)
     private Long id;
@@ -37,12 +38,20 @@ public class AttendanceLog {
     @Column(name = "source", length = 50)
     private String source;
 
-    @Column(name = "version")
-    private Integer version;
-
     @Size(max = 50)
     @Column(name = "status", length = 50)
     private String status;
 
+    @JoinColumn(name = "created_by")
+    private Long createdBy;
+
+    @JoinColumn(name = "updated_by")
+    private Long updatedBy;
+
+    @Column(name = "created_at")
+    private Long createdAt;
+
+    @Column(name = "updated_at")
+    private Long updatedAt;
 
 }

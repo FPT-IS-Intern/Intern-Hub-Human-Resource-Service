@@ -1,15 +1,16 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "evidences", schema = "schema_hrm")
-public class Evidence {
+public class Evidence extends AuditEntity {
     @Id
     @Column(name = "evidence_id", nullable = false)
     private Long id;
@@ -29,25 +30,21 @@ public class Evidence {
     private long uploadedAt;
 
     @Column(name = "updated_at")
-    private long updatedAt;
-
-    @Column(name = "version")
-    private Integer version;
+    private Long updatedAt;
 
     @Size(max = 255)
     @Column(name = "created_by")
-    private String createdBy;
+    private Long createdBy;
 
     @Size(max = 255)
     @Column(name = "updated_by")
-    private String updatedBy;
+    private Long updatedBy;
 
     @Size(max = 50)
     @Column(name = "status", length = 50)
     private String status;
 
-    @Column(name = "create_at")
-    private long createAt;
-
+    @Column(name = "created_at")
+    private Long createdAt;
 
 }

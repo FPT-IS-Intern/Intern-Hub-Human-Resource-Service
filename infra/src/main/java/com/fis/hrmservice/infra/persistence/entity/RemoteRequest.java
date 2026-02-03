@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "remote_requests", schema = "schema_hrm")
-public class RemoteRequest {
+public class RemoteRequest extends AuditEntity {
     @Id
     @Column(name = "ticket_id", nullable = false)
     private Long id;

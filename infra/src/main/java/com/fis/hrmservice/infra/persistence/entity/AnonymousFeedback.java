@@ -31,6 +31,17 @@ public class AnonymousFeedback extends AuditEntity {
     @JoinColumn(name = "creator")
     private User creator;
 
+    @Size(max = 50)
+    @Column(name = "status", length = 50)
+    private String status;
+
+    @Column(name = "content", length = Integer.MAX_VALUE)
+    private String content;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    private User sender;
+
     @JoinColumn(name = "created_by")
     private Long createdBy;
 
@@ -42,18 +53,4 @@ public class AnonymousFeedback extends AuditEntity {
 
     @Column(name = "updated_at")
     private Long updatedAt;
-
-    @Column(name = "version")
-    private Integer version;
-
-    @Size(max = 50)
-    @Column(name = "status", length = 50)
-    private String status;
-
-    @Column(name = "content", length = Integer.MAX_VALUE)
-    private String content;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private User sender;
 }

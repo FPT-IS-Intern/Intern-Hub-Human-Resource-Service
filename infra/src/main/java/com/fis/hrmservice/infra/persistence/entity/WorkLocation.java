@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "work_locations", schema = "schema_hrm")
-public class WorkLocation {
+public class WorkLocation extends AuditEntity {
     @Id
     @Column(name = "work_location_id", nullable = false)
     private Long id;
@@ -32,21 +33,18 @@ public class WorkLocation {
     private Boolean isActive;
 
     @Column(name = "created_at")
-    private long createdAt;
+    private Long createdAt;
 
     @Column(name = "updated_at")
-    private long updatedAt;
-
-    @Column(name = "version")
-    private Integer version;
+    private Long updatedAt;
 
     @Size(max = 255)
     @Column(name = "created_by")
-    private String createdBy;
+    private Long createdBy;
 
     @Size(max = 255)
     @Column(name = "updated_by")
-    private String updatedBy;
+    private Long updatedBy;
 
     @Size(max = 50)
     @Column(name = "status", length = 50)

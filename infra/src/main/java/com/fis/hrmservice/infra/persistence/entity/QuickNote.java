@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,7 +14,7 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name = "quick_notes", schema = "schema_hrm")
-public class QuickNote {
+public class QuickNote extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -38,27 +39,23 @@ public class QuickNote {
     private Instant writeDate;
 
     @NotNull
-    @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private Long createdAt;
 
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Long updatedAt;
 
     @Size(max = 50)
     @Column(name = "status", length = 50)
     private String status;
 
-    @Column(name = "version")
-    private Integer version;
-
     @Size(max = 255)
     @Column(name = "created_by")
-    private String createdBy;
+    private Long createdBy;
 
     @Size(max = 255)
     @Column(name = "updated_by")
-    private String updatedBy;
+    private Long updatedBy;
 
     @ColumnDefault("false")
     @Column(name = "is_deleted")

@@ -22,21 +22,18 @@ public class Avatar {
     private String avatarUrl;
 
     @Column(name = "created_at")
-    private long createdAt;
+    private Long createdAt;
 
     @Column(name = "updated_at")
-    private long updatedAt;
+    private Long updatedAt;
 
     @Size(max = 255)
     @Column(name = "created_by")
-    private String createdBy;
+    private Long createdBy;
 
     @Size(max = 255)
     @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "version")
-    private Integer version;
+    private Long updatedBy;
 
     @Size(max = 50)
     @Column(name = "status", length = 50)
