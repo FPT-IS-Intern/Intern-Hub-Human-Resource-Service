@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SnowflakeConfig {
 
-    @Bean
-    public Snowflake snowflake() {
-        return new Snowflake(1L);
-    }
+  @Bean
+  public Snowflake snowflake() {
+    return new Snowflake(1L);
+  }
 }

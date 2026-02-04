@@ -7,6 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface QuickNoteApiMapper {
 
-    QuickNoteCommand toCommand(CreateQuickNoteRequest request);
-
+  QuickNoteCommand toCommand(CreateQuickNoteRequest request);
 }

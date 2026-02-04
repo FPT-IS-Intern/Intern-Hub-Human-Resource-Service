@@ -19,55 +19,56 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 
-    private final UserRepositoryPort userRepository;
-    private final PositionRepositoryPort positionRepository;
-    private final Snowflake snowflake;
-    private final UserValidationService validationService;
+  private final UserRepositoryPort userRepository;
+  private final PositionRepositoryPort positionRepository;
+  private final Snowflake snowflake;
+  private final UserValidationService validationService;
 
-    @Override
-    public UserModel registerUser(RegisterUserCommand command) {
+  @Override
+  public UserModel registerUser(RegisterUserCommand command) {
 
-        validationService.validateRegistration(command);
-        checkForDuplicates(command);
-        PositionModel position = positionRepository
-                .findByCode(command.getPositionCode())
-                .orElseThrow(() -> new ConflictDataException("Position không tồn tại"));
-        log.debug("Position found: {}", position);
-        UserModel user = buildUserModel(command, position);
+    validationService.validateRegistration(command);
+    checkForDuplicates(command);
+    PositionModel position =
+        positionRepository
+            .findByCode(command.getPositionCode())
+            .orElseThrow(() -> new ConflictDataException("Position không tồn tại"));
+    log.debug("Position found: {}", position);
+    UserModel user = buildUserModel(command, position);
 
-        return userRepository.save(user);
+    return userRepository.save(user);
+  }
+
+  private void checkForDuplicates(RegisterUserCommand command) {
+    if (userRepository.existsByEmail(command.getEmail())) {
+      throw new ConflictDataException("Email đã tồn tại");
     }
 
-    private void checkForDuplicates(RegisterUserCommand command) {
-        if (userRepository.existsByEmail(command.getEmail())) {
-            throw new ConflictDataException("Email đã tồn tại");
-        }
+    if (userRepository.existsByIdNumber(command.getIdNumber())) {
+      throw new ConflictDataException("Id user đã bị trùng");
+    }
+  }
 
-        if (userRepository.existsByIdNumber(command.getIdNumber())) {
-            throw new ConflictDataException("Id user đã bị trùng");
-        }
+  private UserModel buildUserModel(RegisterUserCommand command, PositionModel position) {
+
+    UserModel.UserModelBuilder builder =
+        UserModel.builder()
+            .userId(snowflake.next())
+            .position(position)
+            .fullName(command.getFullName())
+            .idNumber(command.getIdNumber())
+            .dateOfBirth(command.getBirthDate())
+            .companyEmail(command.getEmail())
+            .phoneNumber(command.getPhoneNumber())
+            .address(command.getAddress())
+            .sysStatus(UserStatus.PENDING);
+
+    if (command.isInternRegistration()) {
+      builder
+          .internshipStartDate(command.getInternshipStartDate())
+          .internshipEndDate(command.getInternshipEndDate());
     }
 
-    private UserModel buildUserModel(RegisterUserCommand command, PositionModel position) {
-
-        UserModel.UserModelBuilder builder = UserModel.builder()
-                .userId(snowflake.next())
-                .position(position)
-                .fullName(command.getFullName())
-                .idNumber(command.getIdNumber())
-                .dateOfBirth(command.getBirthDate())
-                .companyEmail(command.getEmail())
-                .phoneNumber(command.getPhoneNumber())
-                .address(command.getAddress())
-                .sysStatus(UserStatus.PENDING);
-
-        if (command.isInternRegistration()) {
-            builder
-                    .internshipStartDate(command.getInternshipStartDate())
-                    .internshipEndDate(command.getInternshipEndDate());
-        }
-
-        return builder.build();
-    }
-
+    return builder.build();
+  }
 }

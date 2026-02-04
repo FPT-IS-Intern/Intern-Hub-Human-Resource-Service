@@ -19,9 +19,9 @@ snowflake:
 spring:
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/hrm_service
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://100.92.147.62:5432/ih_hrm?currentSchema=ih_hrm
+    username: ih_hrm
+    password: 123qwe!@#4
     driver-class-name: org.postgresql.Driver
 
   jpa:

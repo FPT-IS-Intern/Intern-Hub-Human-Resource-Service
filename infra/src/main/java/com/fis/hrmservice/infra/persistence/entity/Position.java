@@ -16,30 +16,28 @@ import lombok.*;
 @Entity
 @Table(name = "positions", schema = "schema_hrm")
 public class Position extends AuditEntity {
-    @Id
-    @Column(name = "position_id", nullable = false)
-    private Long id;
+  @Id
+  @Column(name = "position_id", nullable = false)
+  private Long id;
 
-    @Size(max = 10)
-    @Column(name = "name", length = 10)
-    private String name;
+  @Size(max = 10)
+  @Column(name = "name", length = 10)
+  private String name;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
+  @Column(name = "description", length = Integer.MAX_VALUE)
+  private String description;
 
-    @Column(name = "created_at")
-    private Long createdAt;
+  @Column(name = "created_at")
+  private Long createdAt;
 
-    @Column(name = "updated_at")
-    private Long updatedAt;
+  @Column(name = "updated_at")
+  private Long updatedAt;
 
-    @Size(max = 255)
-    @Column(name = "created_by")
-    private Long createdBy;
+  @Size(max = 255)
+  @Column(name = "created_by")
+  private Long createdBy;
 
-    @Size(max = 255)
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-
+  @Size(max = 255)
+  @Column(name = "updated_by")
+  private Long updatedBy;
 }

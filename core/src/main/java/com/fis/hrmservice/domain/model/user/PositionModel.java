@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class PositionModel extends BaseDomain {
-    Long positionId;
-    String name;
-    String description;
-    String type;
+  Long positionId;
+  String name;
+  String description;
+  String type;
 }

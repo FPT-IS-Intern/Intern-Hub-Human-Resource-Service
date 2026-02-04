@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LeaveRequestModel extends BaseDomain {
-    private TicketModel ticket;
-    private LeaveTypeModel leaveType;
-    private Integer totalDays;
+  private TicketModel ticket;
+  private Integer totalDays;
 }

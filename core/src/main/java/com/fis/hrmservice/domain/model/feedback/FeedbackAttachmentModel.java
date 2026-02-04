@@ -8,12 +8,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Data
 public class FeedbackAttachmentModel extends BaseDomain {
-    long attachmentId;
-    FeedbackMessageModel feedbackMessage;
-    UserModel uploader;
-    AnonymousFeedBackModel feedback;
-    String fileName;
-    String fileUrl;
-    String fileType;
-    long fileSize;
+  long attachmentId;
+  FeedbackMessageModel feedbackMessage;
+  UserModel uploader;
+  AnonymousFeedBackModel feedback;
+  String fileName;
+  String fileUrl;
+  String fileType;
+  long fileSize;
 }

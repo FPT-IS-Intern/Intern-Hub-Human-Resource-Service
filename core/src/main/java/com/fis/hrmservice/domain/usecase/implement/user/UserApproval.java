@@ -12,16 +12,18 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserApproval implements ApprovalUser {
 
-    private final UserRepositoryPort userRepositoryPort;
+  private final UserRepositoryPort userRepositoryPort;
 
-    @Override
-    public UserModel approveUser(Long userId) {
-        UserModel userModel = userRepositoryPort.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+  @Override
+  public UserModel approveUser(Long userId) {
+    UserModel userModel =
+        userRepositoryPort
+            .findById(userId)
+            .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
 
-        userModel.setSysStatus(UserStatus.APPROVED);
-        userRepositoryPort.save(userModel);
+    userModel.setSysStatus(UserStatus.APPROVED);
+    userRepositoryPort.save(userModel);
 
-        return userModel;
-    }
+    return userModel;
+  }
 }

@@ -19,15 +19,13 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Quick note Management", description = "APIs for Quick note")
 public class QuickNoteController {
 
-    private final QuickNoteUserUseCase quickNoteUserUseCase;
-    private final QuickNoteApiMapper quickNoteApiMapper;
+  private final QuickNoteUserUseCase quickNoteUserUseCase;
+  private final QuickNoteApiMapper quickNoteApiMapper;
 
-    @PostMapping("/{userId}")
-    public ResponseApi<?> createTicket(
-            @RequestBody CreateQuickNoteRequest request,
-            @PathVariable("userId") Long userId
-    ) {
-        QuickNoteCommand command = quickNoteApiMapper.toCommand(request);
-        return ResponseApi.ok(quickNoteUserUseCase.createQuickNote(command, userId));
-    }
+  @PostMapping("/{userId}")
+  public ResponseApi<?> createTicket(
+      @RequestBody CreateQuickNoteRequest request, @PathVariable("userId") Long userId) {
+    QuickNoteCommand command = quickNoteApiMapper.toCommand(request);
+    return ResponseApi.ok(quickNoteUserUseCase.createQuickNote(command, userId));
+  }
 }

@@ -14,37 +14,35 @@ import lombok.Setter;
 @Entity
 @Table(name = "work_locations", schema = "schema_hrm")
 public class WorkLocation extends AuditEntity {
-    @Id
-    @Column(name = "work_location_id", nullable = false)
-    private Long id;
+  @Id
+  @Column(name = "work_location_id", nullable = false)
+  private Long id;
 
-    @Size(max = 255)
-    @Column(name = "name")
-    private String name;
+  @Size(max = 255)
+  @Column(name = "name")
+  private String name;
 
-    @Size(max = 255)
-    @Column(name = "address")
-    private String address;
+  @Size(max = 255)
+  @Column(name = "address")
+  private String address;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
+  @Column(name = "description", length = Integer.MAX_VALUE)
+  private String description;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+  @Column(name = "is_active")
+  private Boolean isActive;
 
-    @Column(name = "created_at")
-    private Long createdAt;
+  @Column(name = "created_at")
+  private Long createdAt;
 
-    @Column(name = "updated_at")
-    private Long updatedAt;
+  @Column(name = "updated_at")
+  private Long updatedAt;
 
-    @Size(max = 255)
-    @Column(name = "created_by")
-    private Long createdBy;
+  @Size(max = 255)
+  @Column(name = "created_by")
+  private Long createdBy;
 
-    @Size(max = 255)
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-
+  @Size(max = 255)
+  @Column(name = "updated_by")
+  private Long updatedBy;
 }

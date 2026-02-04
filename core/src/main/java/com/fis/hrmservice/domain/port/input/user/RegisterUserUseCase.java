@@ -4,5 +4,5 @@ import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 
 public interface RegisterUserUseCase {
-    UserModel registerUser(RegisterUserCommand command);
+  UserModel registerUser(RegisterUserCommand command);
 }

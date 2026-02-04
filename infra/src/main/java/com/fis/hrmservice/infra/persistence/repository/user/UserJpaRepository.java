@@ -2,26 +2,26 @@ package com.fis.hrmservice.infra.persistence.repository.user;
 
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.infra.persistence.entity.User;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 public interface UserJpaRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByCompanyEmail(String companyEmail);
+  Optional<User> findByCompanyEmail(String companyEmail);
 
-    boolean existsByCompanyEmail(String companyEmail);
+  boolean existsByCompanyEmail(String companyEmail);
 
-    boolean existsByIdNumber(String idNumber);
+  boolean existsByIdNumber(String idNumber);
 
-    User findMentorById(Long id);
+  User findMentorById(Long id);
 
-    @Query("""
+  @Query(
+      """
         SELECT u FROM User u
         WHERE
             (
@@ -38,5 +38,5 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
                 OR u.position.name IN :#{#command.positions}
             )
     """)
-    List<User> filterUser(@Param("command") FilterUserCommand command);
+  List<User> filterUser(@Param("command") FilterUserCommand command);
 }

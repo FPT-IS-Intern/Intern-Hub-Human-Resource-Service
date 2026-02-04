@@ -2,10 +2,9 @@ package com.fis.hrmservice.domain.model.user;
 
 import com.fis.hrmservice.domain.model.common.BaseDomain;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
+import java.time.LocalDate;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -13,22 +12,22 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserModel extends BaseDomain {
 
-    Long userId;
-    String fullName;
-    String companyEmail;
-    String phoneNumber;
-    String idNumber;
-    LocalDate dateOfBirth;
+  Long userId;
+  String fullName;
+  String companyEmail;
+  String phoneNumber;
+  String idNumber;
+  LocalDate dateOfBirth;
 
-    String address;
-    UserStatus sysStatus;
+  String address;
+  UserStatus sysStatus;
 
-    LocalDate internshipStartDate;
-    LocalDate internshipEndDate;
+  LocalDate internshipStartDate;
+  LocalDate internshipEndDate;
 
-    PositionModel position;
-    UserModel mentor;
+  PositionModel position;
+  UserModel mentor;
 
-    String avatarUrl;
-    String cvUrl;
+  String avatarUrl;
+  String cvUrl;
 }

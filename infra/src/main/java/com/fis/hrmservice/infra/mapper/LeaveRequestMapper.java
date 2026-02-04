@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface LeaveRequestMapper {
 
-    LeaveRequestModel toModel(LeaveRequest leaveRequest);
+  LeaveRequestModel toModel(LeaveRequest leaveRequest);
 
-    LeaveRequest toEntity(LeaveRequestModel leaveRequestModel);
+  LeaveRequest toEntity(LeaveRequestModel leaveRequestModel);
 }

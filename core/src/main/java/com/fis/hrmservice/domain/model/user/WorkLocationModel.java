@@ -12,9 +12,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WorkLocationModel extends BaseDomain {
-    Long workLocationId;
-    String name;
-    String address;
-    String description;
-    Boolean isActive;
+  Long workLocationId;
+  String name;
+  String address;
+  String description;
+  Boolean isActive;
 }

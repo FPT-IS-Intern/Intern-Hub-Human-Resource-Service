@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TicketTypeModel extends BaseDomain {
-    Long ticketTypeId;
-    TicketType typeName;
-    String description;
+  Long ticketTypeId;
+  TicketType typeName;
+  String description;
 }

@@ -8,45 +8,45 @@ import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.quicknote.QuickNoteCommand;
 import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.library.common.utils.Snowflake;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Component
 public class QuickNoteUseCaseImpl implements QuickNoteUserUseCase {
 
-    private final QuickNoteRepositoryPort quickNoteRepositoryPort;
-    private final Snowflake snowflake;
-    private final UserRepositoryPort userRepositoryPort;
+  private final QuickNoteRepositoryPort quickNoteRepositoryPort;
+  private final Snowflake snowflake;
+  private final UserRepositoryPort userRepositoryPort;
 
-    @Override
-    public QuickNoteModel createQuickNote(QuickNoteCommand command, Long userId) {
+  @Override
+  public QuickNoteModel createQuickNote(QuickNoteCommand command, Long userId) {
 
-        //TODO: đợi ong api gateway xong thì mở lại
-//        AuthContext authContext = AuthContextHolder.get()
-//                .orElseThrow(() -> new NotFoundException("Not authenticated"));
-//
-//        Long writerId = authContext.userId();
-//
-//        UserModel writer = userRepositoryPort.findById(writerId).orElseThrow();
+    // TODO: đợi ong api gateway xong thì mở lại
+    //        AuthContext authContext = AuthContextHolder.get()
+    //                .orElseThrow(() -> new NotFoundException("Not authenticated"));
+    //
+    //        Long writerId = authContext.userId();
+    //
+    //        UserModel writer = userRepositoryPort.findById(writerId).orElseThrow();
 
-        UserModel userNoted = userRepositoryPort.findById(userId).orElseThrow();
+    UserModel userNoted = userRepositoryPort.findById(userId).orElseThrow();
 
-        if (userNoted == null) {
-            throw new NotFoundException("User not found");
-        }
-
-        QuickNoteModel quickNoteModel = QuickNoteModel.builder()
-                .id(snowflake.next())
-                .intern(userNoted)
-//                .writer(writer)   TODO: đợi api gateway xong thì mở lại
-                .writer(null)   //TODO: đợi api gateway xong thì xoá đi
-                .content(command.getContent())
-                .writeDate(LocalDateTime.now())
-                .build();
-
-        return quickNoteRepositoryPort.save(quickNoteModel);
+    if (userNoted == null) {
+      throw new NotFoundException("User not found");
     }
+
+    QuickNoteModel quickNoteModel =
+        QuickNoteModel.builder()
+            .id(snowflake.next())
+            .intern(userNoted)
+            //                .writer(writer)   TODO: đợi api gateway xong thì mở lại
+            .writer(null) // TODO: đợi api gateway xong thì xoá đi
+            .content(command.getContent())
+            .writeDate(LocalDateTime.now())
+            .build();
+
+    return quickNoteRepositoryPort.save(quickNoteModel);
+  }
 }

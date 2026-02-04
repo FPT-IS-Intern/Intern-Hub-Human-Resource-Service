@@ -11,16 +11,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ExplanationRepositoryAdapter implements TicketRepositoryPort {
 
-    @Autowired
-    private TicketRepository ticketRepository;
+  @Autowired private TicketRepository ticketRepository;
 
-    @Autowired
-    private TicketMapper ticketMapper;
+  @Autowired private TicketMapper ticketMapper;
 
-    @Override
-    public TicketModel save(TicketModel ticket) {
-        Ticket ticketEntity = ticketMapper.toEntity(ticket);
-        ticketRepository.save(ticketEntity);
-        return ticketMapper.toModel(ticketEntity);
-    }
+  @Override
+  public TicketModel save(TicketModel ticket) {
+    Ticket ticketEntity = ticketMapper.toEntity(ticket);
+    ticketRepository.save(ticketEntity);
+    return ticketMapper.toModel(ticketEntity);
+  }
+
+  @Override
+  public TicketModel findById(Long ticketId) {
+    return ticketMapper.toModel(ticketRepository.findById(ticketId).get());
+  }
 }

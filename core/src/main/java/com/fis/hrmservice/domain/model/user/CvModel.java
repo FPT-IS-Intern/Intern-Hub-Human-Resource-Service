@@ -7,11 +7,11 @@ import lombok.Data;
 @Builder
 @Data
 public class CvModel extends BaseDomain {
-    long cvId;
-    UserModel user;
-    String cvUrl;
-    String fileType;
-    long fileSize;
-    String fileName;
-    String status;
+  long cvId;
+  UserModel user;
+  String cvUrl;
+  String fileType;
+  long fileSize;
+  String fileName;
+  String status;
 }

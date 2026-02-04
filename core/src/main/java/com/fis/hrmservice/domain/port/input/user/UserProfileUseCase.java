@@ -4,6 +4,7 @@ import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 
 public interface UserProfileUseCase {
-    UserModel getUserProfile(Long userId);
-    UserModel updateProfileUser(UpdateUserProfileCommand command, long userId);
+  UserModel getUserProfile(Long userId);
+
+  UserModel updateProfileUser(UpdateUserProfileCommand command, long userId);
 }

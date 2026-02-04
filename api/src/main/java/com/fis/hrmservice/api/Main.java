@@ -7,16 +7,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(
-        scanBasePackages = "com.fis.hrmservice"
-)
+@SpringBootApplication(scanBasePackages = "com.fis.hrmservice")
 @EnableJpaRepositories(basePackages = "com.fis.hrmservice.infra.persistence.repository")
 @EntityScan(basePackages = "com.fis.hrmservice.infra.persistence.entity")
 @EnableGlobalExceptionHandler
 @EnableSecurity
 public class Main {
 
-    static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-    }
+  static void main(String[] args) {
+    SpringApplication.run(Main.class, args);
+  }
 }

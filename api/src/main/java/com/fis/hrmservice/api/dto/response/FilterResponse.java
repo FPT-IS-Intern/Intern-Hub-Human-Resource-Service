@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 @Builder
 public class FilterResponse {
-    Integer no;
-    String avatarUrl;
-    String fullName;
-    String sysStatus;
-    String email;
-    String role;
-    String position;
+  Integer no;
+  String avatarUrl;
+  String fullName;
+  String sysStatus;
+  String email;
+  String role;
+  String position;
 }

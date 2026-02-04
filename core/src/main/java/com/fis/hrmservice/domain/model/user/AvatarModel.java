@@ -9,11 +9,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class AvatarModel extends BaseDomain {
-    long avatarId;
-    UserModel user;
-    String avatarUrl;
-    String fileType;
-    long fileSize;
-    String fileName;
-    String status;
+  long avatarId;
+  UserModel user;
+  String avatarUrl;
+  String fileType;
+  long fileSize;
+  String fileName;
+  String status;
 }

@@ -11,19 +11,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class QuickNoteRepositoryAdapter implements QuickNoteRepositoryPort {
 
-    @Autowired
-    private QuickNoteRepository quickNoteRepository;
+  @Autowired private QuickNoteRepository quickNoteRepository;
 
-    @Autowired
-    private QuickNoteMapper quickNoteMapper;
+  @Autowired private QuickNoteMapper quickNoteMapper;
 
-    @Override
-    public QuickNoteModel save(QuickNoteModel quickNoteModel) {
+  @Override
+  public QuickNoteModel save(QuickNoteModel quickNoteModel) {
 
-        QuickNote quickNote = quickNoteMapper.toEntity(quickNoteModel);
+    QuickNote quickNote = quickNoteMapper.toEntity(quickNoteModel);
 
-        quickNoteRepository.save(quickNote);
+    quickNoteRepository.save(quickNote);
 
-        return quickNoteMapper.toModel(quickNote);
-    }
+    return quickNoteMapper.toModel(quickNote);
+  }
 }

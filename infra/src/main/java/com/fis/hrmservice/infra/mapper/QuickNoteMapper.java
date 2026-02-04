@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface QuickNoteMapper {
 
-    QuickNote toEntity(QuickNoteModel quickNoteModel);
+  QuickNote toEntity(QuickNoteModel quickNoteModel);
 
-    QuickNoteModel toModel(QuickNote quickNote);
+  QuickNoteModel toModel(QuickNote quickNote);
 }

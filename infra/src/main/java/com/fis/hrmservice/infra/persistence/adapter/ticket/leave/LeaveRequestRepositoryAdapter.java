@@ -10,14 +10,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class LeaveRequestRepositoryAdapter implements LeaveRequestRepositoryPort {
 
-    @Autowired
-    private LeaveTicketRepository leaveTicketRepository;
+  @Autowired private LeaveTicketRepository leaveTicketRepository;
 
-    @Autowired
-    private LeaveRequestMapper leaveRequestMapper;
+  @Autowired private LeaveRequestMapper leaveRequestMapper;
 
-    @Override
-    public LeaveRequestModel save(LeaveRequestModel model) {
-        return null;
-    }
+  @Override
+  public LeaveRequestModel save(LeaveRequestModel model) {
+    return null;
+  }
 }
