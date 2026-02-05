@@ -1,7 +1,8 @@
 package com.fis.hrmservice.infra.persistence.repository.ticket;
 
-import com.fis.hrmservice.infra.persistence.entity.WorkLocation;
 import java.util.List;
+
+import com.fis.hrmservice.infra.persistence.entity.WorkLocation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

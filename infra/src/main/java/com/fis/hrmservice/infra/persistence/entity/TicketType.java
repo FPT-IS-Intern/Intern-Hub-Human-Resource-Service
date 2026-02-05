@@ -7,37 +7,35 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
-@Table(name = "ticket_types", schema = "schema_hrm")
+@Table(name = "ticket_types")
 public class TicketType extends AuditEntity {
-  @Id
-  @Column(name = "ticket_type_id", nullable = false)
-  private Long id;
+    @Id
+    @Column(name = "ticket_type_id", nullable = false)
+    private Long id;
 
-  @Size(max = 255)
-  @Column(name = "type_name")
-  private String typeName;
+    @Size(max = 255)
+    @Column(name = "type_name")
+    private String typeName;
 
-  @Column(name = "description", length = Integer.MAX_VALUE)
-  private String description;
+    @Column(name = "description", length = Integer.MAX_VALUE)
+    private String description;
 
-  @Column(name = "created_at")
-  private Long createdAt;
+    @Column(name = "created_at")
+    private Long createdAt;
 
-  @Column(name = "updated_at")
-  private Long updatedAt;
+    @Column(name = "updated_at")
+    private Long updatedAt;
 
-  @Size(max = 255)
-  @Column(name = "created_by")
-  private Long createdBy;
+    @Column(name = "updated_by")
+    private Long updatedBy;
 
-  @Size(max = 255)
-  @Column(name = "updated_by")
-  private Long updatedBy;
+    @Column(name = "created_by")
+    private Long createdBy;
+
+
 }

@@ -10,21 +10,23 @@ import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.utils.Snowflake;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
-public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
+@Service
+public class RegisterUserUseCaseImpl {
 
-  private final UserRepositoryPort userRepository;
-  private final PositionRepositoryPort positionRepository;
-  private final Snowflake snowflake;
-  private final UserValidationService validationService;
+  @Autowired
+  private UserRepositoryPort userRepository;
+  @Autowired
+  private PositionRepositoryPort positionRepository;
+  @Autowired
+  private Snowflake snowflake;
+  @Autowired
+  private UserValidationService validationService;
 
-  @Override
   public UserModel registerUser(RegisterUserCommand command) {
 
     validationService.validateRegistration(command);

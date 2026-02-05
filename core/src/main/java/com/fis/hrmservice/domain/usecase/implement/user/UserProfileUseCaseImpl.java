@@ -5,24 +5,25 @@ import static cn.hutool.core.text.CharSequenceUtil.trim;
 import com.fis.hrmservice.common.utils.UpdateHelper;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.input.user.UserProfileUseCase;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Component
-@RequiredArgsConstructor
-public class UserProfileUseCaseImpl implements UserProfileUseCase {
+@Service
+public class UserProfileUseCaseImpl {
 
-  private final UserRepositoryPort userRepositoryPort;
-  private final UserValidationService userValidationService;
+  @Autowired
+  private UserRepositoryPort userRepositoryPort;
 
-  @Override
+  @Autowired
+  private UserValidationService userValidationService;
+
+
   public UserModel getUserProfile(Long userId) {
 
     return userRepositoryPort
@@ -30,7 +31,6 @@ public class UserProfileUseCaseImpl implements UserProfileUseCase {
         .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
   }
 
-  @Override
   public UserModel updateProfileUser(UpdateUserProfileCommand command, long userId) {
 
     /*

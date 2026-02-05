@@ -5,16 +5,15 @@ import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.input.user.ApprovalUser;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.intern.hub.library.common.exception.NotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Component
-@RequiredArgsConstructor
-public class UserApproval implements ApprovalUser {
+@Service
+public class UserApproval {
 
-  private final UserRepositoryPort userRepositoryPort;
+  @Autowired
+  private UserRepositoryPort userRepositoryPort;
 
-  @Override
   public UserModel approveUser(Long userId) {
     UserModel userModel =
         userRepositoryPort

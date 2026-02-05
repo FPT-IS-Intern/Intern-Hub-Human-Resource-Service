@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AvatarRepository extends JpaRepository<Avatar, Long> {
 
-  @Query("SELECT a.avatarUrl FROM Avatar a WHERE a.user.id = :userId")
-  String findAvatarUrlByUserId(@Param("userId") Long userId);
-
-  Long user(User user);
+  @Query("SELECT a FROM Avatar a WHERE a.user.id = :userId")
+  Avatar findAvatarByUserId(@Param("userId") Long userId);
 }

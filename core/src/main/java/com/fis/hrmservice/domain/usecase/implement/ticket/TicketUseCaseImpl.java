@@ -15,7 +15,6 @@ import com.fis.hrmservice.domain.usecase.command.ticket.LeaveRequestCommand;
 import com.fis.hrmservice.domain.usecase.command.ticket.RemoteRequest;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.utils.Snowflake;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,12 +47,20 @@ public class TicketUseCaseImpl implements TicketUserCase {
     DateValidationHelper.validateDate(command.getFromDate(), command.getToDate());
 
     // check evidence
-    if ((!Objects.requireNonNull(command.getEvidence().getContentType()).equalsIgnoreCase(".png")
-            || !command.getEvidence().getContentType().equalsIgnoreCase(".jpg")
-            || !command.getEvidence().getContentType().equalsIgnoreCase(".jpeg"))
-        && command.getEvidence().getSize() > 2097152) {
-      throw new ConflictDataException(
-          "File evidence must be in .png, .jpeg, .jpg format and size must be less than 2MB");
+    String contentType = command.getEvidence().getContentType();
+    if (contentType != null) {
+      String lowerContentType = contentType.toLowerCase();
+      boolean isValidFormat =
+          lowerContentType.endsWith("png")
+              || lowerContentType.endsWith("jpg")
+              || lowerContentType.endsWith("jpeg")
+              || lowerContentType.contains("image/png")
+              || lowerContentType.contains("image/jpeg");
+
+      if (!isValidFormat || command.getEvidence().getSize() > 2097152) {
+        throw new ConflictDataException(
+            "File evidence must be in .png, .jpeg, .jpg format and size must be less than 2MB");
+      }
     }
 
     TicketModel ticketModel =

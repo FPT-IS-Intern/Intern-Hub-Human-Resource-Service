@@ -28,12 +28,17 @@ public interface UserApiMapper {
 
   // ===== Response =====
   @Mapping(source = "companyEmail", target = "email")
+  @Mapping(source = "dateOfBirth", target = "dateOfBirth")
+  @Mapping(source = "sysStatus", target = "status")
+  @Mapping(source = "avatar.avatarUrl", target = "avatarUrl")
+  @Mapping(source = "cv.cvUrl", target = "cvUrl")
   @Mapping(source = "position.name", target = "positionCode")
+  @Mapping(source = "mentor.fullName", target = "superVisorName")
   UserResponse toResponse(UserModel model);
 
   @Mapping(source = "companyEmail", target = "email")
   @Mapping(source = "position.name", target = "position")
-  @Mapping(source = "avatarUrl", target = "avatarUrl")
+  @Mapping(source = "avatar.avatarUrl", target = "avatarUrl")
   @Mapping(source = "fullName", target = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
   FilterResponse toFilterResponse(UserModel model);

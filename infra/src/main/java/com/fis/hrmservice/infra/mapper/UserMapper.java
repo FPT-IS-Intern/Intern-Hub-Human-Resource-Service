@@ -2,12 +2,14 @@ package com.fis.hrmservice.infra.mapper;
 
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.infra.persistence.entity.Position;
-import com.fis.hrmservice.infra.persistence.entity.User;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+
+import com.fis.hrmservice.infra.persistence.entity.Position;
+import com.fis.hrmservice.infra.persistence.entity.User;
 import org.mapstruct.*;
 import org.mapstruct.Named;
 

@@ -16,12 +16,17 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
   Long userId;
+  String avatarUrl;
+  String idNumber;
   String fullName;
   String email;
   String phoneNumber;
   String address;
   LocalDate dateOfBirth;
   String positionCode;
+//  String role; sau này enable sau
+  String cvUrl;
+  String superVisorName;
   LocalDate internshipStartDate;
   LocalDate internshipEndDate;
   String status;

@@ -6,35 +6,44 @@ import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
 import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.input.user.*;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
+import com.fis.hrmservice.domain.usecase.implement.user.*;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("hrm-serice/api/users")
-@RequiredArgsConstructor
 @EnableGlobalExceptionHandler
 @Slf4j
 @Tag(name = "User Management", description = "APIs for user registration and management")
 public class UserController {
 
-  private final RegisterUserUseCase registerUserUseCase;
-  private final FilterUserUseCase filterUserUseCase;
-  private final UserApiMapper userApiMapper;
-  private final UserProfileUseCase userProfileUseCase;
-  private final ApprovalUser approvalUser;
-  private final RejectionUser rejectionUser;
+  @Autowired
+  private RegisterUserUseCaseImpl registerUserUseCase;
+
+  @Autowired
+  private FilterUseCaseImpl filterUserUseCase;
+
+  @Autowired
+  private UserApiMapper userApiMapper;
+
+  @Autowired
+  private UserProfileUseCaseImpl userProfileUseCase;
+
+  @Autowired
+  private UserApproval approvalUser;
+
+  @Autowired
+  private UserRejection rejectionUser;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<?> registerUser(
@@ -72,7 +81,7 @@ public class UserController {
   @DeleteMapping("/{userId}")
   public ResponseApi<?> deactivateUser(@PathVariable Long userId) {
     log.info("Deactivate user request for ID: {}", userId);
-    return ResponseApi.ok(null);
+    return ResponseApi.ok(true);
   }
 
   @PostMapping("/filter")
@@ -91,7 +100,6 @@ public class UserController {
 
   // -------------------- Approval and Rejection Endpoints -------------------//
   @PutMapping("/approval/{userId}")
-  @Transactional
   public ResponseApi<?> approveUser(@PathVariable("userId") Long userId) {
     log.info("Approve user request for ID: {}", userId);
     UserModel userModel = approvalUser.approveUser(userId);
@@ -100,7 +108,6 @@ public class UserController {
   }
 
   @PutMapping("/rejection/{userId}")
-  @Transactional
   public ResponseApi<?> rejectUser(@PathVariable("userId") Long userId) {
     log.info("Reject user request for ID: {}", userId);
     UserModel userReject = rejectionUser.rejectUser(userId);
@@ -113,7 +120,7 @@ public class UserController {
       @RequestPart("userInfo") UpdateProfileRequest request,
       @RequestPart("cvFile") MultipartFile cvFile,
       @RequestPart("avatarFile") MultipartFile avatarFile,
-      @PathVariable("userId") long userId) {
+      @PathVariable("userId") long userId) { //sau này hoàn thành api gateway se sửa sau
     request.setCvFile(cvFile);
     request.setAvatarFile(avatarFile);
     userProfileUseCase.updateProfileUser(userApiMapper.toUpdateUserProfileCommand(request), userId);

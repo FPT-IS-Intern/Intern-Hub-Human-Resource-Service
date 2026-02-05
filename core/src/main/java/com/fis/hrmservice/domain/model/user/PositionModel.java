@@ -14,5 +14,4 @@ public class PositionModel extends BaseDomain {
   Long positionId;
   String name;
   String description;
-  String type;
 }

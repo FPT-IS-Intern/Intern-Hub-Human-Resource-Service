@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class UserRepositoryAdapter implements UserRepositoryPort {
@@ -19,6 +20,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   @Autowired private UserMapper userMapper;
 
   @Override
+  @Transactional
   public UserModel save(UserModel user) {
     User entity = userMapper.toEntity(user);
     User savedEntity = userJpaRepository.save(entity);

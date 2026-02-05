@@ -2,25 +2,25 @@ package com.fis.hrmservice.domain.usecase.implement.quicknote;
 
 import com.fis.hrmservice.domain.model.user.QuickNoteModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.input.quicknote.QuickNoteUserUseCase;
 import com.fis.hrmservice.domain.port.output.quicknote.QuickNoteRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.quicknote.QuickNoteCommand;
 import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.library.common.utils.Snowflake;
 import java.time.LocalDateTime;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
-@Component
-public class QuickNoteUseCaseImpl implements QuickNoteUserUseCase {
+@Service
+public class QuickNoteUseCaseImpl {
 
-  private final QuickNoteRepositoryPort quickNoteRepositoryPort;
-  private final Snowflake snowflake;
-  private final UserRepositoryPort userRepositoryPort;
+  @Autowired
+  private QuickNoteRepositoryPort quickNoteRepositoryPort;
+  @Autowired
+  private Snowflake snowflake;
+  @Autowired
+  private UserRepositoryPort userRepositoryPort;
 
-  @Override
   public QuickNoteModel createQuickNote(QuickNoteCommand command, Long userId) {
 
     // TODO: đợi ong api gateway xong thì mở lại

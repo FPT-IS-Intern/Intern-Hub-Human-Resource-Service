@@ -28,6 +28,6 @@ public class UserModel extends BaseDomain {
   PositionModel position;
   UserModel mentor;
 
-  String avatarUrl;
-  String cvUrl;
+  AvatarModel avatar;
+  CvModel cv;
 }

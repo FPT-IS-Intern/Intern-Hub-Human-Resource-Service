@@ -1,31 +1,34 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
+import com.fis.hrmservice.domain.model.user.AvatarModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.input.user.FilterUserUseCase;
 import com.fis.hrmservice.domain.port.output.user.AvatarRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
+
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
-@Component
-public class FilterUseCaseImpl implements FilterUserUseCase {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-  private final UserRepositoryPort userRepositoryPort;
-  private final AvatarRepositoryPort avatarRepositoryPort;
+@Service
+public class FilterUseCaseImpl {
 
-  @Override
-  public List<UserModel> filterUsers(FilterUserCommand command) {
-    List<UserModel> users = userRepositoryPort.filterUser(command);
+    @Autowired
+    private UserRepositoryPort userRepositoryPort;
+    @Autowired
+    private AvatarRepositoryPort avatarRepositoryPort;
 
-    users.forEach(
-        user -> {
-          String avatarUrl = avatarRepositoryPort.getAvatarUrlByUserId(user.getUserId());
-          user.setAvatarUrl(avatarUrl);
-        });
+    public List<UserModel> filterUsers(FilterUserCommand command) {
+        List<UserModel> users = userRepositoryPort.filterUser(command);
 
-    return users;
-  }
+        users.forEach(
+                user -> {
+                    AvatarModel avatarUrl = avatarRepositoryPort.getAvatarByUserId(user.getUserId());
+                    user.setAvatar(avatarUrl);
+                });
+
+        return users;
+    }
 }

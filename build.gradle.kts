@@ -21,16 +21,18 @@ allprojects {
         mavenLocal()
     }
 }
+
 subprojects {
 
     apply(plugin = "java")
+    apply(plugin = "org.springframework.boot")              // ⭐ QUAN TRỌNG
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "com.diffplug.spotless")
     apply(plugin = "org.sonarqube")
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(25))
+            languageVersion.set(JavaLanguageVersion.of(25)) // 25 chưa LTS – recommend 21
         }
     }
 
@@ -49,10 +51,23 @@ subprojects {
     }
 
     dependencies {
+
         // Spring Core
         implementation(rootProject.libs.spring.boot.starter)
         implementation(rootProject.libs.spring.boot.starter.log4j2)
         testImplementation(rootProject.libs.spring.boot.starter.test)
+
+        // Security Test (FIX LỖI)
+        testImplementation("org.springframework.security:spring-security-test")
+
+        // Web
+        implementation("org.springframework:spring-web")
+
+        // JPA
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+        // PostgreSQL
+        runtimeOnly("org.postgresql:postgresql")
 
         // Utils
         implementation("cn.hutool:hutool-all:5.8.43")
@@ -64,24 +79,17 @@ subprojects {
         // Lombok
         compileOnly("org.projectlombok:lombok:1.18.42")
         annotationProcessor("org.projectlombok:lombok:1.18.42")
-
-        // Validation API
-        implementation("jakarta.validation:jakarta.validation-api:3.0.2")
-
-        // Lombok + MapStruct binding
         annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
-        //common lib
+        // Validation
+        implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+
+        // Common lib
         implementation("com.github.FPT-IS-Intern:Intern-Hub-Common-Library:2.0.0")
 
-        // Source: https://mvnrepository.com/artifact/org.springframework/spring-web
-        implementation("org.springframework:spring-web:7.0.3")
-
-        // Update Security Starter Library to 1.0.1
-        implementation("org.springframework.boot:spring-boot-starter-security:3.2.2")
-
-        implementation("com.github.FPT-IS-Intern:Intern-Hub-Security-Starter:1.0.2")
+        implementation("com.github.FPT-IS-Intern:Intern-Hub-Security-Starter:1.0.3")
     }
+
 
     configure<SpotlessExtension> {
         java {
@@ -96,4 +104,12 @@ subprojects {
         useJUnitPlatform()
     }
 
+    // Disable bootJar for library modules
+    tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+        enabled = false
+    }
+
+    tasks.withType<Jar> {
+        enabled = true
+    }
 }

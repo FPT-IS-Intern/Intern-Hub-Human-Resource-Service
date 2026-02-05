@@ -1,7 +1,8 @@
 package com.fis.hrmservice.infra.persistence.repository.user;
 
-import com.fis.hrmservice.infra.persistence.entity.Position;
 import java.util.Optional;
+
+import com.fis.hrmservice.infra.persistence.entity.Position;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
