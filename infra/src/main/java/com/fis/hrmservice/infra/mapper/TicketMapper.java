@@ -5,6 +5,7 @@ import com.fis.hrmservice.infra.persistence.entity.Ticket;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+
 @Mapper(
         componentModel = "spring",
         uses = {
@@ -14,25 +15,23 @@ import org.mapstruct.Mapping;
 )
 public interface TicketMapper {
 
-  /* ========== ENTITY → MODEL ========== */
+    /* ENTITY → MODEL */
 
-  @Mapping(source = "id", target = "ticketId")
-  @Mapping(source = "user", target = "requester")
-  @Mapping(source = "status", target = "sysStatus")
-  TicketModel toModel(Ticket ticket);
+    @Mapping(source = "id", target = "ticketId")
+    @Mapping(source = "user", target = "requester")
+    @Mapping(source = "status", target = "sysStatus")
+    TicketModel toModel(Ticket ticket);
 
+    /* MODEL → ENTITY */
 
-  /* ========== MODEL → ENTITY ========== */
+    @Mapping(source = "ticketId", target = "id")
+    @Mapping(source = "requester", target = "user")
+    @Mapping(source = "sysStatus", target = "status")
+    @Mapping(source = "ticketType", target = "ticketType")   // 🔥 THIẾU DÒNG NÀY
 
-  @Mapping(source = "ticketId", target = "id")
-  @Mapping(source = "requester", target = "user")
-  @Mapping(source = "sysStatus", target = "status")
-
-  // ignore audit fields (AuditEntity tự xử lý)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
-  @Mapping(target = "createdBy", ignore = true)
-  @Mapping(target = "updatedBy", ignore = true)
-
-  Ticket toEntity(TicketModel ticketModel);
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    Ticket toEntity(TicketModel ticketModel);
 }

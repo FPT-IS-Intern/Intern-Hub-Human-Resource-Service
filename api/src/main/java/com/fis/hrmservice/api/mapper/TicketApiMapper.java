@@ -17,9 +17,6 @@ public interface TicketApiMapper {
     CreateTicketRequest toTicketRequest(CreateTicketCommand command);
     CreateTicketCommand toTicketCommand(CreateTicketRequest request);
 
-    LeaveRequestCommand toLeaveCommand(LeaveTicketRequest leaveRequest);
-
-
     @Mapping(source = "ticket.ticketId", target = "ticketId")
     @Mapping(source = "ticket.ticketType.typeName", target = "ticketType")
     @Mapping(source = "ticket.sysStatus", target = "ticketStatus")

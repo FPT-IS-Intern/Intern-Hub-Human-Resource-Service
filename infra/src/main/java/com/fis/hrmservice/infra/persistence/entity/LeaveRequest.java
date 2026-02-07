@@ -16,9 +16,9 @@ public class LeaveRequest extends AuditEntity {
     private Long id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "ticket_id", nullable = false)
-    private Ticket tickets;
+    private Ticket ticket;
 
     @Column(name = "leave_type_id")
     private Long leaveTypeId;
@@ -35,11 +35,9 @@ public class LeaveRequest extends AuditEntity {
     @Column(name = "version")
     private Integer version;
 
-    @Size(max = 255)
     @Column(name = "created_by")
     private Long createdBy;
 
-    @Size(max = 255)
     @Column(name = "updated_by")
     private Long updatedBy;
 

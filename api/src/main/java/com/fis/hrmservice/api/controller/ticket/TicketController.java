@@ -34,21 +34,23 @@ public class TicketController {
 
     @PostMapping(
             value = "/leave-ticket/{userId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+            consumes = {
+                    MediaType.MULTIPART_FORM_DATA_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE
+            }
     )
     public ResponseApi<CreateTicketResponse> createLeaveTicket(
             @PathVariable Long userId,
             @RequestPart("ticketInfo") CreateTicketRequest ticketRequest,
-            @RequestPart("leaveTicketInfo") LeaveTicketRequest leaveTicketRequest,
-            @RequestPart("evidenceFile") MultipartFile evidenceFile
+            @RequestPart(value = "evidenceFile", required = false) MultipartFile evidenceFile
     ) {
 
         //chuyển request từ controller sang command ở dưới core
         CreateTicketCommand requestCommand = mapToTicketCommand(ticketRequest);
         //set file evidence
         requestCommand.setEvidence(evidenceFile);
-        //chuyển leave request từ controller sang command ở dưới core
-        LeaveRequestCommand leaveCommand = ticketApiMapper.toLeaveCommand(leaveTicketRequest);
+        
+        LeaveRequestCommand leaveCommand = LeaveRequestCommand.builder().build();
 
         LeaveRequestModel leaveModel = ticketUseCaseImpl.createLeaveRequest(requestCommand, leaveCommand, userId);
 

@@ -9,9 +9,14 @@ import org.mapstruct.*;
 public interface RemoteRequestMapper {
 
     /* ========= Model → Entity ========= */
-    @Mapping(source = "ticket.ticketId", target = "id")
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "ticket", target = "tickets")
     @Mapping(source = "remoteType", target = "remoteType", qualifiedByName = "remoteTypeToString")
+    @Mapping(target = "workLocation", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
     RemoteRequest toEntity(RemoteRequestModel model);
 
     /* ========= Entity → Model ========= */

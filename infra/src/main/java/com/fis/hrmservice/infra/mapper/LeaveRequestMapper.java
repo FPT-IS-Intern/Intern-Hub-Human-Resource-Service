@@ -8,33 +8,21 @@ import org.mapstruct.Mappings;
 
 @Mapper(
         componentModel = "spring",
-        uses = {
-                TicketMapper.class
-        }
+        uses = TicketMapper.class
 )
 public interface LeaveRequestMapper {
 
-  /* ================= ENTITY → MODEL ================= */
+    LeaveRequestModel toModel(LeaveRequest entity);
 
-  @Mapping(source = "tickets", target = "ticket")
-  LeaveRequestModel toModel(LeaveRequest entity);
+    /* MODEL → ENTITY */
 
-
-  /* ================= MODEL → ENTITY ================= */
-
-  @Mapping(source = "ticket", target = "tickets")
-
-  // IMPORTANT: KHÔNG set id thủ công — @MapsId sẽ tự copy từ Ticket
-  @Mapping(target = "id", ignore = true)
-
-  // audit + system fields
-  @Mapping(target = "leaveTypeId", ignore = true)
-  @Mapping(target = "status", ignore = true)
-  @Mapping(target = "version", ignore = true)
-  @Mapping(target = "createdAt", ignore = true)
-  @Mapping(target = "updatedAt", ignore = true)
-  @Mapping(target = "createdBy", ignore = true)
-  @Mapping(target = "updatedBy", ignore = true)
-
-  LeaveRequest toEntity(LeaveRequestModel model);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "leaveTypeId", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    LeaveRequest toEntity(LeaveRequestModel model);
 }

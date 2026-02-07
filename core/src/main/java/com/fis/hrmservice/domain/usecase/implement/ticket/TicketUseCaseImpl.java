@@ -3,10 +3,9 @@ package com.fis.hrmservice.domain.usecase.implement.ticket;
 import com.fis.hrmservice.common.utils.DateValidationHelper;
 import com.fis.hrmservice.domain.model.constant.RemoteType;
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
-import com.fis.hrmservice.domain.model.ticket.LeaveRequestModel;
-import com.fis.hrmservice.domain.model.ticket.RemoteRequestModel;
-import com.fis.hrmservice.domain.model.ticket.TicketModel;
+import com.fis.hrmservice.domain.model.ticket.*;
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.port.output.ticket.TicketApprovalRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketTypeRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.leaveticket.LeaveRequestRepositoryPort;
@@ -46,6 +45,9 @@ public class TicketUseCaseImpl {
     private UserRepositoryPort userRepositoryPort;
 
     @Autowired
+    private TicketApprovalRepositoryPort ticketApprovalRepositoryPort;
+
+    @Autowired
     private Snowflake snowflake;
 
     /* ================= BASE TICKET ================= */
@@ -58,14 +60,17 @@ public class TicketUseCaseImpl {
 
         DateValidationHelper.validateDate(command.getFromDate(), command.getToDate());
 
+        TicketTypeModel ticketTypeModel = ticketTypeRepositoryPort.findTicketTypeByCode(command.getTicketType());
+
+        if (ticketTypeModel == null) {
+            throw new NotFoundException("Ticket type not found: " + command.getTicketType());
+        }
+
         TicketModel ticket =
                 TicketModel.builder()
                         .ticketId(snowflake.next())
                         .requester(requester)
-                        .ticketType(
-                                ticketTypeRepositoryPort
-                                        .findTicketTypeByCode(command.getTicketType())
-                        )
+                        .ticketType(ticketTypeModel)
                         .startAt(command.getFromDate())
                         .endAt(command.getToDate())
                         .reason(command.getReason())
@@ -83,21 +88,59 @@ public class TicketUseCaseImpl {
             Long userId
     ) {
 
-        if (leaveCommand.getTotalDays() <= 0) {
+        // 1. Calculate total days
+        // Assuming inclusive: from 2024-01-01 to 2024-01-01 is 1 day
+        int totalDays = (int) (java.time.temporal.ChronoUnit.DAYS.between(
+                ticketCommand.getFromDate(),
+                ticketCommand.getToDate()
+        ) + 1);
+
+        if (totalDays <= 0) {
             throw new ConflictDataException("Total days must be greater than 0");
         }
 
         TicketModel ticket = createBaseTicket(ticketCommand, userId);
 
-        ticket = ticketRepositoryPort.save(ticket);
-
         LeaveRequestModel model =
                 LeaveRequestModel.builder()
                         .ticket(ticket)
-                        .totalDays(leaveCommand.getTotalDays())
+                        .totalDays(totalDays)
                         .build();
 
-        return leaveRequestRepositoryPort.save(model);
+        LeaveRequestModel savedModel = leaveRequestRepositoryPort.save(model);
+
+        // 2. Set up approval flow
+        // Level 1: Mentor/Leader (always)
+        if (ticket.getRequester().getMentor() != null) {
+            ticketApprovalRepositoryPort.save(TicketApprovalModel.builder()
+                    .approvalId(snowflake.next())
+                    .ticket(ticket)
+                    .approver(ticket.getRequester().getMentor())
+                    .status("WAITING")
+                    .build());
+        }
+
+        // Level 2: Management/Admin (if > 5 days)
+        if (totalDays > 5) {
+            java.util.List<UserModel> admins = userRepositoryPort.filterUser(
+                    com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand.builder()
+                            .positions(java.util.List.of("ADMIN", "MANAGER")) // Assuming these position names
+                            .build()
+            );
+
+            if (!admins.isEmpty()) {
+                // For simplicity, pick the first one or assign to a generic one
+                ticketApprovalRepositoryPort.save(TicketApprovalModel.builder()
+                        .approvalId(snowflake.next())
+                        .ticket(ticket)
+                        .approver(admins.get(0))
+                        .status("PENDING") // Level 2 starts as PENDING until Level 1 is WAITING? 
+                        // Actually, Level 1 should be WAITING, Level 2 should be PENDING.
+                        .build());
+            }
+        }
+
+        return savedModel;
     }
 
     /* ================= REMOTE ================= */
