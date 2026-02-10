@@ -8,6 +8,8 @@ import com.fis.hrmservice.infra.persistence.repository.quicknote.QuickNoteReposi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class QuickNoteRepositoryAdapter implements QuickNoteRepositoryPort {
 
@@ -23,5 +25,11 @@ public class QuickNoteRepositoryAdapter implements QuickNoteRepositoryPort {
     quickNoteRepository.save(quickNote);
 
     return quickNoteMapper.toModel(quickNote);
+  }
+
+  @Override
+  public List<QuickNoteModel> findAllByUserId(Long userId) {
+    List<QuickNote> quickNotes = quickNoteRepository.findAllByInternId(userId);
+    return quickNoteMapper.toModelList(quickNotes);
   }
 }

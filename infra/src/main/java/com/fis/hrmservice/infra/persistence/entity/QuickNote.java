@@ -23,7 +23,7 @@ public class QuickNote extends AuditEntity {
   @JoinColumn(name = "intern_id", nullable = false)
   private User intern;
 
-  @NotNull
+//  @NotNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "writer_id", nullable = false)
   private User writer;

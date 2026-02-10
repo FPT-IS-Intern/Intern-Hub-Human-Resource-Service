@@ -1,12 +1,14 @@
 package com.fis.hrmservice.api.controller.quicknote;
 
 import com.fis.hrmservice.api.dto.request.CreateQuickNoteRequest;
+import com.fis.hrmservice.api.dto.response.QuickNoteResponse;
 import com.fis.hrmservice.api.mapper.QuickNoteApiMapper;
 import com.fis.hrmservice.domain.usecase.command.quicknote.QuickNoteCommand;
 import com.fis.hrmservice.domain.usecase.implement.quicknote.QuickNoteUseCaseImpl;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,5 +28,11 @@ public class QuickNoteController {
       @RequestBody CreateQuickNoteRequest request, @PathVariable("userId") Long userId) {
     QuickNoteCommand command = quickNoteApiMapper.toCommand(request);
     return ResponseApi.ok(quickNoteUserUseCase.createQuickNote(command, userId));
+  }
+
+  @GetMapping("/{userId}")
+  public ResponseApi<List<QuickNoteResponse>> listQuickNoteByUserId(@PathVariable Long userId) {
+    return ResponseApi.ok(
+        quickNoteApiMapper.toResponse(quickNoteUserUseCase.findAllByUserId(userId)));
   }
 }

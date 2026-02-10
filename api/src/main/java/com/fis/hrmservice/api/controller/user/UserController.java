@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("hrm-serice/users")
+@RequestMapping("hrm-service/users")
 @EnableGlobalExceptionHandler
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4205"})
 @Slf4j
@@ -72,6 +72,7 @@ public class UserController {
   // cái này dùng cho admin xem profile của 1 user cụ thể nào đó
   @GetMapping("/profile/{userId}")
   public ResponseApi<?> getUserProfile(@PathVariable Long userId) {
+    log.info("Get user profile for ID: {}", userId);
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
     return ResponseApi.ok(userApiMapper.toResponse(userModel));
   }
@@ -100,6 +101,7 @@ public class UserController {
       @RequestPart("cvFile") MultipartFile cvFile,
       @RequestPart("avatarFile") MultipartFile avatarFile,
       @PathVariable long userId) { // sau này hoàn thành api gateway se sửa sau
+    log.info("Update profile for user ID: {}", userId);
     request.setCvFile(cvFile);
     request.setAvatarFile(avatarFile);
     userProfileUseCase.updateProfileUser(userApiMapper.toUpdateUserProfileCommand(request), userId);
