@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-alter-date-to-long
+      author: gwuy
+      changes:
+
+        # ============================
+        # TABLE: tickets
+        # ============================
+        - modifyDataType:
+            tableName: tickets
+            columnName: start_at
+            newDataType: bigint
+
+        - modifyDataType:
+            tableName: tickets
+            columnName: end_at
+            newDataType: bigint
+
+        # ============================
+        # TABLE: remote_requests
+        # ============================
+        - modifyDataType:
+            tableName: remote_requests
+            columnName: start_time
+            newDataType: bigint
+
+        - modifyDataType:
+            tableName: remote_requests
+            columnName: end_time
+            newDataType: bigint
+
+        # ============================
+        # TABLE: ticket_approvals
+        # ============================
+        - modifyDataType:
+            tableName: ticket_approvals
+            columnName: action_at
+            newDataType: bigint
+
+        # ============================
+        # TABLE: attendance_logs
+        # ============================
+        - modifyDataType:
+            tableName: attendance_logs
+            columnName: work_date
+            newDataType: bigint
+
+        - modifyDataType:
+            tableName: attendance_logs
+            columnName: check_in_time
+            newDataType: bigint
+
+        - modifyDataType:
+            tableName: attendance_logs
+            columnName: check_out_time
+            newDataType: bigint
+
+        # ============================
+        # TABLE: quick_notes
+        # ============================
+        - modifyDataType:
+            tableName: quick_notes
+            columnName: write_date
+            newDataType: bigint
+
+        - modifyDataType:
+            tableName: quick_notes
+            columnName: created_at
+            newDataType: bigint
+
+        - modifyDataType:
+            tableName: quick_notes
+            columnName: updated_at
+            newDataType: bigint

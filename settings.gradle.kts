@@ -1,18 +1,16 @@
 rootProject.name = "Intern-Hub-Human-Resource-Service"
 
-include("common")
-include("api")
-include("core")
-include("infra")
-
-dependencyResolutionManagement {
+pluginManagement {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
-    }
-
-    versionCatalogs {
-        create("libs") {
-            from(files("libs.versions.toml"))
-        }
+        maven { url = uri("https://jitpack.io") }
     }
 }
+
+include(
+    "common",
+    "api",
+    "core",
+    "infra"
+)

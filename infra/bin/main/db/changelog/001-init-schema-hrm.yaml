@@ -1,0 +1,390 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-init-schema-hrm
+      author: gwuy
+      changes:
+        - sql:
+            dbms: postgresql
+            splitStatements: true
+            stripComments: true
+            sql: |
+              -- ============================
+              -- TABLE: work_locations
+              -- ============================
+              DROP TABLE IF EXISTS work_locations CASCADE;
+              CREATE TABLE work_locations (
+                work_location_id bigint PRIMARY KEY,
+                name varchar(255),
+                address varchar(255),
+                description text,
+                is_active boolean,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              -- ============================
+              -- TABLE: positions
+              -- ============================
+              DROP TABLE IF EXISTS positions CASCADE;
+              CREATE TABLE positions (
+                position_id bigint PRIMARY KEY,
+                name varchar(10),
+                description text,
+                status varchar(50),
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by integer,
+                updated_by integer,
+                type varchar(20)
+              );
+
+              -- ============================
+              -- TABLE: users
+              -- ============================
+              DROP TABLE IF EXISTS users CASCADE;
+              CREATE TABLE users (
+                user_id bigint PRIMARY KEY,
+                position_id bigint,
+                mentor_id bigint,
+                full_name varchar(100),
+                id_number varchar(12),
+                date_of_birth bigint,
+                company_email varchar(100),
+                phone_number varchar(20),
+                status varchar(50),
+                version integer,
+                created_at bigint,
+                updated_at bigint,
+                created_by varchar(255),
+                updated_by varchar(255),
+                internship_start_date bigint,
+                internship_end_date bigint,
+                address text NOT NULL,
+                sys_status varchar
+              );
+
+              ALTER TABLE users
+                ADD CONSTRAINT fk_users_position FOREIGN KEY (position_id) REFERENCES positions(position_id);
+              ALTER TABLE users
+                ADD CONSTRAINT fk_users_mentor FOREIGN KEY (mentor_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: ticket_types
+              -- ============================
+              DROP TABLE IF EXISTS ticket_types CASCADE;
+              CREATE TABLE ticket_types (
+                ticket_type_id bigint PRIMARY KEY,
+                type_name varchar(255),
+                description text,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              -- ============================
+              -- TABLE: tickets
+              -- ============================
+              DROP TABLE IF EXISTS tickets CASCADE;
+              CREATE TABLE tickets (
+                ticket_id bigint PRIMARY KEY,
+                user_id bigint NOT NULL,
+                ticket_type_id bigint NOT NULL,
+                start_at date,
+                end_at date,
+                reason text,
+                status varchar(20),
+                created_at bigint,
+                updated_at bigint,
+                sys_status varchar(20)
+              );
+
+              ALTER TABLE tickets
+                ADD CONSTRAINT fk_tickets_user FOREIGN KEY (user_id) REFERENCES users(user_id);
+              ALTER TABLE tickets
+                ADD CONSTRAINT fk_tickets_ticket_type FOREIGN KEY (ticket_type_id) REFERENCES ticket_types(ticket_type_id);
+
+              -- ============================
+              -- TABLE: remote_requests
+              -- ============================
+              DROP TABLE IF EXISTS remote_requests CASCADE;
+              CREATE TABLE remote_requests (
+                ticket_id bigint PRIMARY KEY,
+                work_location_id bigint,
+                start_time timestamp,
+                end_time timestamp
+              );
+
+              ALTER TABLE remote_requests
+                ADD CONSTRAINT fk_remote_requests_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(ticket_id);
+              ALTER TABLE remote_requests
+                ADD CONSTRAINT fk_remote_requests_work_location FOREIGN KEY (work_location_id) REFERENCES work_locations(work_location_id);
+
+              -- ============================
+              -- TABLE: ticket_approvals
+              -- ============================
+              DROP TABLE IF EXISTS ticket_approvals CASCADE;
+              CREATE TABLE ticket_approvals (
+                approval_id bigint PRIMARY KEY,
+                approver_id bigint,
+                ticket_id bigint,
+                action varchar(50),
+                comment text,
+                action_at date,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              ALTER TABLE ticket_approvals
+                ADD CONSTRAINT fk_ticket_approvals_approver FOREIGN KEY (approver_id) REFERENCES users(user_id);
+              ALTER TABLE ticket_approvals
+                ADD CONSTRAINT fk_ticket_approvals_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(ticket_id);
+
+              -- ============================
+              -- TABLE: evidences
+              -- ============================
+              DROP TABLE IF EXISTS evidences CASCADE;
+              CREATE TABLE evidences (
+                evidence_id bigint PRIMARY KEY,
+                ticket_id bigint,
+                evidence_folder varchar(255),
+                evidence_url text,
+                uploaded_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50),
+                create_at bigint
+              );
+
+              ALTER TABLE evidences
+                ADD CONSTRAINT fk_evidences_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(ticket_id);
+
+              -- ============================
+              -- TABLE: leave_types
+              -- ============================
+              DROP TABLE IF EXISTS leave_types CASCADE;
+              CREATE TABLE leave_types (
+                leave_type_id bigint PRIMARY KEY,
+                type_name varchar(255),
+                description text,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              -- ============================
+              -- TABLE: leave_requests
+              -- ============================
+              DROP TABLE IF EXISTS leave_requests CASCADE;
+              CREATE TABLE leave_requests (
+                ticket_id bigint PRIMARY KEY,
+                leave_type_id bigint,
+                total_days integer,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              ALTER TABLE leave_requests
+                ADD CONSTRAINT fk_leave_requests_ticket FOREIGN KEY (ticket_id) REFERENCES tickets(ticket_id);
+              ALTER TABLE leave_requests
+                ADD CONSTRAINT fk_leave_requests_leave_type FOREIGN KEY (leave_type_id) REFERENCES leave_types(leave_type_id);
+
+              -- ============================
+              -- TABLE: attendance_logs
+              -- ============================
+              DROP TABLE IF EXISTS attendance_logs CASCADE;
+              CREATE TABLE attendance_logs (
+                attendance_id bigint PRIMARY KEY,
+                user_id bigint,
+                work_date date,
+                check_in_time timestamp,
+                check_out_time timestamp,
+                attendance_status varchar(20),
+                source varchar(50),
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              ALTER TABLE attendance_logs
+                ADD CONSTRAINT fk_attendance_logs_user FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: avatars
+              -- ============================
+              DROP TABLE IF EXISTS avatars CASCADE;
+              CREATE TABLE avatars (
+                avatar_id bigint PRIMARY KEY,
+                user_id bigint,
+                avatar_url text,
+                created_at bigint,
+                updated_at bigint,
+                created_by varchar(255),
+                updated_by varchar(255),
+                version integer,
+                status varchar(50),
+                file_type varchar(100),
+                file_size bigint,
+                avatar_file_name varchar(255)
+              );
+
+              ALTER TABLE avatars
+                ADD CONSTRAINT fk_avatars_user FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: cv
+              -- ============================
+              DROP TABLE IF EXISTS cv CASCADE;
+              CREATE TABLE cv (
+                cv_id bigint PRIMARY KEY,
+                user_id bigint,
+                cv_url text,
+                created_at bigint,
+                updated_at bigint,
+                created_by varchar(255),
+                updated_by varchar(255),
+                version integer,
+                status varchar(50),
+                file_type varchar(100),
+                file_size bigint,
+                cv_file_name varchar(255)
+              );
+
+              ALTER TABLE cv
+                ADD CONSTRAINT fk_cv_user FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: feedback_types
+              -- ============================
+              DROP TABLE IF EXISTS feedback_types CASCADE;
+              CREATE TABLE feedback_types (
+                feedback_type_id bigint PRIMARY KEY,
+                code varchar(50) NOT NULL,
+                name varchar(255),
+                description text,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                status varchar(50)
+              );
+
+              -- ============================
+              -- TABLE: anonymous_feedbacks
+              -- ============================
+              DROP TABLE IF EXISTS anonymous_feedbacks CASCADE;
+              CREATE TABLE anonymous_feedbacks (
+                feedback_id bigint PRIMARY KEY,
+                feedback_type_id bigint NOT NULL,
+                title varchar(255),
+                created_by bigint,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                status varchar(50),
+                content text,
+                sender_id integer
+              );
+
+              ALTER TABLE anonymous_feedbacks
+                ADD CONSTRAINT fk_anonymous_feedbacks_feedback_type FOREIGN KEY (feedback_type_id) REFERENCES feedback_types(feedback_type_id);
+              ALTER TABLE anonymous_feedbacks
+                ADD CONSTRAINT fk_anonymous_feedbacks_creator FOREIGN KEY (created_by) REFERENCES users(user_id);
+              ALTER TABLE anonymous_feedbacks
+                ADD CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: feedback_messages
+              -- ============================
+              DROP TABLE IF EXISTS feedback_messages CASCADE;
+              CREATE TABLE feedback_messages (
+                message_id bigint PRIMARY KEY,
+                feedback_id bigint NOT NULL,
+                parent_message_id bigint,
+                sender_id bigint NOT NULL,
+                sender_role varchar(20) NOT NULL,
+                message text NOT NULL,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                status varchar(50)
+              );
+
+              ALTER TABLE feedback_messages
+                ADD CONSTRAINT fk_feedback_messages_feedback FOREIGN KEY (feedback_id) REFERENCES anonymous_feedbacks(feedback_id);
+              ALTER TABLE feedback_messages
+                ADD CONSTRAINT fk_feedback_messages_parent FOREIGN KEY (parent_message_id) REFERENCES feedback_messages(message_id);
+              ALTER TABLE feedback_messages
+                ADD CONSTRAINT fk_feedback_messages_sender FOREIGN KEY (sender_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: feedback_attachments
+              -- ============================
+              DROP TABLE IF EXISTS feedback_attachments CASCADE;
+              CREATE TABLE feedback_attachments (
+                attachment_id bigint PRIMARY KEY,
+                message_id bigint NOT NULL,
+                uploader_id bigint,
+                file_name varchar(255),
+                file_url text,
+                uploaded_at bigint,
+                created_at bigint,
+                updated_at bigint,
+                version integer,
+                status varchar(50),
+                file_type varchar,
+                file_size varchar
+              );
+
+              ALTER TABLE feedback_attachments
+                ADD CONSTRAINT fk_feedback_attachments_message FOREIGN KEY (message_id) REFERENCES feedback_messages(message_id);
+              ALTER TABLE feedback_attachments
+                ADD CONSTRAINT fk_feedback_attachments_uploader FOREIGN KEY (uploader_id) REFERENCES users(user_id);
+
+              -- ============================
+              -- TABLE: quick_notes
+              -- ============================
+              DROP TABLE IF EXISTS quick_notes CASCADE;
+              CREATE TABLE quick_notes (
+                id bigserial PRIMARY KEY,
+                intern_id bigint NOT NULL,
+                writer_id bigint NOT NULL,
+                content text NOT NULL,
+                write_date timestamp NOT NULL,
+                created_at timestamp NOT NULL DEFAULT now(),
+                updated_at timestamp,
+                status varchar(50),
+                version integer,
+                created_by varchar(255),
+                updated_by varchar(255),
+                is_deleted boolean DEFAULT false
+              );
+
+              ALTER TABLE quick_notes
+                ADD CONSTRAINT fk_quick_note_intern FOREIGN KEY (intern_id) REFERENCES users(user_id);
+              ALTER TABLE quick_notes
+                ADD CONSTRAINT fk_quick_note_writer FOREIGN KEY (writer_id) REFERENCES users(user_id);

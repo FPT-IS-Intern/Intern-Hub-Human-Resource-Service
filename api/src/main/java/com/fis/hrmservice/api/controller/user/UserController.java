@@ -106,13 +106,6 @@ public class UserController {
     return ResponseApi.ok("Update user profile thành công");
   }
 
-  @GetMapping("/internal/{userId}")
-  //  @Internal
-  public ResponseApi<UserResponse> getUserByIdInternal(@PathVariable Long userId) {
-    UserModel userModel = userProfileUseCase.internalUserProfile(userId);
-    return ResponseApi.ok(userApiMapper.toResponse(userModel));
-  }
-
   @PutMapping("/suspension/{userId}")
   public ResponseApi<UserResponse> suspendUser(@PathVariable Long userId) {
     UserModel userModel = userSuspension.suspendUser(userId);
