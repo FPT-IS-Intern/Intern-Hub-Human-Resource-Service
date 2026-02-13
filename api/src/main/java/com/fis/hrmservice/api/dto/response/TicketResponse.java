@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateTicketResponse {
+public class TicketResponse {
   Long ticketId;
   String ticketType;
   String ticketStatus;

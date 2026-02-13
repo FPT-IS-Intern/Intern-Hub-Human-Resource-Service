@@ -2,7 +2,7 @@ package com.fis.hrmservice.api.controller.ticket;
 
 import com.fis.hrmservice.api.dto.request.CreateTicketRequest;
 import com.fis.hrmservice.api.dto.request.RemoteTicketRequest;
-import com.fis.hrmservice.api.dto.response.CreateTicketResponse;
+import com.fis.hrmservice.api.dto.response.TicketResponse;
 import com.fis.hrmservice.api.mapper.TicketApiMapper;
 import com.fis.hrmservice.domain.model.ticket.LeaveRequestModel;
 import com.fis.hrmservice.domain.usecase.command.ticket.CreateTicketCommand;
@@ -32,7 +32,7 @@ public class TicketController {
   @PostMapping(
       value = "/leave-ticket/{userId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  public ResponseApi<CreateTicketResponse> createLeaveTicket(
+  public ResponseApi<TicketResponse> createLeaveTicket(
       @PathVariable Long userId,
       @RequestPart("ticketInfo") CreateTicketRequest ticketRequest,
       @RequestPart(value = "evidenceFile", required = false) MultipartFile evidenceFile) {
@@ -51,7 +51,7 @@ public class TicketController {
   }
 
   @PostMapping(value = "remote-ticket/{userid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseApi<?> createRemoteTicket(
+  public ResponseApi<TicketResponse> createRemoteTicket(
       @PathVariable Long userid,
       @RequestPart("ticketInfo") CreateTicketRequest ticketRequest,
       @RequestPart("evidenceFile") MultipartFile evidenceFile,
@@ -60,8 +60,11 @@ public class TicketController {
     requestCommand.setEvidence(evidenceFile);
     RemoteRequestCommand remoteCommand =
         ticketApiMapper.toRemoteRequestCommand(remoteTicketRequest);
-    ticketUseCaseImpl.createRemoteRequest(requestCommand, remoteCommand, userid);
+    return ResponseApi.ok(ticketApiMapper.toTicketResponse(ticketUseCaseImpl.createRemoteRequest(requestCommand, remoteCommand, userid)));
+  }
 
+  @PostMapping(value = "/explanation-ticket/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseApi<TicketResponse> createExplanationTicket() {
     return ResponseApi.ok(null);
   }
 

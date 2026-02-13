@@ -5,6 +5,7 @@ import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.regex.Pattern;
 
 public class UserValidationService {
@@ -74,6 +75,10 @@ public class UserValidationService {
     // chỉ");
     //        }
 
+    if (idNumber == null || idNumber.isBlank()) {
+      throw new ConflictDataException("Số CCCD/CMND không được để trống");
+    }
+
     if (idNumber.length() != 12) {
       throw new ConflictDataException("Số CCCD/CMND không hợp lệ");
     }
@@ -106,6 +111,7 @@ public class UserValidationService {
   }
 
   public void validateFileMetadata(RegisterUserCommand command) {
+
     // Validate CV
     validateCvFile(command.getCvContentType(), command.getCvSize());
 
@@ -114,6 +120,16 @@ public class UserValidationService {
   }
 
   public void validateFileMetadataUpdate(UpdateUserProfileCommand command) {
+
+    if (command.getCvFile() != null) {
+      validateCvFile(command.getCvFile().getContentType(), command.getCvFile().getSize());
+    }
+
+    if (command.getAvatarFile() != null) {
+      validateAvatarFile(command.getAvatarFile().getContentType(), command.getAvatarFile().getSize());
+    }
+
+
     // Validate CV
     validateCvFile(command.getCvFile().getContentType(), command.getCvFile().getSize());
 
@@ -163,18 +179,20 @@ public class UserValidationService {
     if (startDate == null) {
       throw new ConflictDataException("Ngày bắt đầu thực tập không được để trống");
     }
+
     if (endDate == null) {
       throw new ConflictDataException("Ngày kết thúc thực tập không được để trống");
     }
 
-    LocalDate today = LocalDate.now();
+    LocalDate today = LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 
     if (startDate.isBefore(today)) {
       throw new ConflictDataException("Ngày bắt đầu thực tập không được trước ngày hiện tại");
     }
 
-    if (endDate.isBefore(startDate)) {
+    if (!endDate.isAfter(startDate)) {
       throw new ConflictDataException("Ngày kết thúc phải sau ngày bắt đầu thực tập");
     }
   }
+
 }

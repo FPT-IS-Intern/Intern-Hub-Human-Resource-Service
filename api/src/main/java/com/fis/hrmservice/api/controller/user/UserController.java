@@ -45,16 +45,28 @@ public class UserController {
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<?> registerUser(
       @RequestPart("userInfo") RegisterUserRequest request,
-      @RequestPart("avatarFile") MultipartFile avatarFile,
-      @RequestPart("cvFile") MultipartFile cvFile) {
+      @RequestPart(value = "avatarFile") MultipartFile avatarFile,
+      @RequestPart(value = "cvFile") MultipartFile cvFile) {
 
+    log.info("=== Register User Request ===");
+    log.info("UserInfo: email={}, fullName={}", request.getEmail(), request.getFullName());
     log.info(
-        "Got avatar file: {}, cv file: {}",
-        avatarFile.getOriginalFilename(),
-        cvFile.getOriginalFilename());
+        "Avatar file: present={}, name={}, size={}",
+        avatarFile != null,
+        avatarFile != null ? avatarFile.getOriginalFilename() : "N/A",
+        avatarFile != null ? avatarFile.getSize() : 0);
+    log.info(
+        "CV file: present={}, name={}, size={}",
+        cvFile != null,
+        cvFile != null ? cvFile.getOriginalFilename() : "N/A",
+        cvFile != null ? cvFile.getSize() : 0);
 
-    request.setAvatar(avatarFile);
-    request.setCv(cvFile);
+    if (avatarFile != null && !avatarFile.isEmpty()) {
+      request.setAvatar(avatarFile);
+    }
+    if (cvFile != null && !cvFile.isEmpty()) {
+      request.setCv(cvFile);
+    }
 
     RegisterUserCommand command = userApiMapper.toCommand(request);
     UserModel user = registerUserUseCase.registerUser(command);
