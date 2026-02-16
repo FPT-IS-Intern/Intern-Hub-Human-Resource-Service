@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
@@ -73,6 +74,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   @Query("SELECT t from Ticket t ORDER BY t.startAt DESC")
   List<Ticket> firstThreeRegistrationTicket();
 
-  @Query("SELECT t from Ticket t WHERE t.id = :ticketId AND t.ticketType = 'REGISTRATION'")
+  @Query("SELECT t from Ticket t WHERE t.id = :ticketId AND t.ticketType.typeName = 'REGISTRATION'")
   Ticket getDetailRegistrationTicket(Long ticketId);
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE Ticket t set t.status = :ticketStatus where t.id = :ticketId and t.ticketType.typeName = 'REGISTRATION'")
+  int updateRegistrationTicketStatus(
+          @Param("ticketStatus") String ticketStatus,
+          @Param("ticketId") Long ticketId);
 }

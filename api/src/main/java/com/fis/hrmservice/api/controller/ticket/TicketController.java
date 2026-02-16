@@ -16,7 +16,6 @@ import com.fis.hrmservice.domain.usecase.implement.ticket.TicketUseCaseImpl;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -101,5 +100,15 @@ public class TicketController {
   @GetMapping("/registration-ticket-detail/{ticketId}")
   public ResponseApi<RegistrationDetailResponse> getDetailRegistrationTicket(@PathVariable Long ticketId){
     return ResponseApi.ok(ticketApiMapper.toRegistrationDetailResponse(ticketUseCaseImpl.getDetailRegistrationTicket(ticketId)));
+  }
+
+  @PutMapping("/approve/{ticketId}")
+  public ResponseApi<?> approveRegistrationRequest(@PathVariable Long ticketId) {
+    return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId));
+  }
+
+  @PutMapping("/reject/{ticketId}")
+  public ResponseApi<?> rejectRegistrationRequest(@PathVariable Long ticketId) {
+    return ResponseApi.ok(ticketUseCaseImpl.rejectRegistrationTicketByTicketId(ticketId));
   }
 }

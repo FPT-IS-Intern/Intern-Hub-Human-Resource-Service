@@ -18,4 +18,6 @@ public class AttendanceLogModel extends BaseDomain {
   long checkOutTime;
   String attendanceStatus;
   String source;
+  boolean isCheckInValid;
+  boolean isCheckOutValid;
 }

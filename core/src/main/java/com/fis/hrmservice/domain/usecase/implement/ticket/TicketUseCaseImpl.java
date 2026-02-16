@@ -201,6 +201,21 @@ public class TicketUseCaseImpl {
   }
 
   public TicketModel getDetailRegistrationTicket(Long ticketId){
-    return ticketRepositoryPort.getDetailRegistrationTicket(ticketId);
+
+    TicketModel ticket = ticketRepositoryPort.getDetailRegistrationTicket(ticketId);
+
+    if (ticket == null) {
+      throw new NotFoundException("Ticket not found: " + ticketId);
+    }
+
+    return ticket;
+  }
+
+  public TicketModel approveRegistrationTicketByTicketId(Long ticketId) {
+    return ticketRepositoryPort.updateRegistrationTicketStatus(ticketId, "APPROVED");
+  }
+
+  public TicketModel rejectRegistrationTicketByTicketId(Long ticketId) {
+    return ticketRepositoryPort.updateRegistrationTicketStatus(ticketId, "REJECTED");
   }
 }

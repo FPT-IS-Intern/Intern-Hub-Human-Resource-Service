@@ -16,4 +16,6 @@ public interface TicketRepositoryPort {
   List<TicketModel> firstThreeRegistrationTicket();
 
   TicketModel getDetailRegistrationTicket(Long ticketId);
+
+  TicketModel updateRegistrationTicketStatus(Long ticketId, String ticketStatus);
 }
