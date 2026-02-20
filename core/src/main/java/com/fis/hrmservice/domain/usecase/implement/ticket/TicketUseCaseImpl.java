@@ -218,4 +218,20 @@ public class TicketUseCaseImpl {
   public TicketModel rejectRegistrationTicketByTicketId(Long ticketId) {
     return ticketRepositoryPort.updateRegistrationTicketStatus(ticketId, "REJECTED");
   }
+
+  public int allRegistrationTicket() {
+      return ticketRepositoryPort.getAllRegistrationTicket();
+  }
+
+  public int allApprovedRegistrationTicket() {
+      return ticketRepositoryPort.getAllRegistrationTicketApproved();
+  }
+
+  public int allRejectedRegistrationTicket() {
+      return ticketRepositoryPort.getAllRegistrationTicketRejected();
+  }
+
+  public int allPendingRegistrationTicket() {
+      return ticketRepositoryPort.getAllRegistrationTicketPending();
+  }
 }

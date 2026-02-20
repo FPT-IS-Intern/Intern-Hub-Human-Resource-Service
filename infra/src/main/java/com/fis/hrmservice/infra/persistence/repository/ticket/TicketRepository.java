@@ -37,17 +37,17 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       @Param("ticketType") String ticketType,
       @Param("ticketStatus") String ticketStatus);
 
-  @Query("SELECT COUNT(t) FROM Ticket t")
-  int allRequestsCount();
+  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.ticketType.typeName = 'REGISTRATION'")
+  int allRegistrationCount();
 
-  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = 'PENDING'")
-  int allPendingRequestsCount();
+  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = 'PENDING' AND t.ticketType.typeName = 'REGISTRATION'")
+  int allPendingRegistrationCount();
 
-  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = 'WAITING'")
-  int allWaitingRequestsCount();
+  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = 'REJECTED' AND t.ticketType.typeName = 'REGISTRATION'")
+  int allRejectedRegistrationCount();
 
-  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = 'APPROVED'")
-  int allApprovedRequestsCount();
+  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = 'APPROVED' AND t.ticketType.typeName = 'REGISTRATION'")
+  int allApprovedRegistrationCount();
 
   @Modifying
   @Query(
@@ -71,7 +71,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   List<Ticket> filterTickets(@Param("keyword") String keyword,
                              @Param("status") String status);
 
-  @Query("SELECT t from Ticket t ORDER BY t.startAt DESC")
+  @Query("SELECT t from Ticket t ORDER BY t.startAt DESC limit 3")
   List<Ticket> firstThreeRegistrationTicket();
 
   @Query("SELECT t from Ticket t WHERE t.id = :ticketId AND t.ticketType.typeName = 'REGISTRATION'")

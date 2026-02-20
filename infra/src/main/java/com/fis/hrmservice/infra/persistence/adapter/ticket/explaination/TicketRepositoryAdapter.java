@@ -57,6 +57,7 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
 
   @Override
   public List<TicketModel> filterRegistrationTicket(String keyword, String ticketStatus) {
+    System.out.println("CALLING FILTER TICKETS");
       return ticketRepository.filterTickets(keyword, ticketStatus).stream().map(ticketMapper::toModel).toList();
   }
 
@@ -98,6 +99,26 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
     }
     userRepository.save(user);
     return ticket;
+  }
+
+  @Override
+  public int getAllRegistrationTicket() {
+    return ticketRepository.allRegistrationCount();
+  }
+
+  @Override
+  public int getAllRegistrationTicketApproved() {
+    return ticketRepository.allApprovedRegistrationCount();
+  }
+
+  @Override
+  public int getAllRegistrationTicketRejected() {
+    return ticketRepository.allRejectedRegistrationCount();
+  }
+
+  @Override
+  public int getAllRegistrationTicketPending() {
+    return ticketRepository.allPendingRegistrationCount();
   }
 
 }

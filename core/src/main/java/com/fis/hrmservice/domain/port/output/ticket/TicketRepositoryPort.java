@@ -18,4 +18,9 @@ public interface TicketRepositoryPort {
   TicketModel getDetailRegistrationTicket(Long ticketId);
 
   TicketModel updateRegistrationTicketStatus(Long ticketId, String ticketStatus);
+
+  int getAllRegistrationTicket();
+  int getAllRegistrationTicketApproved();
+  int getAllRegistrationTicketRejected();
+  int getAllRegistrationTicketPending();
 }
