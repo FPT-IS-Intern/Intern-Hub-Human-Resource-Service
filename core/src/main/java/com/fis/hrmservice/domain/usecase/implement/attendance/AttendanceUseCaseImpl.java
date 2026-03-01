@@ -108,14 +108,6 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
       checkInTimestamp = System.currentTimeMillis();
     }
 
-    // Validate 7:30 AM Constraint
-    // LocalTime checkInTime = convertToLocalTime(checkInTimestamp);
-    // LocalTime earliestTime = LocalTime.of(EARLIEST_CHECK_IN_HOUR,
-    // EARLIEST_CHECK_IN_MINUTE);
-    // if (checkInTime.isBefore(earliestTime)) {
-    // throw new BadRequestException("Chưa đến giờ điểm danh (7:30)");
-    // }
-
     LocalDate workDate = convertToLocalDate(checkInTimestamp);
 
     // Check if already checked in today
