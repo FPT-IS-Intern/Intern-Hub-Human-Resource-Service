@@ -7,7 +7,6 @@ import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
 import com.fis.hrmservice.api.util.WebUtils;
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
-import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.domain.usecase.attendance.AttendanceUseCase;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
@@ -16,6 +15,7 @@ import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("hrm/attendance")
+@CrossOrigin(origins = "*")
 @EnableGlobalExceptionHandler
 @Slf4j
 @Tag(name = "Attendance Management", description = "APIs for attendance check-in and check-out")
@@ -50,13 +51,14 @@ public class AttendanceController {
 
   /** Process check-in */
   @PostMapping("/check-in")
-  public ResponseApi<AttendanceResponse> checkIn(
-      @RequestParam Long userId, HttpServletRequest servletRequest) {
+  public ResponseApi<AttendanceResponse> checkIn(@RequestParam Long userId,
+      @RequestParam(required = false) Double latitude,
+      @RequestParam(required = false) Double longitude, HttpServletRequest servletRequest) {
     log.info("POST /attendance/check-in - userId: {}", userId);
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     long now = System.currentTimeMillis();
-    CheckInCommand command = attendanceApiMapper.toCheckInCommand(userId, now, clientIp);
+    CheckInCommand command = attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkIn(command);
     AttendanceResponse response = attendanceApiMapper.toCheckInResponseFromLog(attendance);
 
@@ -76,21 +78,28 @@ public class AttendanceController {
     return ResponseApi.ok(response);
   }
 
-  /** Check if user is on company network based on IP address Validates against company IP ranges */
-  @GetMapping("/network-check")
-  public ResponseApi<WiFiInfoResponse> checkNetwork(HttpServletRequest request) {
-    log.info("GET /attendance/network-check - checking client IP");
+  /**
+   * Unified check-point for attendance eligibility (IP or GPS)
+   */
+  @GetMapping("/check-point")
+  public ResponseApi<WiFiInfoResponse> checkPoint(
+      @RequestParam(required = false) Double latitude,
+      @RequestParam(required = false) Double longitude,
+      HttpServletRequest request) {
+    log.info("GET /attendance/check-point - checking eligibility");
 
     String clientIp = WebUtils.getClientIpAddress(request);
     boolean isCompanyNetwork = networkCheckPort.isCompanyIpAddress(clientIp);
+    boolean isAtLocation = networkCheckPort.isAtCompanyLocation(latitude, longitude);
 
-    WiFiInfoResponse response =
-        WiFiInfoResponse.builder()
-            .wifiName(isCompanyNetwork ? "FPT-Network" : "External-Network")
-            .isCompanyWifi(isCompanyNetwork)
-            .build();
+    boolean isValid = isCompanyNetwork || isAtLocation;
 
-    log.info("Network check result - IP: {}, isCompanyNetwork: {}", clientIp, isCompanyNetwork);
+    WiFiInfoResponse response = WiFiInfoResponse.builder()
+        .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
+        .isCompanyWifi(isValid)
+        .build();
+
+    log.info("Check-point result - IP: {}, GPS: {}, isValid: {}", clientIp, (latitude != null), isValid);
     return ResponseApi.ok(response);
   }
 }

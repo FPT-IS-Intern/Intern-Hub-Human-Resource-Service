@@ -95,24 +95,20 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
             .findById(command.getUserId())
             .orElseThrow(() -> new NotFoundException("User không tồn tại"));
 
-    // Validate IP address
-    if (!networkCheckPort.isCompanyIpAddress(command.getClientIp())) {
-      log.warn("Check-in rejected: IP {} is not a company network", command.getClientIp());
-      throw new BadRequestException("Bạn cần kết nối Wi-Fi công ty để điểm danh");
+    // Unified Location Check: IP or GPS
+    boolean isCorrectIp = networkCheckPort.isCompanyIpAddress(command.getClientIp());
+    boolean isCorrectLocation = networkCheckPort.isAtCompanyLocation(command.getLatitude(), command.getLongitude());
+
+    if (!isCorrectIp && !isCorrectLocation) {
+      log.warn("Check-in rejected: IP {} and location ({}, {}) are both invalid",
+          command.getClientIp(), command.getLatitude(), command.getLongitude());
+      throw new BadRequestException("Bạn cần kết nối Wi-Fi công ty HOẶC ở văn phòng để điểm danh");
     }
 
     long checkInTimestamp = command.getCheckInTime();
     if (checkInTimestamp <= 0) {
       checkInTimestamp = System.currentTimeMillis();
     }
-
-    // Validate 7:30 AM Constraint
-    // LocalTime checkInTime = convertToLocalTime(checkInTimestamp);
-    // LocalTime earliestTime = LocalTime.of(EARLIEST_CHECK_IN_HOUR,
-    // EARLIEST_CHECK_IN_MINUTE);
-    // if (checkInTime.isBefore(earliestTime)) {
-    // throw new BadRequestException("Chưa đến giờ điểm danh (7:30)");
-    // }
 
     LocalDate workDate = convertToLocalDate(checkInTimestamp);
 

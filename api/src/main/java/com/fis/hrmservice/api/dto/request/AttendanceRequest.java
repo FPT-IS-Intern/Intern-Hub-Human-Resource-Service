@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class AttendanceRequest {
   private Long userId;
-  private long checkInTime;
-  private long checkOutTime;
+  private Double latitude;
+  private Double longitude;
 }

@@ -11,4 +11,6 @@ public class CheckInCommand {
   private Long userId;
   private long checkInTime;
   private String clientIp;
+  private Double latitude;
+  private Double longitude;
 }
