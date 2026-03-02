@@ -35,18 +35,18 @@ public class QuickNoteController {
     return ResponseApi.ok(quickNoteUserUseCase.createQuickNote(command, userId));
   }
 
-  //cái này cho admin xem
+  // cái này cho admin xem
   @GetMapping("/{userId}")
   public ResponseApi<List<QuickNoteResponse>> listQuickNoteByUserId(@PathVariable Long userId) {
     return ResponseApi.ok(
         quickNoteApiMapper.toResponse(quickNoteUserUseCase.findAllByUserId(userId)));
   }
 
-  //cái này cho user xem của chonhs bản thân mình
+  // cái này cho user xem của chonhs bản thân mình
   @GetMapping
   public ResponseApi<List<QuickNoteResponse>> myQuickNote() {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(
-            quickNoteApiMapper.toResponse(quickNoteUserUseCase.findAllByUserId(userId)));
+        quickNoteApiMapper.toResponse(quickNoteUserUseCase.findAllByUserId(userId)));
   }
 }

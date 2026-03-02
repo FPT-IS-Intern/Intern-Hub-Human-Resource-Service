@@ -2,16 +2,12 @@ package com.fis.hrmservice.infra.service;
 
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.infra.feign.BoPortalFeignClient;
-import com.fis.hrmservice.infra.model.AttendanceLocationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
- * Service for network-related operations including company network validation.
- * This service handles
+ * Service for network-related operations including company network validation. This service handles
  * infrastructure concerns related to network checking.
  */
 @Slf4j
@@ -22,8 +18,7 @@ public class NetworkCheckService implements NetworkCheckPort {
   private final BoPortalFeignClient boPortalFeignClient;
 
   /**
-   * Check if the given IP address belongs to the company network. Validates
-   * against allowed IP
+   * Check if the given IP address belongs to the company network. Validates against allowed IP
    * ranges from bo-portal service.
    *
    * @param ip the IP address to check
@@ -39,7 +34,8 @@ public class NetworkCheckService implements NetworkCheckPort {
       var response = boPortalFeignClient.getAllowedIpRanges();
       if (response != null && response.data() != null) {
         for (var range : response.data()) {
-          if (range.isActive() && (ip.startsWith(range.ipPrefix()) || ip.equals(range.ipPrefix()))) {
+          if (range.isActive()
+              && (ip.startsWith(range.ipPrefix()) || ip.equals(range.ipPrefix()))) {
             log.info("IP {} matched allowed range: {}", ip, range.description());
             return true;
           }
@@ -60,7 +56,7 @@ public class NetworkCheckService implements NetworkCheckPort {
     }
 
     try {
-       var response = boPortalFeignClient.getAttendanceLocations();
+      var response = boPortalFeignClient.getAttendanceLocations();
       if (response != null && response.data() != null) {
         for (var loc : response.data()) {
           double distance = calculateDistance(latitude, longitude, loc.latitude(), loc.longitude());
@@ -83,9 +79,12 @@ public class NetworkCheckService implements NetworkCheckPort {
     double deltaPhi = Math.toRadians(lat2 - lat1);
     double deltaLambda = Math.toRadians(lon2 - lon1);
 
-    double a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-        Math.cos(phi1) * Math.cos(phi2) *
-            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    double a =
+        Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2)
+            + Math.cos(phi1)
+                * Math.cos(phi2)
+                * Math.sin(deltaLambda / 2)
+                * Math.sin(deltaLambda / 2);
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c;

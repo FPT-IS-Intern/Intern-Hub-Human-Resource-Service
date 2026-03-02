@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -31,8 +32,9 @@ public class AttendanceLog extends AuditEntity {
   private LocalDateTime checkOutTime;
 
   @Size(max = 20)
+  @Enumerated(EnumType.STRING)
   @Column(name = "attendance_status", length = 20)
-  private String attendanceStatus;
+  private AttendanceStatus attendanceStatus;
 
   @Size(max = 50)
   @Column(name = "source", length = 50)

@@ -13,7 +13,7 @@ public interface NetworkCheckPort {
   /**
    * Check if the given coordinates are within range of any company location.
    *
-   * @param latitude  user's latitude
+   * @param latitude user's latitude
    * @param longitude user's longitude
    * @return true if within range of any location, false otherwise
    */

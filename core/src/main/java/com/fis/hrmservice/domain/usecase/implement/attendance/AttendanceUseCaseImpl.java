@@ -2,6 +2,7 @@ package com.fis.hrmservice.domain.usecase.implement.attendance;
 
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
+import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.attendance.AttendanceRepositoryPort;
@@ -97,11 +98,15 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     // Unified Location Check: IP or GPS
     boolean isCorrectIp = networkCheckPort.isCompanyIpAddress(command.getClientIp());
-    boolean isCorrectLocation = networkCheckPort.isAtCompanyLocation(command.getLatitude(), command.getLongitude());
+    boolean isCorrectLocation =
+        networkCheckPort.isAtCompanyLocation(command.getLatitude(), command.getLongitude());
 
     if (!isCorrectIp && !isCorrectLocation) {
-      log.warn("Check-in rejected: IP {} and location ({}, {}) are both invalid",
-          command.getClientIp(), command.getLatitude(), command.getLongitude());
+      log.warn(
+          "Check-in rejected: IP {} and location ({}, {}) are both invalid",
+          command.getClientIp(),
+          command.getLatitude(),
+          command.getLongitude());
       throw new BadRequestException("Bạn cần kết nối Wi-Fi công ty HOẶC ở văn phòng để điểm danh");
     }
 
@@ -132,9 +137,14 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
             .checkOutTime(0)
             .isCheckInValid(isValid)
             .isCheckOutValid(false)
-            .attendanceStatus("CHECKED_IN")
             .source("WEB")
             .build();
+
+    if (isValid) {
+      attendance.setAttendanceStatus(AttendanceStatus.CHECK_IN_ON_TIME);
+    } else {
+      attendance.setAttendanceStatus(AttendanceStatus.CHECK_IN_LATE);
+    }
     attendance = attendanceRepository.save(attendance);
 
     log.info("Check-in successful for userId: {}, isValid: {}", command.getUserId(), isValid);
@@ -171,7 +181,13 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     attendance.setCheckOutTime(checkOutTime);
     attendance.setCheckOutValid(isValid);
-    attendance.setAttendanceStatus("COMPLETED");
+    //    attendance.setAttendanceStatus("COMPLETED");
+
+    if (isValid) {
+      attendance.setAttendanceStatus(AttendanceStatus.CHECK_OUT_ON_TIME);
+    } else {
+      attendance.setAttendanceStatus(AttendanceStatus.CHECK_OUT_EARLY);
+    }
 
     attendance = attendanceRepository.update(attendance);
 

@@ -7,6 +7,7 @@ import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
 import com.fis.hrmservice.api.util.WebUtils;
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
+import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.domain.usecase.attendance.AttendanceUseCase;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
@@ -15,7 +16,6 @@ import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -51,14 +51,17 @@ public class AttendanceController {
 
   /** Process check-in */
   @PostMapping("/check-in")
-  public ResponseApi<AttendanceResponse> checkIn(@RequestParam Long userId,
+  public ResponseApi<AttendanceResponse> checkIn(
+      @RequestParam Long userId,
       @RequestParam(required = false) Double latitude,
-      @RequestParam(required = false) Double longitude, HttpServletRequest servletRequest) {
+      @RequestParam(required = false) Double longitude,
+      HttpServletRequest servletRequest) {
     log.info("POST /attendance/check-in - userId: {}", userId);
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     long now = System.currentTimeMillis();
-    CheckInCommand command = attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
+    CheckInCommand command =
+        attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkIn(command);
     AttendanceResponse response = attendanceApiMapper.toCheckInResponseFromLog(attendance);
 
@@ -78,9 +81,7 @@ public class AttendanceController {
     return ResponseApi.ok(response);
   }
 
-  /**
-   * Unified check-point for attendance eligibility (IP or GPS)
-   */
+  /** Unified check-point for attendance eligibility (IP or GPS) */
   @GetMapping("/check-point")
   public ResponseApi<WiFiInfoResponse> checkPoint(
       @RequestParam(required = false) Double latitude,
@@ -94,12 +95,14 @@ public class AttendanceController {
 
     boolean isValid = isCompanyNetwork || isAtLocation;
 
-    WiFiInfoResponse response = WiFiInfoResponse.builder()
-        .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
-        .isCompanyWifi(isValid)
-        .build();
+    WiFiInfoResponse response =
+        WiFiInfoResponse.builder()
+            .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
+            .isCompanyWifi(isValid)
+            .build();
 
-    log.info("Check-point result - IP: {}, GPS: {}, isValid: {}", clientIp, (latitude != null), isValid);
+    log.info(
+        "Check-point result - IP: {}, GPS: {}, isValid: {}", clientIp, (latitude != null), isValid);
     return ResponseApi.ok(response);
   }
 }
