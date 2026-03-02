@@ -31,7 +31,6 @@ public class AttendanceLog extends AuditEntity {
   @Column(name = "check_out_time")
   private LocalDateTime checkOutTime;
 
-  @Size(max = 20)
   @Enumerated(EnumType.STRING)
   @Column(name = "attendance_status", length = 20)
   private AttendanceStatus attendanceStatus;

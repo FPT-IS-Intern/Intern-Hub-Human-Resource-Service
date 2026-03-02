@@ -181,7 +181,6 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     attendance.setCheckOutTime(checkOutTime);
     attendance.setCheckOutValid(isValid);
-    //    attendance.setAttendanceStatus("COMPLETED");
 
     if (isValid) {
       attendance.setAttendanceStatus(AttendanceStatus.CHECK_OUT_ON_TIME);
