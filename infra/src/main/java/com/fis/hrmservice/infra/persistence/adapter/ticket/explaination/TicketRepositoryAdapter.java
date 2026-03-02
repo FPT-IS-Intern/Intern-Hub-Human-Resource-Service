@@ -73,8 +73,7 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
     Page<Ticket> ticketPage =
         ticketRepository.filterRegistrationTicketPaged(command, PageRequest.of(page, size));
 
-    List<TicketModel> models =
-        ticketPage.getContent().stream().map(ticketMapper::toModel).toList();
+    List<TicketModel> models = ticketPage.getContent().stream().map(ticketMapper::toModel).toList();
 
     return PaginatedData.<TicketModel>builder()
         .items(models)

@@ -103,8 +103,7 @@ public class TicketController {
     return ResponseApi.ok(
         PaginatedData.<ListRegistrationResponse>builder()
             .items(
-                ticketApiMapper.toRegistrationResponseList(
-                    (List<TicketModel>) result.getItems()))
+                ticketApiMapper.toRegistrationResponseList((List<TicketModel>) result.getItems()))
             .totalItems(result.getTotalItems())
             .totalPages(result.getTotalPages())
             .build());

@@ -12,4 +12,3 @@ public class FilterRegistrationTicketCommand {
   String keyword;
   String ticketStatus;
 }
-
