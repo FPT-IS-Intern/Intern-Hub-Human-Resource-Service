@@ -12,7 +12,7 @@ public class FeignConfiguration {
 
   // Hi
 
-  @Value("security.internal-secret")
+  @Value("${security.internal-secret}")
   private String secretKey;
 
   @Bean
