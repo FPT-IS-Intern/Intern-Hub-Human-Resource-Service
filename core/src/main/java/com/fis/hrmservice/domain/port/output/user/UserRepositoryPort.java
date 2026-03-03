@@ -31,4 +31,6 @@ public interface UserRepositoryPort {
   int totalIntern();
 
   int internshipChanging();
+
+  List<UserModel> listAllSupervisor();
 }

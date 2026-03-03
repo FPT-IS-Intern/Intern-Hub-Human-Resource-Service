@@ -5,6 +5,7 @@ import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
 import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
 import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.dto.response.InternalUserResponse;
+import com.fis.hrmservice.api.dto.response.SupervisorResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
@@ -52,6 +53,8 @@ public class UserController {
   UserSuspension userSuspension;
 
   CreateAuthIdentityPort createAuthIdentityPort;
+
+  SupervisorUseCaseImpl supervisorUseCase;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<?> registerUser(
@@ -182,5 +185,10 @@ public class UserController {
     Long userId = UserContext.requiredUserId();
     UserModel userModel = userProfileUseCase.internalUserProfile(userId);
     return ResponseApi.ok(userApiMapper.toInternalUserResponse(userModel));
+  }
+
+  @GetMapping("/supervisor")
+  public ResponseApi<List<SupervisorResponse>> listAllSupervisor() {
+    return ResponseApi.ok(supervisorUseCase.listAllSupervisor().stream().map(userApiMapper::toSupervisorResponse).toList());
   }
 }

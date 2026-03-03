@@ -3,6 +3,8 @@ package com.fis.hrmservice.infra.persistence.repository.user;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.infra.persistence.entity.User;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,4 +86,8 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
                             """,
       nativeQuery = true)
   int internshipChanging();
+
+
+  @Query("SELECT u FROM User u WHERE u.position.name = 'STAFF'")
+  List<User> listAllSupervisor();
 }

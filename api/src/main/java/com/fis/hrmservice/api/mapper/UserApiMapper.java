@@ -69,6 +69,8 @@ public interface UserApiMapper {
   @Mapping(target = "role", ignore = true)
   InternalUserResponse toInternalUserResponse(UserModel model);
 
+  SupervisorResponse toSupervisorResponse(UserModel model);
+
   // ===== Filter =====
   FilterUserCommand toCommand(FilterRequest request);
 

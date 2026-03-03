@@ -106,4 +106,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   public int internshipChanging() {
     return userJpaRepository.internshipChanging();
   }
+
+  @Override
+  public List<UserModel> listAllSupervisor() {
+    return userJpaRepository.listAllSupervisor().stream().map(userMapper::toModel).toList();
+  }
 }
