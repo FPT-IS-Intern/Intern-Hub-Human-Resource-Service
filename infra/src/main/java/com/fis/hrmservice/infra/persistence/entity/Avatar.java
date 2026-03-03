@@ -47,8 +47,4 @@ public class Avatar extends AuditEntity {
 
   @Column(name = "file_size")
   private Long fileSize;
-
-  @Size(max = 255)
-  @Column(name = "avatar_file_name")
-  private String avatarFileName;
 }

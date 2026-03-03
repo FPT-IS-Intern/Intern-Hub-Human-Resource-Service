@@ -95,7 +95,6 @@ public interface UserMapper {
     return AvatarModel.builder()
         .avatarId(entity.getId())
         .avatarUrl(entity.getAvatarUrl())
-        .fileName(entity.getAvatarFileName())
         .fileType(entity.getFileType())
         .fileSize(entity.getFileSize() != null ? entity.getFileSize() : 0)
         .build();
@@ -119,7 +118,6 @@ public interface UserMapper {
     Avatar avatar = new Avatar();
     avatar.setId(model.getAvatarId());
     avatar.setAvatarUrl(model.getAvatarUrl());
-    avatar.setAvatarFileName(model.getFileName());
     avatar.setFileType(model.getFileType());
     avatar.setFileSize(model.getFileSize());
     return avatar;

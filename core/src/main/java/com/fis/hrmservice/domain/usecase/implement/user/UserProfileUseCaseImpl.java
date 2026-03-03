@@ -128,7 +128,6 @@ public class UserProfileUseCaseImpl {
       }
 
       avatar.setAvatarUrl(avatarUrl);
-      avatar.setFileName(command.getAvatarFile().getOriginalFilename());
       avatar.setFileSize(command.getAvatarFile().getSize());
       avatar.setFileType(command.getAvatarFile().getContentType());
 

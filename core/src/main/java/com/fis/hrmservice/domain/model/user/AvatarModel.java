@@ -16,5 +16,4 @@ public class AvatarModel extends BaseDomain {
   String avatarUrl;
   String fileType;
   long fileSize;
-  String fileName;
 }

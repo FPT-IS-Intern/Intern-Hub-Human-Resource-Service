@@ -77,7 +77,6 @@ public class RegisterUserUseCaseImpl {
                   .avatarId(snowflake.next())
                   .user(savedUser)
                   .avatarUrl(avatarUrl)
-                  .fileName(command.getAvatar().getOriginalFilename())
                   .fileSize(command.getAvatar().getSize())
                   .fileType(command.getAvatar().getContentType())
                   .build());

@@ -12,12 +12,10 @@ import org.mapstruct.Named;
 public interface AvatarMapper {
 
   @Mapping(target = "avatarId", source = "id")
-  @Mapping(target = "fileName", source = "avatarFileName")
   @Mapping(target = "user", source = "user", qualifiedByName = "userToSimpleModel")
   AvatarModel toModel(Avatar avatar);
 
   @Mapping(target = "id", source = "avatarId")
-  @Mapping(target = "avatarFileName", source = "fileName")
   @Mapping(target = "fileType", source = "fileType")
   @Mapping(target = "fileSize", source = "fileSize")
   @Mapping(target = "user", source = "user", qualifiedByName = "userModelToEntity")
