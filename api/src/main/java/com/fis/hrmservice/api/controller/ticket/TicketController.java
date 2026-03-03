@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Ticket Management", description = "APIs for Ticket")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4205")
 public class TicketController {
 
   TicketUseCaseImpl ticketUseCaseImpl;

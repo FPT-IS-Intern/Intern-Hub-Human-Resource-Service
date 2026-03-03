@@ -10,7 +10,7 @@ import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.output.CreateAuthIdentityPort;
+import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 import com.fis.hrmservice.domain.usecase.implement.user.*;
@@ -36,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User Management", description = "APIs for user registration and management")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4205")
 public class UserController {
 
   RegisterUserUseCaseImpl registerUserUseCase;

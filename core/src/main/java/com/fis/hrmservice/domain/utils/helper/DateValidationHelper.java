@@ -1,4 +1,4 @@
-package com.fis.hrmservice.domain.utils;
+package com.fis.hrmservice.domain.utils.helper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

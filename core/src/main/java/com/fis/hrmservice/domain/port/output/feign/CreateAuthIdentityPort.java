@@ -1,4 +1,4 @@
-package com.fis.hrmservice.domain.port.output;
+package com.fis.hrmservice.domain.port.output.feign;
 
 public interface CreateAuthIdentityPort {
 

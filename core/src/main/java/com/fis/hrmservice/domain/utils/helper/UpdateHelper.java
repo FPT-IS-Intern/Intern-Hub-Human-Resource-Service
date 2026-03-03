@@ -1,4 +1,4 @@
-package com.fis.hrmservice.domain.utils;
+package com.fis.hrmservice.domain.utils.helper;
 
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
