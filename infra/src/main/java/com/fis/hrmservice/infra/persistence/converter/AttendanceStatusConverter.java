@@ -27,4 +27,3 @@ public class AttendanceStatusConverter implements AttributeConverter<AttendanceS
     }
   }
 }
-

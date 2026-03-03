@@ -1,8 +1,7 @@
 package com.fis.hrmservice.domain.utils.response;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,14 +9,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InternalUploadDirectResponse {
-    Long id;
-    String objectKey;
-    String originalFileName;
-    String contentType;
-    Long fileSize;
-    String status;
-    Long actorId;
-    Long version;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+  Long id;
+  String objectKey;
+  String originalFileName;
+  String contentType;
+  Long fileSize;
+  String status;
+  Long actorId;
+  Long version;
+  LocalDateTime createdAt;
+  LocalDateTime updatedAt;
 }

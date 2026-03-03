@@ -8,9 +8,9 @@ public interface InternalUploadDirectPort {
   /**
    * Upload file to DMS microservice via internal API.
    *
-   * @param file            the multipart file to upload
+   * @param file the multipart file to upload
    * @param destinationPath the storage destination path (e.g., "avatars/12345")
-   * @param actorId         the user ID performing the upload
+   * @param actorId the user ID performing the upload
    * @return upload result with file metadata (objectKey, url, etc.)
    */
   InternalUploadDirectResponse upload(MultipartFile file, String destinationPath, Long actorId);

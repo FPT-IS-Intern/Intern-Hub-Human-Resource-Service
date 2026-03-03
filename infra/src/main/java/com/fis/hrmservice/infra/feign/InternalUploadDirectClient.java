@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 @FeignClient(name = "dms", url = "${feign.client.config.dns.url}")
 public interface InternalUploadDirectClient {
 
-  @PostMapping(value = "/dms/internal/direct/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/dms/internal/direct/upload",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseApi<InternalUploadDirectResponse> uploadDirect(
       @RequestPart("file") MultipartFile file,
       @RequestParam("destinationPath") String destinationPath,

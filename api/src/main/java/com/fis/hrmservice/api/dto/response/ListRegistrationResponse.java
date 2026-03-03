@@ -9,8 +9,10 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ListRegistrationResponse {
   int no;
+
   @JsonSerialize(using = ToStringSerializer.class)
   Long ticketId;
+
   String fullName;
   String companyEmail;
   String departmentName;

@@ -12,6 +12,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 public class TicketResponse {
   @JsonSerialize(using = ToStringSerializer.class)
   Long ticketId;
+
   String ticketType;
   String ticketStatus;
   LocalDate createDate;

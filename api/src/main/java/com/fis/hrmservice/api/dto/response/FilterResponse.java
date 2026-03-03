@@ -9,8 +9,10 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 @Builder
 public class FilterResponse {
   Integer no;
+
   @JsonSerialize(using = ToStringSerializer.class)
   Long userId;
+
   String avatarUrl;
   String fullName;
   String sysStatus;

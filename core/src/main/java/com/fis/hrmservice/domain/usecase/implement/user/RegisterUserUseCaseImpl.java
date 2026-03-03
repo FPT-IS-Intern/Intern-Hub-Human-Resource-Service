@@ -8,11 +8,13 @@ import com.fis.hrmservice.domain.model.user.AvatarModel;
 import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.port.output.feign.InternalUploadDirectPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketTypeRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.*;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
+import com.fis.hrmservice.domain.utils.response.InternalUploadDirectResponse;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.utils.Snowflake;
 import java.time.LocalDate;
@@ -34,7 +36,7 @@ public class RegisterUserUseCaseImpl {
   UserValidationService validationService;
   TicketRepositoryPort ticketRepositoryPort;
   TicketTypeRepositoryPort ticketTypeRepositoryPort;
-  FileStoragePort fileStoragePort;
+  InternalUploadDirectPort fileUploadPort;
   AvatarRepositoryPort avatarRepositoryPort;
   CvRepositoryPort cvRepositoryPort;
 
@@ -63,20 +65,17 @@ public class RegisterUserUseCaseImpl {
 
     try {
 
-      // 5️⃣ Upload Avatar
-      String avatarUrl =
-          fileStoragePort.upload(
-              command.getAvatar().getBytes(),
-              command.getAvatar().getOriginalFilename(),
-              command.getAvatar().getContentType(),
-              "avatars/" + savedUser.getUserId());
+      // 5️⃣ Upload Avatar via DMS
+      InternalUploadDirectResponse avatarResult =
+          fileUploadPort.upload(
+              command.getAvatar(), "avatars/" + savedUser.getUserId(), savedUser.getUserId());
 
       AvatarModel avatar =
           avatarRepositoryPort.save(
               AvatarModel.builder()
                   .avatarId(snowflake.next())
                   .user(savedUser)
-                  .avatarUrl(avatarUrl)
+                  .avatarUrl(avatarResult.getObjectKey())
                   .fileSize(command.getAvatar().getSize())
                   .fileType(command.getAvatar().getContentType())
                   .build());
@@ -85,20 +84,17 @@ public class RegisterUserUseCaseImpl {
         throw new ConflictDataException("Cannot save avatar");
       }
 
-      // 6️⃣ Upload CV
-      String cvUrl =
-          fileStoragePort.upload(
-              command.getCv().getBytes(),
-              command.getCv().getOriginalFilename(),
-              command.getCv().getContentType(),
-              "cvs/" + savedUser.getUserId());
+      // 6️⃣ Upload CV via DMS
+      InternalUploadDirectResponse cvResult =
+          fileUploadPort.upload(
+              command.getCv(), "cvs/" + savedUser.getUserId(), savedUser.getUserId());
 
       CvModel cv =
           cvRepositoryPort.save(
               CvModel.builder()
                   .cvId(snowflake.next())
                   .user(savedUser)
-                  .cvUrl(cvUrl)
+                  .cvUrl(cvResult.getObjectKey())
                   .fileSize(command.getCv().getSize())
                   .fileType(command.getCv().getContentType())
                   .build());
@@ -157,9 +153,10 @@ public class RegisterUserUseCaseImpl {
     }
 
     String cvType = command.getCv().getContentType();
-    if (cvType == null ||
-            !(cvType.equals("application/pdf") ||
-                    cvType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))) {
+    if (cvType == null
+        || !(cvType.equals("application/pdf")
+            || cvType.equals(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))) {
       throw new ConflictDataException("CV must be PDF or DOCX");
     }
   }

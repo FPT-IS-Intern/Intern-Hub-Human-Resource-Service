@@ -19,7 +19,6 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -131,8 +130,7 @@ public class UserController {
   public ResponseApi<?> updateProfile(
       @Valid @RequestPart("userInfo") UpdateProfileRequest request,
       @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
-      @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile)
-      throws IOException {
+      @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile) {
 
     Long userId = UserContext.requiredUserId();
 
@@ -180,6 +178,9 @@ public class UserController {
 
   @GetMapping("/supervisor")
   public ResponseApi<List<SupervisorResponse>> listAllSupervisor() {
-    return ResponseApi.ok(supervisorUseCase.listAllSupervisor().stream().map(userApiMapper::toSupervisorResponse).toList());
+    return ResponseApi.ok(
+        supervisorUseCase.listAllSupervisor().stream()
+            .map(userApiMapper::toSupervisorResponse)
+            .toList());
   }
 }

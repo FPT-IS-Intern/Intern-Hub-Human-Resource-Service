@@ -13,7 +13,8 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SupervisorResponse {
-    @JsonSerialize(using = ToStringSerializer.class)
-    Long userId;
-    String fullName;
+  @JsonSerialize(using = ToStringSerializer.class)
+  Long userId;
+
+  String fullName;
 }

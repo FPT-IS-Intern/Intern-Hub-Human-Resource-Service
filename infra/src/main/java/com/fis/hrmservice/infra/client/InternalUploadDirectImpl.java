@@ -37,11 +37,11 @@ public class InternalUploadDirectImpl implements InternalUploadDirectPort {
       ResponseApi<com.fis.hrmservice.infra.model.InternalUploadDirectResponse> response =
           internalUploadDirectClient.uploadDirect(file, destinationPath, actorId);
 
-      if (response == null || response.getData() == null) {
+      if (response == null || response.data() == null) {
         throw new ConflictDataException("DMS upload returned empty response");
       }
 
-      InternalUploadDirectResponse result = mapper.toDomain(response.getData());
+      InternalUploadDirectResponse result = mapper.toDomain(response.data());
 
       log.info(
           "DMS upload success: objectKey={}, fileSize={}",

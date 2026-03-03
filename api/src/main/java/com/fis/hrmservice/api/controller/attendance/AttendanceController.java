@@ -60,7 +60,8 @@ public class AttendanceController {
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     long now = System.currentTimeMillis();
-    CheckInCommand command = attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
+    CheckInCommand command =
+        attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkIn(command);
     AttendanceResponse response = attendanceApiMapper.toCheckInResponseFromLog(attendance);
 
@@ -78,7 +79,8 @@ public class AttendanceController {
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     long now = System.currentTimeMillis();
-    CheckOutCommand command = attendanceApiMapper.toCheckOutCommand(userId, now, clientIp, latitude, longitude);
+    CheckOutCommand command =
+        attendanceApiMapper.toCheckOutCommand(userId, now, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkOut(command);
     AttendanceResponse response = attendanceApiMapper.toCheckOutResponseFromLog(attendance);
 
@@ -99,10 +101,11 @@ public class AttendanceController {
 
     boolean isValid = isCompanyNetwork || isAtLocation;
 
-    WiFiInfoResponse response = WiFiInfoResponse.builder()
-        .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
-        .isCompanyWifi(isValid)
-        .build();
+    WiFiInfoResponse response =
+        WiFiInfoResponse.builder()
+            .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
+            .isCompanyWifi(isValid)
+            .build();
 
     log.info(
         "Check-point result - IP: {}, GPS: {}, isValid: {}", clientIp, (latitude != null), isValid);

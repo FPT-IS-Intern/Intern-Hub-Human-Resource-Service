@@ -3,15 +3,15 @@ package com.fis.hrmservice.domain.usecase.implement.user;
 import com.fis.hrmservice.domain.model.user.AvatarModel;
 import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.port.output.feign.InternalUploadDirectPort;
 import com.fis.hrmservice.domain.port.output.user.AvatarRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.CvRepositoryPort;
-import com.fis.hrmservice.domain.port.output.user.FileStoragePort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.fis.hrmservice.domain.utils.helper.UpdateHelper;
+import com.fis.hrmservice.domain.utils.response.InternalUploadDirectResponse;
 import com.intern.hub.library.common.exception.NotFoundException;
-import java.io.IOException;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class UserProfileUseCaseImpl {
 
   UserRepositoryPort userRepositoryPort;
   UserValidationService userValidationService;
-  FileStoragePort fileStoragePort;
+  InternalUploadDirectPort fileUploadPort;
   AvatarRepositoryPort avatarRepositoryPort;
   CvRepositoryPort cvRepositoryPort;
 
@@ -35,8 +35,7 @@ public class UserProfileUseCaseImpl {
         .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
   }
 
-  public UserModel updateProfileUser(UpdateUserProfileCommand command, long userId)
-      throws IOException {
+  public UserModel updateProfileUser(UpdateUserProfileCommand command, long userId) {
 
     UserModel user =
         userRepositoryPort
@@ -88,12 +87,8 @@ public class UserProfileUseCaseImpl {
 
     if (command.getCvFile() != null && !command.getCvFile().isEmpty()) {
 
-      String cvUrl =
-          fileStoragePort.upload(
-              command.getCvFile().getBytes(),
-              command.getCvFile().getOriginalFilename(),
-              command.getCvFile().getContentType(),
-              "/cvs/" + user.getUserId());
+      InternalUploadDirectResponse cvResult =
+          fileUploadPort.upload(command.getCvFile(), "cvs/" + user.getUserId(), user.getUserId());
 
       CvModel cv = cvRepositoryPort.findByUserId(user.getUserId());
 
@@ -102,23 +97,19 @@ public class UserProfileUseCaseImpl {
         cv.setUser(user);
       }
 
-      cv.setCvUrl(cvUrl);
+      cv.setCvUrl(cvResult.getObjectKey());
       cv.setFileSize(command.getCvFile().getSize());
       cv.setFileType(command.getCvFile().getContentType());
       CvModel savedCv = cvRepositoryPort.save(cv);
-      // Update user's cv reference so CascadeType.ALL won't overwrite with old values
       user.setCv(savedCv);
       changed = true;
     }
 
     if (command.getAvatarFile() != null && !command.getAvatarFile().isEmpty()) {
 
-      String avatarUrl =
-          fileStoragePort.upload(
-              command.getAvatarFile().getBytes(),
-              command.getAvatarFile().getOriginalFilename(),
-              command.getAvatarFile().getContentType(),
-              "/avatars/" + user.getUserId());
+      InternalUploadDirectResponse avatarResult =
+          fileUploadPort.upload(
+              command.getAvatarFile(), "avatars/" + user.getUserId(), user.getUserId());
 
       AvatarModel avatar = avatarRepositoryPort.getAvatarByUserId(user.getUserId());
 
@@ -127,12 +118,11 @@ public class UserProfileUseCaseImpl {
         avatar.setUser(user);
       }
 
-      avatar.setAvatarUrl(avatarUrl);
+      avatar.setAvatarUrl(avatarResult.getObjectKey());
       avatar.setFileSize(command.getAvatarFile().getSize());
       avatar.setFileType(command.getAvatarFile().getContentType());
 
       AvatarModel savedAvatar = avatarRepositoryPort.save(avatar);
-      // Update user's avatar reference so CascadeType.ALL won't overwrite with old values
       user.setAvatar(savedAvatar);
       changed = true;
     }
