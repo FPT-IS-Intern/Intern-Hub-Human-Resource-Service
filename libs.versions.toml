@@ -21,8 +21,8 @@ lombok-mapstruct-binding = "0.2.0"
 jakarta-validation = "3.0.2"
 
 # Custom Libraries
-common-library = "2.0.4"
-security-starter = "1.0.7"
+common-library = "2.0.6"
+security-starter = "1.0.9"
 
 # AWS
 aws-sdk = "2.41.34"
