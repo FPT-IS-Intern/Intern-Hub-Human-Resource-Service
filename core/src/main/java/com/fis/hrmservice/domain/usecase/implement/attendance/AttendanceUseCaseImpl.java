@@ -29,10 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
-  @Autowired private AttendanceRepositoryPort attendanceRepository;
-  @Autowired private UserRepositoryPort userRepository;
-  @Autowired private NetworkCheckPort networkCheckPort;
-  @Autowired private Snowflake snowflake;
+  @Autowired
+  private AttendanceRepositoryPort attendanceRepository;
+  @Autowired
+  private UserRepositoryPort userRepository;
+  @Autowired
+  private NetworkCheckPort networkCheckPort;
+  @Autowired
+  private Snowflake snowflake;
 
   private static final int STANDARD_CHECK_IN_HOUR = 8;
   private static final int STANDARD_CHECK_IN_MINUTE = 45;
@@ -44,8 +48,7 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
   public AttendanceStatusModel getAttendanceStatus(Long userId, LocalDate workDate) {
     log.info("Getting attendance status for userId: {} on date: {}", userId, workDate);
 
-    Optional<AttendanceLogModel> attendanceOpt =
-        attendanceRepository.findByUserIdAndDate(userId, workDate);
+    Optional<AttendanceLogModel> attendanceOpt = attendanceRepository.findByUserIdAndDate(userId, workDate);
 
     if (attendanceOpt.isEmpty()) {
       // No attendance record for today
@@ -62,18 +65,14 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     AttendanceLogModel attendance = attendanceOpt.get();
 
-    LocalTime checkInTime =
-        attendance.getCheckInTime() > 0 ? convertToLocalTime(attendance.getCheckInTime()) : null;
-    LocalTime checkOutTime =
-        attendance.getCheckOutTime() > 0 ? convertToLocalTime(attendance.getCheckOutTime()) : null;
+    LocalTime checkInTime = attendance.getCheckInTime() > 0 ? convertToLocalTime(attendance.getCheckInTime()) : null;
+    LocalTime checkOutTime = attendance.getCheckOutTime() > 0 ? convertToLocalTime(attendance.getCheckOutTime()) : null;
 
-    boolean isCheckInValid =
-        checkInTime != null
-            && !checkInTime.isAfter(LocalTime.of(STANDARD_CHECK_IN_HOUR, STANDARD_CHECK_IN_MINUTE));
-    boolean isCheckOutValid =
-        checkOutTime != null
-            && !checkOutTime.isBefore(
-                LocalTime.of(STANDARD_CHECK_OUT_HOUR, STANDARD_CHECK_OUT_MINUTE));
+    boolean isCheckInValid = checkInTime != null
+        && !checkInTime.isAfter(LocalTime.of(STANDARD_CHECK_IN_HOUR, STANDARD_CHECK_IN_MINUTE));
+    boolean isCheckOutValid = checkOutTime != null
+        && !checkOutTime.isBefore(
+            LocalTime.of(STANDARD_CHECK_OUT_HOUR, STANDARD_CHECK_OUT_MINUTE));
 
     return AttendanceStatusModel.builder()
         .workDate(workDate)
@@ -91,24 +90,12 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     log.info("Processing check-in for userId: {}", command.getUserId());
 
     // Validate user exists
-    UserModel user =
-        userRepository
-            .findById(command.getUserId())
-            .orElseThrow(() -> new NotFoundException("User không tồn tại"));
+    UserModel user = userRepository
+        .findById(command.getUserId())
+        .orElseThrow(() -> new NotFoundException("User không tồn tại"));
 
-    // Unified Location Check: IP or GPS
-    boolean isCorrectIp = networkCheckPort.isCompanyIpAddress(command.getClientIp());
-    boolean isCorrectLocation =
-        networkCheckPort.isAtCompanyLocation(command.getLatitude(), command.getLongitude());
-
-    if (!isCorrectIp && !isCorrectLocation) {
-      log.warn(
-          "Check-in rejected: IP {} and location ({}, {}) are both invalid",
-          command.getClientIp(),
-          command.getLatitude(),
-          command.getLongitude());
-      throw new BadRequestException("Bạn cần kết nối Wi-Fi công ty HOẶC ở văn phòng để điểm danh");
-    }
+    // Validate location: WiFi (IP) first, then GPS fallback
+    validateCompanyAccess(command.getClientIp(), command.getLatitude(), command.getLongitude(), "check-in");
 
     long checkInTimestamp = command.getCheckInTime();
     if (checkInTimestamp <= 0) {
@@ -118,8 +105,8 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     LocalDate workDate = convertToLocalDate(checkInTimestamp);
 
     // Check if already checked in today
-    Optional<AttendanceLogModel> existingAttendance =
-        attendanceRepository.findByUserIdAndDate(command.getUserId(), workDate);
+    Optional<AttendanceLogModel> existingAttendance = attendanceRepository.findByUserIdAndDate(command.getUserId(),
+        workDate);
 
     if (existingAttendance.isPresent() && existingAttendance.get().getCheckInTime() > 0) {
       throw new BadRequestException("Bạn đã check-in hôm nay rồi");
@@ -128,17 +115,16 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     // Validate check-in time (Standard 8:30)
     boolean isValid = validateCheckInTime(checkInTimestamp);
 
-    AttendanceLogModel attendance =
-        AttendanceLogModel.builder()
-            .attendanceId(snowflake.next())
-            .user(user)
-            .workDate(workDate)
-            .checkInTime(checkInTimestamp)
-            .checkOutTime(0)
-            .isCheckInValid(isValid)
-            .isCheckOutValid(false)
-            .source("WEB")
-            .build();
+    AttendanceLogModel attendance = AttendanceLogModel.builder()
+        .attendanceId(snowflake.next())
+        .user(user)
+        .workDate(workDate)
+        .checkInTime(checkInTimestamp)
+        .checkOutTime(0)
+        .isCheckInValid(isValid)
+        .isCheckOutValid(false)
+        .source("WEB")
+        .build();
 
     if (isValid) {
       attendance.setAttendanceStatus(AttendanceStatus.CHECK_IN_ON_TIME);
@@ -155,6 +141,9 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
   public AttendanceLogModel checkOut(CheckOutCommand command) {
     log.info("Processing check-out for userId: {}", command.getUserId());
 
+    // Validate location: WiFi (IP) first, then GPS fallback
+    validateCompanyAccess(command.getClientIp(), command.getLatitude(), command.getLongitude(), "check-out");
+
     long checkOutTime = command.getCheckOutTime();
     if (checkOutTime <= 0) {
       checkOutTime = System.currentTimeMillis();
@@ -163,10 +152,9 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     LocalDate workDate = convertToLocalDate(checkOutTime);
 
     // Find today's attendance record
-    AttendanceLogModel attendance =
-        attendanceRepository
-            .findByUserIdAndDate(command.getUserId(), workDate)
-            .orElseThrow(() -> new BadRequestException("Bạn chưa check-in hôm nay"));
+    AttendanceLogModel attendance = attendanceRepository
+        .findByUserIdAndDate(command.getUserId(), workDate)
+        .orElseThrow(() -> new BadRequestException("Bạn chưa check-in hôm nay"));
 
     if (attendance.getCheckInTime() == 0) {
       throw new BadRequestException("Bạn cần check-in trước khi check-out");
@@ -195,6 +183,23 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
   }
 
   // ==================== Helper Methods ====================
+
+  private void validateCompanyAccess(
+      String clientIp, Double latitude, Double longitude, String action) {
+    boolean isCorrectIp = networkCheckPort.isCompanyIpAddress(clientIp);
+    boolean isCorrectLocation = networkCheckPort.isAtCompanyLocation(latitude, longitude);
+
+    if (!isCorrectIp && !isCorrectLocation) {
+      log.warn(
+          "{} rejected: IP {} and location ({}, {}) are both invalid",
+          action,
+          clientIp,
+          latitude,
+          longitude);
+      throw new BadRequestException(
+          "Bạn cần kết nối Wi-Fi công ty HOẶC ở văn phòng để " + action);
+    }
+  }
 
   private boolean validateCheckInTime(long checkInTimeMillis) {
     LocalTime checkIn = convertToLocalTime(checkInTimeMillis);

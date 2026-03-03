@@ -13,22 +13,17 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", imports = AttendanceUseCaseImpl.class)
 public interface AttendanceApiMapper {
 
-  AttendanceStatusResponse toStatusResponse(AttendanceStatusModel status);
+    AttendanceStatusResponse toStatusResponse(AttendanceStatusModel status);
 
-  CheckInCommand toCheckInCommand(
-      Long userId, long checkInTime, String clientIp, Double latitude, Double longitude);
+    CheckInCommand toCheckInCommand(
+            Long userId, long checkInTime, String clientIp, Double latitude, Double longitude);
 
-  @Mapping(
-      target = "message",
-      expression =
-          "java(AttendanceUseCaseImpl.generateCheckInMessage(attendance.getCheckInTime()))")
-  AttendanceResponse toCheckInResponseFromLog(AttendanceLogModel attendance);
+    @Mapping(target = "message", expression = "java(AttendanceUseCaseImpl.generateCheckInMessage(attendance.getCheckInTime()))")
+    AttendanceResponse toCheckInResponseFromLog(AttendanceLogModel attendance);
 
-  CheckOutCommand toCheckOutCommand(Long userId, long checkOutTime);
+    CheckOutCommand toCheckOutCommand(
+            Long userId, long checkOutTime, String clientIp, Double latitude, Double longitude);
 
-  @Mapping(
-      target = "message",
-      expression =
-          "java(AttendanceUseCaseImpl.generateCheckOutMessage(attendance.getCheckOutTime()))")
-  AttendanceResponse toCheckOutResponseFromLog(AttendanceLogModel attendance);
+    @Mapping(target = "message", expression = "java(AttendanceUseCaseImpl.generateCheckOutMessage(attendance.getCheckOutTime()))")
+    AttendanceResponse toCheckOutResponseFromLog(AttendanceLogModel attendance);
 }

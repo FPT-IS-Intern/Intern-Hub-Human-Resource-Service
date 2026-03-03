@@ -10,4 +10,7 @@ import lombok.Setter;
 public class CheckOutCommand {
   private Long userId;
   private long checkOutTime;
+  private String clientIp;
+  private Double latitude;
+  private Double longitude;
 }

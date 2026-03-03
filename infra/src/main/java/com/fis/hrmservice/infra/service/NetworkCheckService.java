@@ -34,8 +34,7 @@ public class NetworkCheckService implements NetworkCheckPort {
       var response = boPortalFeignClient.getAllowedIpRanges();
       if (response != null && response.data() != null) {
         for (var range : response.data()) {
-          if (range.isActive()
-              && (ip.startsWith(range.ipPrefix()) || ip.equals(range.ipPrefix()))) {
+          if (range.isActive() && ip.startsWith(range.ipPrefix())) {
             log.info("IP {} matched allowed range: {}", ip, range.description());
             return true;
           }

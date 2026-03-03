@@ -60,8 +60,7 @@ public class AttendanceController {
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     long now = System.currentTimeMillis();
-    CheckInCommand command =
-        attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
+    CheckInCommand command = attendanceApiMapper.toCheckInCommand(userId, now, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkIn(command);
     AttendanceResponse response = attendanceApiMapper.toCheckInResponseFromLog(attendance);
 
@@ -70,11 +69,16 @@ public class AttendanceController {
 
   /** Process check-out */
   @PostMapping("/check-out")
-  public ResponseApi<AttendanceResponse> checkOut(@RequestParam Long userId) {
+  public ResponseApi<AttendanceResponse> checkOut(
+      @RequestParam Long userId,
+      @RequestParam(required = false) Double latitude,
+      @RequestParam(required = false) Double longitude,
+      HttpServletRequest servletRequest) {
     log.info("POST /attendance/check-out - userId: {}", userId);
 
+    String clientIp = WebUtils.getClientIpAddress(servletRequest);
     long now = System.currentTimeMillis();
-    CheckOutCommand command = attendanceApiMapper.toCheckOutCommand(userId, now);
+    CheckOutCommand command = attendanceApiMapper.toCheckOutCommand(userId, now, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkOut(command);
     AttendanceResponse response = attendanceApiMapper.toCheckOutResponseFromLog(attendance);
 
@@ -95,11 +99,10 @@ public class AttendanceController {
 
     boolean isValid = isCompanyNetwork || isAtLocation;
 
-    WiFiInfoResponse response =
-        WiFiInfoResponse.builder()
-            .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
-            .isCompanyWifi(isValid)
-            .build();
+    WiFiInfoResponse response = WiFiInfoResponse.builder()
+        .wifiName(isCompanyNetwork ? "FPT-Network" : (isAtLocation ? "Office-GPS" : "External"))
+        .isCompanyWifi(isValid)
+        .build();
 
     log.info(
         "Check-point result - IP: {}, GPS: {}, isValid: {}", clientIp, (latitude != null), isValid);
