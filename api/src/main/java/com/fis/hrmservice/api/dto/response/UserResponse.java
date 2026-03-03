@@ -1,5 +1,7 @@
 package com.fis.hrmservice.api.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import java.time.LocalDate;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
 
+  @JsonSerialize(using = ToStringSerializer.class)
   Long userId;
 
   /** Thông tin chung */

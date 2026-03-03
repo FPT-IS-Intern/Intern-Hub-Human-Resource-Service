@@ -84,11 +84,6 @@ public class TicketController {
     return ticketApiMapper.toTicketCommand(request);
   }
 
-  @PutMapping("/user-approval/{ticketId}")
-  public ResponseApi<?> approveRegistrationRequest() {
-    return ResponseApi.ok(null);
-  }
-
   @PostMapping("/registration-ticket")
   public ResponseApi<PaginatedData<ListRegistrationResponse>> listRegistrationTicket(
       @RequestBody FilterRegistrationRequest request,
