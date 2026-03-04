@@ -1,5 +1,6 @@
 package com.fis.hrmservice.domain.port.output.ticket;
 
+import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
 import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
 import com.intern.hub.library.common.dto.PaginatedData;
@@ -21,7 +22,7 @@ public interface TicketRepositoryPort {
 
   TicketModel getDetailRegistrationTicket(Long ticketId);
 
-  TicketModel updateRegistrationTicketStatus(Long ticketId, String ticketStatus);
+  TicketModel updateRegistrationTicketStatus(Long ticketId, TicketStatus ticketStatus);
 
   int getAllRegistrationTicket();
 

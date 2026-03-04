@@ -1,9 +1,9 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
+import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,9 +36,9 @@ public class Ticket extends AuditEntity {
   @Column(name = "reason", length = Integer.MAX_VALUE)
   private String reason;
 
-  @Size(max = 20)
+  @Enumerated(EnumType.STRING)
   @Column(name = "status", length = 20)
-  private String status;
+  private TicketStatus status;
 
   @Column(name = "created_at")
   private Long createdAt;

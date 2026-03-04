@@ -1,29 +1,26 @@
-import com.diffplug.gradle.spotless.SpotlessExtension
-import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
-
 plugins {
+    java
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.dependency.management) apply false
-    alias(libs.plugins.spotless) apply false
-    java
 }
 
 allprojects {
-    group = "fis.internhub"
-    version = "0.0.1-SNAPSHOT"
+    group = "com.fis.hrmservice"
+    version = "1.0.6"
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
-        mavenLocal()
     }
 }
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "org.springframework.boot")
-    apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "com.diffplug.spotless")
+    apply {
+        plugin("java")
+        plugin("io.spring.dependency-management")
+        plugin("org.springframework.boot")
+    }
 
     java {
         toolchain {
@@ -31,33 +28,30 @@ subprojects {
         }
     }
 
-    configurations.configureEach {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-        exclude(group = "ch.qos.logback", module = "logback-classic")
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.compilerArgs.addAll(
+            listOf(
+                "-parameters",
+                "-Xlint:unchecked",
+                "-Xlint:deprecation"
+            )
+        )
     }
 
-    configure<SpotlessExtension> {
-        java {
-            googleJavaFormat(rootProject.libs.versions.googleJavaFormat.get())
-            importOrder()
-            removeUnusedImports()
-            endWithNewline()
+    configurations {
+        compileOnly {
+            extendsFrom(configurations.annotationProcessor.get())
         }
     }
 
-    configure<DependencyManagementExtension> {
-        imports {
-            mavenBom(rootProject.libs.spring.cloud.dependencies.get().toString())
-            mavenBom(rootProject.libs.opentelemetry.bom.get().toString())
-        }
+
+    tasks.jar {
+        enabled = true
     }
 
     tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
         enabled = false
-    }
-
-    tasks.jar {
-        enabled = true
     }
 
     tasks.test {

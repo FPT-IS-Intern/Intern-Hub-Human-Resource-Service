@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.adapter.ticket.explaination;
 
+import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
@@ -16,11 +17,13 @@ import com.intern.hub.library.common.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class TicketRepositoryAdapter implements TicketRepositoryPort {
@@ -55,7 +58,7 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
 
   @Override
   public TicketModel findById(Long ticketId) {
-    return ticketMapper.toModel(ticketRepository.findById(ticketId).orElseThrow());
+    return ticketMapper.toModel(ticketRepository.findById(ticketId).orElseThrow(() -> new NotFoundException("Ticket not found with id: " + ticketId)));
   }
 
   @Override
@@ -100,28 +103,37 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   }
 
   @Override
-  public TicketModel updateRegistrationTicketStatus(Long ticketId, String ticketStatus) {
+  @Transactional
+  public TicketModel updateRegistrationTicketStatus(Long ticketId, TicketStatus ticketStatus) {
 
+    // findById already throws NotFoundException if not found, no need for null check
     TicketModel ticket = findById(ticketId);
-    if (ticket == null) {
-      throw new NotFoundException("Ticket not found with id: " + ticketId);
-    }
 
     int updatedRows = ticketRepository.updateRegistrationTicketStatus(ticketStatus, ticketId);
+
     if (updatedRows <= 0) {
       throw new ConflictDataException("Cannot update ticket status");
     }
 
+    // ✅ Update in-memory ticket
+    ticket.setSysStatus(ticketStatus);
+
     UserModel user = ticket.getRequester();
 
-    if (ticketStatus.equals("APPROVED")) {
-      user.setSysStatus(UserStatus.APPROVED);
-    } else if (ticketStatus.equals("REJECTED")) {
-      user.setSysStatus(UserStatus.REJECTED);
-    } else if (ticketStatus.equals("SUSPENDED")) {
-      user.setSysStatus(UserStatus.SUSPENDED);
-    }
-    userRepository.save(user);
+    UserStatus newUserStatus = switch (ticket.getSysStatus()) {
+      case APPROVED -> UserStatus.APPROVED;
+      case REJECTED -> UserStatus.REJECTED;
+      case SUSPENDED -> UserStatus.SUSPENDED;
+      case PENDING -> UserStatus.PENDING;
+      default -> throw new ConflictDataException("Unsupported ticket status for user update: " + ticketStatus);
+    };
+
+    user.setSysStatus(newUserStatus);
+
+    log.info("user status after ticket update: userId={}, newStatus={}", user.getUserId(), user.getSysStatus());
+    // Use targeted update to avoid overwriting unrelated user fields with stale data
+    userRepository.updateStatus(user.getUserId(), newUserStatus);
+
     return ticket;
   }
 

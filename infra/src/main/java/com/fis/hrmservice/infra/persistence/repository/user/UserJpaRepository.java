@@ -52,38 +52,38 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
                     SET u.sysStatus = :status
                     WHERE u.id = :id
                     """)
-  Long updateStatus(Long id, UserStatus status);
+  int updateStatus(@Param("id") Long id,@Param("status") UserStatus status);
 
-  @Query("SELECT u FROM User u WHERE u.id = :userId AND u.sysStatus = 'APPROVED'")
+  @Query("SELECT u FROM User u WHERE u.id = :userId")
   User internalUserProfile(@Param("userId") Long userId);
 
   @Transactional
   @Modifying
   @Query("UPDATE User u SET u.sysStatus = :suspend WHERE u.id = :userId")
-  Long suspendUser(@Param("userId") Long userId, @Param("suspend") UserStatus status);
+  int suspendUser(@Param("userId") Long userId, @Param("suspend") UserStatus status);
 
   @Query("SELECT COUNT(u) FROM User u WHERE u.sysStatus = 'APPROVED'")
   int totalIntern();
 
   @Query(
-      value =
-          """
-                            SELECT
-                                COUNT(CASE
-                                    WHEN date_trunc('month', u.internship_start_date) = date_trunc('month', CURRENT_DATE)
-                                    THEN 1
-                                END)
-                                -
-                                COUNT(CASE
-                                    WHEN date_trunc('month', u.internship_start_date) = date_trunc('month', CURRENT_DATE - INTERVAL '1 month')
-                                    THEN 1
-                                END)
-                            FROM users u
-                            JOIN positions p ON u.position_id = p.position_id
-                            WHERE u.internship_start_date IS NOT NULL
-                              AND LOWER(p.name) LIKE '%intern%'
-                            """,
-      nativeQuery = true)
+          value =
+                  """
+                          SELECT
+                              COUNT(CASE
+                                  WHEN date_trunc('month', u.internship_start_date) = date_trunc('month', CURRENT_DATE)
+                                  THEN 1
+                              END)
+                              -
+                              COUNT(CASE
+                                  WHEN date_trunc('month', u.internship_start_date) = date_trunc('month', CURRENT_DATE - INTERVAL '1 month')
+                                  THEN 1
+                              END)
+                          FROM users u
+                          JOIN positions p ON u.position_id = p.position_id
+                          WHERE u.internship_start_date IS NOT NULL
+                            AND LOWER(p.name) LIKE '%intern%'
+                          """,
+          nativeQuery = true)
   int internshipChanging();
 
   @Query("SELECT u FROM User u WHERE u.position.name = 'STAFF'")

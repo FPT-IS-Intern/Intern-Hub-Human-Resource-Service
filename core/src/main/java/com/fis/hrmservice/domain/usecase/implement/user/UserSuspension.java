@@ -6,7 +6,6 @@ import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ public class UserSuspension {
   private final UserRepositoryPort userRepositoryPort;
 
   @Transactional
-  @Modifying
   public UserModel suspendUser(Long userId) {
 
     UserModel model =
@@ -25,16 +23,18 @@ public class UserSuspension {
             .findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));
 
-    if (model.getSysStatus().equals(UserStatus.SUSPENDED)) {
+    if (model.getSysStatus() == UserStatus.SUSPENDED) {
       throw new ConflictDataException("User is already suspended");
     }
 
-    Long suspended = userRepositoryPort.suspendUser(userId, UserStatus.SUSPENDED);
+    int suspended = userRepositoryPort.suspendUser(userId, UserStatus.SUSPENDED);
 
     if (suspended != 1) {
       throw new ConflictDataException("Cannot suspend user");
     }
 
-    return model;
+    return userRepositoryPort
+        .findById(userId)
+        .orElseThrow(() -> new NotFoundException("User not found after update"));
   }
 }

@@ -20,7 +20,7 @@ public class QuickNoteUseCaseImpl {
   private final Snowflake snowflake;
   private final UserRepositoryPort userRepositoryPort;
 
-  public QuickNoteModel createQuickNote(QuickNoteCommand command, Long userId) {
+  public QuickNoteModel createQuickNote(QuickNoteCommand command, Long userId, Long writerId) {
 
     // TODO: đợi ong api gateway xong thì mở lại
     //        AuthContext authContext = AuthContextHolder.get()
@@ -28,20 +28,21 @@ public class QuickNoteUseCaseImpl {
     //
     //        Long writerId = authContext.userId();
     //
-    //        UserModel writer = userRepositoryPort.findById(writerId).orElseThrow();
+    UserModel writer =
+        userRepositoryPort
+            .findById(writerId)
+            .orElseThrow(() -> new NotFoundException("Writer not found"));
 
-    UserModel userNoted = userRepositoryPort.findById(userId).orElseThrow();
-
-    if (userNoted == null) {
-      throw new NotFoundException("User not found");
-    }
+    UserModel userNoted =
+        userRepositoryPort
+            .findById(userId)
+            .orElseThrow(() -> new NotFoundException("User not found"));
 
     QuickNoteModel quickNoteModel =
         QuickNoteModel.builder()
             .id(snowflake.next())
             .intern(userNoted)
-            //                .writer(writer)   TODO: đợi api gateway xong thì mở lại
-            .writer(null) // TODO: đợi api gateway xong thì xoá đi
+            .writer(writer)
             .content(command.getContent())
             .writeDate(LocalDateTime.now())
             .build();

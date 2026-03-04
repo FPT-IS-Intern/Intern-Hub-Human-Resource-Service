@@ -36,5 +36,5 @@ public class UserResponse {
   LocalDate internshipEndDate;
 
   /** Trạng thái người dùng */
-  String status;
+  String sysStatus;
 }

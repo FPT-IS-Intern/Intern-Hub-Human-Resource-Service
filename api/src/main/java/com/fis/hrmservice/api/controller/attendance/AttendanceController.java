@@ -4,6 +4,7 @@ import com.fis.hrmservice.api.dto.response.AttendanceResponse;
 import com.fis.hrmservice.api.dto.response.AttendanceStatusResponse;
 import com.fis.hrmservice.api.dto.response.WiFiInfoResponse;
 import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
+import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.api.util.WebUtils;
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("hrm/attendance")
-@CrossOrigin(origins = "*")
 @EnableGlobalExceptionHandler
 @Slf4j
 @Tag(name = "Attendance Management", description = "APIs for attendance check-in and check-out")
@@ -52,10 +52,10 @@ public class AttendanceController {
   /** Process check-in */
   @PostMapping("/check-in")
   public ResponseApi<AttendanceResponse> checkIn(
-      @RequestParam Long userId,
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
       HttpServletRequest servletRequest) {
+    Long userId = UserContext.requiredUserId(); // dùng cái này đi cha
     log.info("POST /attendance/check-in - userId: {}", userId);
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);

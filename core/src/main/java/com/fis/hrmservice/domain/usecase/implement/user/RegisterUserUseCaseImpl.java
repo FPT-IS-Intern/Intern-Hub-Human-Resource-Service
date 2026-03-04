@@ -4,17 +4,13 @@ import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.constant.TicketType;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
-import com.fis.hrmservice.domain.model.user.AvatarModel;
-import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.output.feign.InternalUploadDirectPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketTypeRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.*;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
-import com.fis.hrmservice.domain.utils.response.InternalUploadDirectResponse;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.utils.Snowflake;
 import java.time.LocalDate;
@@ -23,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -36,10 +33,10 @@ public class RegisterUserUseCaseImpl {
   UserValidationService validationService;
   TicketRepositoryPort ticketRepositoryPort;
   TicketTypeRepositoryPort ticketTypeRepositoryPort;
-  InternalUploadDirectPort fileUploadPort;
   AvatarRepositoryPort avatarRepositoryPort;
   CvRepositoryPort cvRepositoryPort;
 
+  @Transactional(rollbackFor = Exception.class)
   public UserModel registerUser(RegisterUserCommand command) {
 
     // 1️⃣ Validate business rule
@@ -62,51 +59,51 @@ public class RegisterUserUseCaseImpl {
     if (savedUser == null) {
       throw new ConflictDataException("Cannot save user");
     }
-//
-//    try {
-//
-//      // 5️⃣ Upload Avatar via DMS
-//      InternalUploadDirectResponse avatarResult =
-//          fileUploadPort.upload(
-//              command.getAvatar(), "avatars/" + savedUser.getUserId(), savedUser.getUserId());
-//
-//      AvatarModel avatar =
-//          avatarRepositoryPort.save(
-//              AvatarModel.builder()
-//                  .avatarId(snowflake.next())
-//                  .user(savedUser)
-//                  .avatarUrl(avatarResult.getObjectKey())
-//                  .fileSize(command.getAvatar().getSize())
-//                  .fileType(command.getAvatar().getContentType())
-//                  .build());
-//
-//      if (avatar == null) {
-//        throw new ConflictDataException("Cannot save avatar");
-//      }
-//
-//      // 6️⃣ Upload CV via DMS
-//      InternalUploadDirectResponse cvResult =
-//          fileUploadPort.upload(
-//              command.getCv(), "cvs/" + savedUser.getUserId(), savedUser.getUserId());
-//
-//      CvModel cv =
-//          cvRepositoryPort.save(
-//              CvModel.builder()
-//                  .cvId(snowflake.next())
-//                  .user(savedUser)
-//                  .cvUrl(cvResult.getObjectKey())
-//                  .fileSize(command.getCv().getSize())
-//                  .fileType(command.getCv().getContentType())
-//                  .build());
-//
-//      if (cv == null) {
-//        throw new ConflictDataException("Cannot save CV");
-//      }
-//
-//    } catch (Exception e) {
-//      log.error("Register process failed. Transaction rollback triggered.", e);
-//      throw new ConflictDataException("Register failed");
-//    }
+    //
+    //    try {
+    //
+    //      // 5️⃣ Upload Avatar via DMS
+    //      InternalUploadDirectResponse avatarResult =
+    //          fileUploadPort.upload(
+    //              command.getAvatar(), "avatars/" + savedUser.getUserId(), savedUser.getUserId());
+    //
+    //      AvatarModel avatar =
+    //          avatarRepositoryPort.save(
+    //              AvatarModel.builder()
+    //                  .avatarId(snowflake.next())
+    //                  .user(savedUser)
+    //                  .avatarUrl(avatarResult.getObjectKey())
+    //                  .fileSize(command.getAvatar().getSize())
+    //                  .fileType(command.getAvatar().getContentType())
+    //                  .build());
+    //
+    //      if (avatar == null) {
+    //        throw new ConflictDataException("Cannot save avatar");
+    //      }
+    //
+    //      // 6️⃣ Upload CV via DMS
+    //      InternalUploadDirectResponse cvResult =
+    //          fileUploadPort.upload(
+    //              command.getCv(), "cvs/" + savedUser.getUserId(), savedUser.getUserId());
+    //
+    //      CvModel cv =
+    //          cvRepositoryPort.save(
+    //              CvModel.builder()
+    //                  .cvId(snowflake.next())
+    //                  .user(savedUser)
+    //                  .cvUrl(cvResult.getObjectKey())
+    //                  .fileSize(command.getCv().getSize())
+    //                  .fileType(command.getCv().getContentType())
+    //                  .build());
+    //
+    //      if (cv == null) {
+    //        throw new ConflictDataException("Cannot save CV");
+    //      }
+    //
+    //    } catch (Exception e) {
+    //      log.error("Register process failed. Transaction rollback triggered.", e);
+    //      throw new ConflictDataException("không thể up avatar và cv lên DMS: " + e.getMessage());
+    //    }
 
     // 7️⃣ Create registration ticket
     ticketRepositoryPort.save(
@@ -147,9 +144,9 @@ public class RegisterUserUseCaseImpl {
       throw new ConflictDataException("CV is required");
     }
 
-    // Check size > 2MB
-    if (command.getCv().getSize() > 2 * 1024 * 1024) {
-      throw new ConflictDataException("CV vượt quá 2MB");
+    // Check size > 10MB
+    if (command.getCv().getSize() > 10 * 1024 * 1024) {
+      throw new ConflictDataException("CV vượt quá 10MB");
     }
 
     String cvType = command.getCv().getContentType();
@@ -198,7 +195,7 @@ public class RegisterUserUseCaseImpl {
   private void isOver18(LocalDate dateOfBirth) {
     int thisYear = LocalDate.now().getYear();
 
-    if (thisYear - dateOfBirth.getYear() <= 16) {
+    if (thisYear - dateOfBirth.getYear() < 16) {
       throw new ConflictDataException("Ứng viên phải trên 16 tuổi");
     }
   }

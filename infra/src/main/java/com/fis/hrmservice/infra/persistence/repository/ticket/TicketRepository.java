@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.persistence.repository.ticket;
 
+import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
 import com.fis.hrmservice.infra.persistence.entity.Ticket;
 import java.util.List;
@@ -91,14 +92,16 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                                 OR LOWER(TRIM(u.companyEmail)) LIKE LOWER(CONCAT('%', TRIM(:#{#command.keyword}), '%'))
                                 OR LOWER(TRIM(u.fullName)) LIKE LOWER(CONCAT('%', TRIM(:#{#command.keyword}), '%'))
                               )
-                          AND (:#{#command.ticketStatus} IS NULL OR :#{#command.ticketStatus} = '' OR t.status = :#{#command.ticketStatus})
+                          AND (:#{#command.ticketStatus} IS NULL OR t.status = :#{#command.ticketStatus})
+
                           AND tt.typeName = 'REGISTRATION'
                         ORDER BY t.startAt DESC
                     """)
   Page<Ticket> filterRegistrationTicketPaged(
       @Param("command") FilterRegistrationTicketCommand command, Pageable pageable);
 
-  @Query("SELECT t from Ticket t ORDER BY t.startAt DESC limit 3")
+  @Query(
+      "SELECT t from Ticket t WHERE t.ticketType.typeName = 'REGISTRATION' ORDER BY t.startAt DESC limit 3")
   List<Ticket> firstThreeRegistrationTicket();
 
   @Query(
@@ -119,5 +122,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   @Query(
       "UPDATE Ticket t set t.status = :ticketStatus where t.id = :ticketId and t.ticketType.typeName = 'REGISTRATION'")
   int updateRegistrationTicketStatus(
-      @Param("ticketStatus") String ticketStatus, @Param("ticketId") Long ticketId);
+      @Param("ticketStatus") TicketStatus ticketStatus, @Param("ticketId") Long ticketId);
 }

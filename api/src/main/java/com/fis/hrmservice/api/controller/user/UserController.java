@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User Management", description = "APIs for user registration and management")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4205")
 public class UserController {
 
   RegisterUserUseCaseImpl registerUserUseCase;
@@ -162,8 +163,10 @@ public class UserController {
 
     if (internshipChanging > 0) {
       message = "↗ " + internshipChanging + " So với tháng trước";
+    } else if (internshipChanging < 0) {
+      message = "↘ " + Math.abs(internshipChanging) + " So với tháng trước";
     } else {
-      message = "↘ " + internshipChanging + " So vơi tháng trước";
+      message = "→ 0 So với tháng trước";
     }
 
     return ResponseApi.ok(message);

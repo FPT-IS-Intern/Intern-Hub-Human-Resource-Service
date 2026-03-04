@@ -2,7 +2,7 @@ package com.fis.hrmservice.infra.persistence.entity;
 
 import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,11 +37,9 @@ public class Avatar extends AuditEntity {
   @Column(name = "version")
   private Integer version;
 
-  @Size(max = 50)
   @Column(name = "status", length = 50)
   private String status;
 
-  @Size(max = 100)
   @Column(name = "file_type", length = 100)
   private String fileType;
 

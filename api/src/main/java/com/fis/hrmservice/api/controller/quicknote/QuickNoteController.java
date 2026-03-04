@@ -30,9 +30,11 @@ public class QuickNoteController {
 
   @PostMapping("/{userId}")
   public ResponseApi<?> createTicket(
-      @RequestBody CreateQuickNoteRequest request, @PathVariable("userId") Long userId) {
+      @RequestBody CreateQuickNoteRequest request, @PathVariable Long userId) {
+
+    Long writerId = UserContext.requiredUserId();
     QuickNoteCommand command = quickNoteApiMapper.toCommand(request);
-    return ResponseApi.ok(quickNoteUserUseCase.createQuickNote(command, userId));
+    return ResponseApi.ok(quickNoteUserUseCase.createQuickNote(command, userId, writerId));
   }
 
   // cái này cho admin xem

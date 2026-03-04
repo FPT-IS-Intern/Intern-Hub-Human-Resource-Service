@@ -22,11 +22,11 @@ public interface UserRepositoryPort {
 
   PaginatedData<UserModel> filterUser(FilterUserCommand command, int page, int size);
 
-  Long updateStatus(Long userId, UserStatus status);
+  int updateStatus(Long userId, UserStatus status);
 
   UserModel internalUserProfile(Long userId);
 
-  Long suspendUser(Long userId, UserStatus status);
+  int suspendUser(Long userId, UserStatus status);
 
   int totalIntern();
 

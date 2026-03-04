@@ -4,6 +4,7 @@ import com.fis.hrmservice.domain.model.ticket.TicketTypeModel;
 import com.fis.hrmservice.domain.port.output.ticket.TicketTypeRepositoryPort;
 import com.fis.hrmservice.infra.mapper.TicketTypeMapper;
 import com.fis.hrmservice.infra.persistence.repository.ticket.TicketTypeRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,8 +17,8 @@ public class TicketTypeRepositoryAdapter implements TicketTypeRepositoryPort {
   private final TicketTypeMapper ticketTypeMapper;
 
   @Override
-  public TicketTypeModel findTicketTypeById(Long ticketTypeId) {
-    return ticketTypeMapper.toModel(ticketTypeRepository.findById(ticketTypeId).get());
+  public Optional<TicketTypeModel> findTicketTypeById(Long ticketTypeId) {
+    return ticketTypeRepository.findById(ticketTypeId).map(ticketTypeMapper::toModel);
   }
 
   @Override

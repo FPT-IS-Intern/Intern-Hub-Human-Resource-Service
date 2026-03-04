@@ -44,13 +44,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
   @Override
   public Optional<UserModel> findById(Long userId) {
-    return Optional.ofNullable(userMapper.toModel(userJpaRepository.findById(userId).get()));
+    return userJpaRepository.findById(userId).map(userMapper::toModel);
   }
 
   @Override
   public Optional<UserModel> findByEmail(String email) {
-    return Optional.ofNullable(
-        userMapper.toModel(userJpaRepository.findByCompanyEmail(email).get()));
+    return userJpaRepository.findByCompanyEmail(email).map(userMapper::toModel);
   }
 
   @Override
@@ -65,7 +64,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
   @Override
   public List<UserModel> findAll() {
-    return List.of();
+    return userJpaRepository.findAll().stream().map(userMapper::toModel).toList();
   }
 
   @Override
@@ -83,7 +82,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
-  public Long updateStatus(Long userId, UserStatus status) {
+  public int updateStatus(Long userId, UserStatus status) {
     return userJpaRepository.updateStatus(userId, status);
   }
 
@@ -93,7 +92,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
-  public Long suspendUser(Long userId, UserStatus status) {
+  public int suspendUser(Long userId, UserStatus status) {
     return userJpaRepository.suspendUser(userId, status);
   }
 

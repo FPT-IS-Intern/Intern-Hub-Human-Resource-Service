@@ -18,14 +18,23 @@ public class UserRejection {
   @Transactional
   public UserModel rejectUser(Long userId) {
 
-    Long updated = userRepositoryPort.updateStatus(userId, UserStatus.REJECTED);
+    UserModel user =
+        userRepositoryPort
+            .findById(userId)
+            .orElseThrow(() -> new NotFoundException("User not found"));
+
+    // ✅ Guard trạng thái
+    if (user.getSysStatus() != UserStatus.PENDING) {
+      throw new ConflictDataException("Only PENDING users can be rejected");
+    }
+
+    int updated = userRepositoryPort.updateStatus(userId, UserStatus.REJECTED);
 
     if (updated != 1) {
       throw new ConflictDataException("Cannot reject user");
     }
 
-    return userRepositoryPort
-        .findById(userId)
-        .orElseThrow(() -> new NotFoundException("User not found"));
+    user.setSysStatus(UserStatus.REJECTED); // tránh stale data
+    return user;
   }
 }

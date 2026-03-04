@@ -20,7 +20,7 @@ public class RegisterUserRequest {
   String fullName;
 
   @NotBlank(message = "Số CCCD/CMND không được để trống")
-  @Size(min = 12, max = 12, message = "Số CCCD phải có 12 ký tự")
+  @Pattern(regexp = "^(\\d{9}|\\d{12})$", message = "Số CCCD/CMND phải gồm đúng 9 hoặc 12 chữ số")
   String idNumber;
 
   @NotNull(message = "Ngày sinh không được để trống")
