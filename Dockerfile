@@ -2,7 +2,7 @@
 FROM eclipse-temurin:25.0.1_8-jdk AS build
 WORKDIR /app
 
-COPY gradlew gradlew.bat build.gradle.kts settings.gradle.kts libs.versions.toml ./
+COPY gradlew gradlew.bat build.gradle.kts settings.gradle.kts gradle/libs.versions.toml ./
 COPY gradle/ gradle/
 
 COPY api/build.gradle.kts api/
