@@ -93,8 +93,14 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     boolean isSessionOpen = openSessionOpt.isPresent();
     UUID openSessionBranchId = isSessionOpen ? openSessionOpt.get().getCheckInBranchId() : null;
-    String statusMessage =
-        isSessionOpen ? String.format("Bạn đã checkin Onsite ở %s", openSessionBranchId) : null;
+    String statusMessage = null;
+    if (isSessionOpen) {
+      String branchName =
+          networkCheckPort
+              .resolveBranchName(openSessionBranchId)
+              .orElse(openSessionBranchId != null ? openSessionBranchId.toString() : "khác");
+      statusMessage = String.format("Bạn đã checkin Onsite ở %s", branchName);
+    }
 
     return AttendanceStatusModel.builder()
         .workDate(workDate)
