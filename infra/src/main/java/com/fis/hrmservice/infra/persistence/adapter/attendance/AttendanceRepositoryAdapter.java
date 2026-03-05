@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -52,6 +53,25 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
     return attendanceLogRepository.findAllByWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeAsc(workDate).stream()
         .map(this::toModel)
         .toList();
+  }
+
+  @Override
+  public Optional<AttendanceLogModel> findOpenSessionByUserAndDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository
+        .findFirstByUser_IdAndWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeDesc(userId, workDate)
+        .map(this::toModel);
+  }
+
+  @Override
+  public Optional<AttendanceLogModel> findLatestByUserAndDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository
+        .findFirstByUser_IdAndWorkDateOrderByCheckInTimeDesc(userId, workDate)
+        .map(this::toModel);
+  }
+
+  @Override
+  public boolean existsCheckedInBranchByUserAndDate(Long userId, LocalDate workDate, UUID branchId) {
+    return attendanceLogRepository.existsByUser_IdAndWorkDateAndCheckInBranchId(userId, workDate, branchId);
   }
 
   @Override
