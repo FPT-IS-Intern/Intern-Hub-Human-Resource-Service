@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /** JPA Repository for PositionEntity. */
@@ -19,4 +20,12 @@ public interface PositionJpaRepository extends JpaRepository<Position, Long> {
 
   @Query("SELECT p FROM Position p")
   List<Position> findAll();
+
+  @Query(
+      """
+      SELECT p.id
+      FROM Position p
+      WHERE p.id IN :ids
+      """)
+  List<Long> findExistingPositionIds(@Param("ids") List<Long> ids);
 }

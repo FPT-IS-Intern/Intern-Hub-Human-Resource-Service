@@ -10,4 +10,6 @@ public interface PositionRepositoryPort {
   Optional<PositionModel> findById(Long positionId);
 
   List<PositionModel> findAll();
+
+  List<Long> findExistingPositionIds(List<Long> positionIds);
 }

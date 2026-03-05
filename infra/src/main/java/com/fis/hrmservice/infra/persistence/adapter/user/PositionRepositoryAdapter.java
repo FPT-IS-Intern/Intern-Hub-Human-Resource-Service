@@ -30,6 +30,14 @@ public class PositionRepositoryAdapter implements PositionRepositoryPort {
     return positionJpaRepository.findAll().stream().map(this::toModel).toList();
   }
 
+  @Override
+  public List<Long> findExistingPositionIds(List<Long> positionIds) {
+    if (positionIds == null || positionIds.isEmpty()) {
+      return List.of();
+    }
+    return positionJpaRepository.findExistingPositionIds(positionIds);
+  }
+
   private PositionModel toModel(Position entity) {
     return PositionModel.builder()
         .positionId(entity.getId())
