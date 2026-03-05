@@ -1,17 +1,19 @@
 package com.fis.hrmservice.domain.utils.helper;
 
+import com.intern.hub.library.common.exception.ConflictDataException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class DateValidationHelper {
 
   public static void validateDate(LocalDate fromDate, LocalDate toDate) {
+
     if (fromDate == null || toDate == null) {
-      throw new IllegalArgumentException("You must provide from date and to date");
+      throw new ConflictDataException("You must provide from date and to date");
     }
 
     if (fromDate.isAfter(toDate)) {
-      throw new IllegalArgumentException("From date must be before to date");
+      throw new ConflictDataException("From date must be before to date");
     }
   }
 

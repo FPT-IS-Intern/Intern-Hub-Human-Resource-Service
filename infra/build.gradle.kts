@@ -1,30 +1,18 @@
-plugins {
-    id("java-library")
-}
-
-
 dependencies {
-    // Project dependencies
-    api(project(":core"))
+    implementation(project(":core"))
 
-    // OpenTelemetry
-    implementation(platform(libs.opentelemetry.bom))
-    implementation(libs.opentelemetry.sdk)
-    implementation(libs.opentelemetry.sdk.trace)
-
-    // Custom libraries
+    // Custom Libraries
     implementation(libs.bundles.custom.libraries)
 
-    // Spring Boot
-    implementation(libs.spring.boot.starter.security)
+    // Database (JPA + PostgreSQL + Liquibase)
     implementation(libs.bundles.spring.boot.database)
-    implementation(libs.spring.boot.starter.validation)
-    implementation(libs.spring.boot.starter)
-    implementation(libs.spring.boot.starter.log4j2)
-    implementation(libs.spring.boot.starter.liquibase)
 
-    // Spring Cloud
-    implementation(libs.spring.cloud.feign)
+    // Feign client
+    implementation(libs.spring.boot.starter.feign)
+    implementation(libs.spring.boot.starter.validation)
+
+    // AWS S3 SDK (Cloudflare R2)
+    implementation(libs.s3.sdk)
 
     // MapStruct
     implementation(libs.mapstruct)
@@ -34,9 +22,4 @@ dependencies {
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     annotationProcessor(libs.lombok.mapstruct.binding)
-
-    // Source: https://mvnrepository.com/artifact/software.amazon.awssdk/s3
-    implementation(libs.aws.s3)
-
-
 }

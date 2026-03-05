@@ -12,7 +12,9 @@ import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.fis.hrmservice.domain.utils.helper.UpdateHelper;
 import com.fis.hrmservice.domain.utils.response.InternalUploadDirectResponse;
 import com.intern.hub.library.common.exception.NotFoundException;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -143,6 +145,26 @@ public class UserProfileUseCaseImpl {
       throw new NotFoundException("User with id: " + userId + " not found");
     }
     return user;
+  }
+
+  public UserModel internalUserProfileByEmail(String email) {
+    String normalizedEmail = email == null ? null : email.strip().toLowerCase();
+    return userRepositoryPort
+        .findByEmail(normalizedEmail)
+        .orElseThrow(() -> new NotFoundException("User with email: " + email + " not found"));
+  }
+
+  public List<UserModel> internalUserProfilesByIds(List<Long> userIds) {
+    if (userIds == null || userIds.isEmpty()) {
+      return List.of();
+    }
+
+    return userIds.stream()
+        .filter(Objects::nonNull)
+        .distinct()
+        .map(userRepositoryPort::findById)
+        .flatMap(Optional::stream)
+        .toList();
   }
 
   private static String trim(CharSequence cs) {

@@ -59,11 +59,30 @@ feign:
   client:
     config:
       auth:
-        url: ${AUTH_SERVICE_URL:http://localhost:8888}
+        url: ${AUTH_SERVICE_URL:https://internhub-v2.bbtech.io.vn/api}
       bo-portal:
         url: ${BO_PORTAL_SERVICE_URL:http://localhost:8386}
       dns:
         url: ${DNS_SERVICE_URL:http://localhost:8084}
+
+management:
+  opentelemetry:
+    resource-attributes:
+      "service.name": ${spring.application.name}
+      "service.version": "1.0.5"
+      "deployment.environment": ${DEPLOY_ENV:dev}
+  logging:
+    export:
+      otlp:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+  otlp:
+    metrics:
+      export:
+        enabled: false
 
 aws:
   s3:
@@ -73,3 +92,13 @@ aws:
     bucket-name: ${S3_BUCKET_NAME}
     public-base-url: ${S3_BASE_URL}
 
+common:
+  context:
+    enabled: true
+
+  logging:
+    request: true
+    response: true
+  object-mapper:
+    enabled: true
+    serialize-long-as-string: true

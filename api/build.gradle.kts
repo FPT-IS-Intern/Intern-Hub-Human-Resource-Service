@@ -1,63 +1,37 @@
-plugins {
-    id("org.springframework.boot")
-    id("io.spring.dependency-management")
-    id("application")
-}
-
-repositories {
-    maven { url = uri("https://jitpack.io") }
-    mavenCentral()
-}
-
-springBoot {
-    mainClass.set("com.fis.hrmservice.api.InternHubHRMServiceApplication")
-}
-
-application {
-    mainClass.set("com.fis.hrmservice.api.InternHubHRMServiceApplication")
-}
-
 dependencies {
     // Project dependencies
     implementation(project(":infra"))
     implementation(project(":core"))
 
-    // OpenTelemetry BOM
-    implementation(platform(libs.opentelemetry.bom))
-    implementation(libs.opentelemetry.sdk)
-    implementation(libs.opentelemetry.sdk.trace)
-
-    // Custom libraries
+    // Custom Libraries
     implementation(libs.bundles.custom.libraries)
 
-    // Spring Boot
-    implementation(libs.bundles.spring.boot.all)
-    implementation(libs.spring.boot.starter.log4j2)
-    implementation(libs.spring.boot.starter.data.jpa)
+    // Spring Boot dependencies
+    implementation(libs.spring.boot.starter.web)
     implementation(libs.spring.boot.starter.security)
-
-    // Documentation
     implementation(libs.openapi.doc)
 
     // MapStruct
     implementation(libs.mapstruct)
-    implementation(libs.spring.boot.starter.webflux)
-    implementation(libs.spring.cloud.loadbalancer)
-    implementation(libs.spring.cloud.feign)
-    testImplementation(libs.reactor.test)
     annotationProcessor(libs.mapstruct.processor)
-    annotationProcessor(libs.lombok.mapstruct.binding)
+
+    implementation(libs.bundles.spring.boot.database)
 
     // Lombok
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
+    annotationProcessor(libs.lombok.mapstruct.binding)
+}
 
-
-    // Configuration processor
-    annotationProcessor(libs.spring.boot.configuration.processor)
+tasks.jar {
+    enabled = false
 }
 
 tasks.bootJar {
     enabled = true
-    archiveFileName = "hrm-service.jar"
+    archiveFileName.set("hrm-service.jar")
+}
+
+springBoot {
+    mainClass.set("com.fis.hrmservice.api.InternHubHRMServiceApplication")
 }

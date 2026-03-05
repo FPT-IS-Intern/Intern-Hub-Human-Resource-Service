@@ -100,7 +100,17 @@ public interface TicketApiMapper {
   RegistrationDetailResponse toRegistrationDetailResponse(TicketModel ticketModel);
 
   // ===== Filter Registration Ticket =====
+  @Mapping(target = "ticketStatus", expression = "java(toTicketStatus(request.getTicketStatus()))")
   FilterRegistrationTicketCommand toCommand(FilterRegistrationRequest request);
+
+  default TicketStatus toTicketStatus(String ticketStatus) {
+    if (ticketStatus == null || ticketStatus.isBlank()) return null;
+    try {
+      return TicketStatus.valueOf(ticketStatus.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+  }
 
   List<ListRegistrationResponse> toRegistrationResponseList(List<TicketModel> ticketModels);
 }

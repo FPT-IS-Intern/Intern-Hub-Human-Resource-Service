@@ -2,7 +2,7 @@
 FROM eclipse-temurin:25.0.1_8-jdk AS build
 WORKDIR /app
 
-COPY gradlew gradlew.bat build.gradle.kts settings.gradle.kts libs.versions.toml ./
+COPY gradlew gradlew.bat build.gradle.kts settings.gradle.kts gradle/libs.versions.toml ./
 COPY gradle/ gradle/
 
 COPY api/build.gradle.kts api/
@@ -37,6 +37,16 @@ RUN jlink \
     --no-man-pages \
     --output /custom-jre
 
+
+FROM busybox:1.36 AS otel
+
+ARG OTEL_VERSION=2.25.0
+WORKDIR /otel
+
+RUN wget -O opentelemetry-javaagent.jar \
+  https://repo1.maven.org/maven2/io/opentelemetry/javaagent/opentelemetry-javaagent/${OTEL_VERSION}/opentelemetry-javaagent-${OTEL_VERSION}.jar
+
+
 # Runtime stage
 FROM gcr.io/distroless/base-debian12
 
@@ -44,6 +54,12 @@ WORKDIR /app
 
 COPY --from=build /custom-jre /opt/java/openjdk
 COPY --from=build /app/api/build/libs/hrm-service.jar ./app.jar
+COPY --from=otel /otel/opentelemetry-javaagent.jar ./opentelemetry-javaagent.jar
+
+ENV OTEL_TRACES_EXPORTER=none
+ENV OTEL_METRICS_EXPORTER=none
+ENV OTEL_LOGS_EXPORTER=none
+ENV OTEL_SERVICE_NAME=hrm-service
 
 EXPOSE 8080
 

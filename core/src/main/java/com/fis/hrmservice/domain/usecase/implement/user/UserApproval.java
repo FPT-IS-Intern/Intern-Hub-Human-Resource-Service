@@ -20,28 +20,37 @@ public class UserApproval {
 
   private final CreateAuthIdentityPort createAuthIdentityPort;
 
-  @Transactional
+  @Transactional(rollbackFor = Exception.class)
   public UserModel approveUser(Long userId) {
 
-    Long updated = userRepositoryPort.updateStatus(userId, UserStatus.APPROVED);
-
-    if (updated != 1) {
-      throw new ConflictDataException("Cannot approve user");
-    }
-
-    UserModel userModel =
+    // 1️⃣ Load user
+    UserModel user =
         userRepositoryPort
             .findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));
 
-    try {
-      createAuthIdentityPort.createAuthIdentity(userModel.getUserId(), userModel.getCompanyEmail());
-    } catch (Exception e) {
-      log.error("Failed to create auth identity for userId: {}, error: {}", userId, e.getMessage());
-      throw new RuntimeException("Failed to create auth identity");
+    // 2️⃣ Validate trạng thái
+    if (user.getSysStatus() != UserStatus.PENDING) {
+      throw new ConflictDataException("User is not in PENDING state");
     }
 
-    return userModel;
+    // 3️⃣ Tạo auth identity trước
+    try {
+      createAuthIdentityPort.createAuthIdentity(user.getUserId(), user.getCompanyEmail());
+    } catch (Exception e) {
+      log.error("Failed to create auth identity for userId: {}", userId, e);
+      throw new RuntimeException("Failed to create auth identity", e);
+    }
+
+    // 4️⃣ Update status sau khi external call thành công
+    int updated = userRepositoryPort.updateStatus(userId, UserStatus.APPROVED);
+
+    if (updated != 1) {
+      throw new ConflictDataException("Failed to update user status");
+    }
+
+    user.setSysStatus(UserStatus.APPROVED);
+    return user;
   }
 
   public int totalIntern() {

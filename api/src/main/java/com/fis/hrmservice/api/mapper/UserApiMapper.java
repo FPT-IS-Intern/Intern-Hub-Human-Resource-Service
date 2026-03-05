@@ -28,7 +28,6 @@ public interface UserApiMapper {
 
   // ===== Response =====
   @Mapping(target = "email", source = "companyEmail")
-  @Mapping(target = "status", source = "sysStatus")
   @Mapping(target = "avatarUrl", expression = "java(getAvatarUrl(model))")
   @Mapping(target = "cvUrl", expression = "java(getCvUrl(model))")
   @Mapping(target = "positionCode", source = "position.name")

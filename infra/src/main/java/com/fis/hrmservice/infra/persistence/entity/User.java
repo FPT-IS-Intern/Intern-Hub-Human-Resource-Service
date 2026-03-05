@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
@@ -68,4 +69,13 @@ public class User extends AuditEntity {
 
   @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   private Cv cv;
+
+  @ColumnDefault("false")
+  @Column(name = "is_learner")
+  private Boolean isLearner;
+
+  @ColumnDefault("false")
+  @Column(name = "is_face_registry")
+  private Boolean isFaceRegistry;
+
 }
