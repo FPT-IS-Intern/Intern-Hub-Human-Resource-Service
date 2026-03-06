@@ -9,10 +9,12 @@ common-library = "2.1.1"
 security-starter = "1.0.9"
 feign-version = "5.0.1"
 springDoc = "3.0.1"
+jib = "3.5.2"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 dependency-management = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
 
 [libraries]
 # Spring Boot Starters

@@ -1,3 +1,7 @@
+plugins {
+    alias(libs.plugins.jib)
+}
+
 dependencies {
     // Project dependencies
     implementation(project(":infra"))
@@ -34,4 +38,8 @@ tasks.bootJar {
 
 springBoot {
     mainClass.set("com.fis.hrmservice.api.InternHubHRMServiceApplication")
+}
+
+jib {
+    to.image = "intern-hub-hrm-service:latest"
 }
