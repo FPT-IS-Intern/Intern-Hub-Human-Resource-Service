@@ -1,5 +1,6 @@
 package com.fis.hrmservice.api.controller.attendance;
 
+import com.fis.hrmservice.api.dto.request.AttendanceFilterRequest;
 import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
@@ -9,9 +10,9 @@ import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.domain.usecase.attendance.AttendanceUseCase;
-import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
+import com.fis.hrmservice.domain.usecase.command.attendance.FilterAttendanceCommand;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -114,23 +116,30 @@ public class AttendanceController {
     return ResponseApi.ok(response);
   }
 
-  @GetMapping("/filter")
+  @PostMapping("/filter")
   public ResponseApi<PaginatedData<AttendanceFilterResponse>> filterAttendanceLogs(
-      @RequestParam(required = false) String nameOrEmail,
-      @RequestParam(required = false) String attendanceStatus,
+      @RequestBody AttendanceFilterRequest request,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
 
+    FilterAttendanceCommand command = attendanceApiMapper.toCommand(request);
+
     PaginatedData<AttendanceLogModel> logs =
-        attendanceUseCase.filterAttendance(nameOrEmail, attendanceStatus, page, size);
+        attendanceUseCase.filterAttendance(command.getNameOrEmail(), command.getAttendanceStatus(), page, size);
+
+    AtomicInteger counter = new AtomicInteger(page * size + 1);
+    List<AttendanceFilterResponse> items = attendanceApiMapper
+        .toFilterResponseList((List<AttendanceLogModel>) logs.getItems())
+        .stream()
+        .peek(item -> item.setNo(counter.getAndIncrement()))
+        .toList();
 
     return ResponseApi.ok(
-            PaginatedData.<AttendanceFilterResponse>builder()
-                    .items(attendanceApiMapper.toFilterResponseItem((List<AttendanceLogModel>) logs.getItems()))
-                    .totalItems(logs.getTotalItems())
-                    .totalPages(logs.getTotalPages())
-                    .build()
-    );
+        PaginatedData.<AttendanceFilterResponse>builder()
+            .items(items)
+            .totalItems(logs.getTotalItems())
+            .totalPages(logs.getTotalPages())
+            .build());
   }
 
   @GetMapping("/attendance-in-week")

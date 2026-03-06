@@ -3,14 +3,13 @@ package com.fis.hrmservice.domain.usecase.implement.user;
 import com.fis.hrmservice.domain.model.user.AvatarModel;
 import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.output.feign.InternalUploadDirectPort;
 import com.fis.hrmservice.domain.port.output.user.AvatarRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.CvRepositoryPort;
+import com.fis.hrmservice.domain.port.output.user.FileStoragePort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.fis.hrmservice.domain.utils.helper.UpdateHelper;
-import com.fis.hrmservice.domain.utils.response.InternalUploadDirectResponse;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +26,7 @@ public class UserProfileUseCaseImpl {
 
   UserRepositoryPort userRepositoryPort;
   UserValidationService userValidationService;
-  InternalUploadDirectPort fileUploadPort;
+  FileStoragePort fileStoragePort;
   AvatarRepositoryPort avatarRepositoryPort;
   CvRepositoryPort cvRepositoryPort;
 
@@ -89,44 +88,61 @@ public class UserProfileUseCaseImpl {
 
     if (command.getCvFile() != null && !command.getCvFile().isEmpty()) {
 
-      InternalUploadDirectResponse cvResult =
-          fileUploadPort.upload(command.getCvFile(), "cvs/" + user.getUserId(), user.getUserId());
+      try {
+        String cvObjectKey =
+                fileStoragePort.uploadFile(
+                        command.getCvFile(),
+                        "cvs/" + command.getCvFile().getOriginalFilename(),
+                        user.getUserId(),
+                        20971520L,
+                        "(docx|pdf");
 
-      CvModel cv = cvRepositoryPort.findByUserId(user.getUserId());
+        CvModel cv = cvRepositoryPort.findByUserId(user.getUserId());
 
-      if (cv == null) {
-        cv = new CvModel();
-        cv.setUser(user);
+        if (cv == null) {
+          cv = new CvModel();
+          cv.setUser(user);
+        }
+
+        cv.setCvUrl(cvObjectKey);
+        cv.setFileSize(command.getCvFile().getSize());
+        cv.setFileType(command.getCvFile().getContentType());
+        CvModel savedCv = cvRepositoryPort.save(cv);
+        user.setCv(savedCv);
+        changed = true;
+      } catch (Exception e) {
+        throw new RuntimeException("Upload CV failed: " + e.getMessage());
       }
-
-      cv.setCvUrl(cvResult.getObjectKey());
-      cv.setFileSize(command.getCvFile().getSize());
-      cv.setFileType(command.getCvFile().getContentType());
-      CvModel savedCv = cvRepositoryPort.save(cv);
-      user.setCv(savedCv);
-      changed = true;
     }
 
     if (command.getAvatarFile() != null && !command.getAvatarFile().isEmpty()) {
 
-      InternalUploadDirectResponse avatarResult =
-          fileUploadPort.upload(
-              command.getAvatarFile(), "avatars/" + user.getUserId(), user.getUserId());
+      try {
+        String avatarObjectKey =
+                fileStoragePort.uploadFile(
+                        command.getAvatarFile(),
+                        "avatars/" + command.getAvatarFile().getOriginalFilename(),
+                        user.getUserId(),
+                        20971520L,
+                        "image/(png|jpeg|jpg)");
 
-      AvatarModel avatar = avatarRepositoryPort.getAvatarByUserId(user.getUserId());
+        AvatarModel avatar = avatarRepositoryPort.getAvatarByUserId(user.getUserId());
 
-      if (avatar == null) {
-        avatar = new AvatarModel();
-        avatar.setUser(user);
+        if (avatar == null) {
+          avatar = new AvatarModel();
+          avatar.setUser(user);
+        }
+
+        avatar.setAvatarUrl(avatarObjectKey);
+        avatar.setFileSize(command.getAvatarFile().getSize());
+        avatar.setFileType(command.getAvatarFile().getContentType());
+
+        AvatarModel savedAvatar = avatarRepositoryPort.save(avatar);
+        user.setAvatar(savedAvatar);
+        changed = true;
+      } catch (Exception e) {
+        throw new RuntimeException("Upload Avatar failed: " + e.getMessage());
       }
-
-      avatar.setAvatarUrl(avatarResult.getObjectKey());
-      avatar.setFileSize(command.getAvatarFile().getSize());
-      avatar.setFileType(command.getAvatarFile().getContentType());
-
-      AvatarModel savedAvatar = avatarRepositoryPort.save(avatar);
-      user.setAvatar(savedAvatar);
-      changed = true;
     }
 
     // Nếu không có thay đổi gì thì return luôn (không throw)

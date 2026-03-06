@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("hrm/users/positions")
 @Tag(name = "Position Management", description = "APIs for position management")
+@CrossOrigin(origins = "http://localhost:4205")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PositionController {
 

@@ -1,5 +1,8 @@
 package com.fis.hrmservice.domain.port.output.user;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public interface FileStoragePort {
-  String upload(byte[] content, String fileName, String contentType, String folder);
+  String uploadFile(
+          MultipartFile file, String keyPrefix, Long actorId, Long maxSizeBytes, String contentTypeRegex);
 }

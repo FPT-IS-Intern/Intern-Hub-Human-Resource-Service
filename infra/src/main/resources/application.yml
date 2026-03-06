@@ -63,7 +63,7 @@ feign:
       bo-portal:
         url: ${BO_PORTAL_SERVICE_URL:http://localhost:8386}
       dns:
-        url: ${DNS_SERVICE_URL:http://localhost:8084}
+        url: ${DMS_SERVICE_URL:http://localhost:8080}
 
 management:
   opentelemetry:
@@ -83,14 +83,6 @@ management:
     metrics:
       export:
         enabled: false
-
-aws:
-  s3:
-    access-key-id: ${S3_ACCESS_KEY_ID}
-    secret-key-id: ${S3_SECRET_KEY_ID}
-    end-point: ${S3_END_POINT}
-    bucket-name: ${S3_BUCKET_NAME}
-    public-base-url: ${S3_BASE_URL}
 
 
 face-recognition:
