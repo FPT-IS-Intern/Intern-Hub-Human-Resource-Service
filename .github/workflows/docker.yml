@@ -18,6 +18,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  OTEL_VERSION: "2.25.0"
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -42,6 +45,11 @@ jobs:
           registry: ${{ secrets.DOCKERHUB_REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Download OpenTelemetry Java Agent for Jib
+        run: |
+          mkdir -p api/src/main/jib/app
+          curl -fL "https://repo1.maven.org/maven2/io/opentelemetry/javaagent/opentelemetry-javaagent/${OTEL_VERSION}/opentelemetry-javaagent-${OTEL_VERSION}.jar" -o api/src/main/jib/app/opentelemetry-javaagent.jar
 
       - name: Build and push image with Jib
         env:
