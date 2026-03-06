@@ -95,7 +95,7 @@ public class UserProfileUseCaseImpl {
                         "cvs/" + command.getCvFile().getOriginalFilename(),
                         user.getUserId(),
                         20971520L,
-                        "(docx|pdf");
+                        "(?i).*\\.(docx|pdf)$");
 
         CvModel cv = cvRepositoryPort.findByUserId(user.getUserId());
 

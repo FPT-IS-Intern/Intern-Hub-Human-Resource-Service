@@ -54,6 +54,8 @@ spring:
 services:
   gateway:
     url: ${GATEWAY_URL:http://localhost:8765}
+  dms:
+    url: ${DMS_SERVICE_URL:http://localhost:8084}
 
 feign:
   client:
@@ -62,8 +64,6 @@ feign:
         url: ${AUTH_SERVICE_URL:https://internhub-v2.bbtech.io.vn/api}
       bo-portal:
         url: ${BO_PORTAL_SERVICE_URL:http://localhost:8386}
-      dns:
-        url: ${DMS_SERVICE_URL:http://localhost:8080}
 
 management:
   opentelemetry:
