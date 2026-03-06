@@ -14,6 +14,7 @@ import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
@@ -41,6 +42,7 @@ public class AttendanceController {
 
   /** Get current attendance status for a user */
   @GetMapping("/status")
+  @Authenticated
   public ResponseApi<AttendanceStatusResponse> getAttendanceStatus() {
     Long userId = UserContext.requiredUserId();
     log.info("GET /attendance/status - userId: {}", userId);
@@ -54,6 +56,7 @@ public class AttendanceController {
 
   /** Process check-in */
   @PostMapping("/check-in")
+  @Authenticated
   public ResponseApi<AttendanceResponse> checkIn(
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
@@ -71,6 +74,7 @@ public class AttendanceController {
 
   /** Process check-out */
   @PostMapping("/check-out")
+  @Authenticated
   public ResponseApi<AttendanceResponse> checkOut(
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
@@ -88,6 +92,7 @@ public class AttendanceController {
 
   /** Unified check-point for attendance eligibility (IP or GPS) */
   @GetMapping("/check-point")
+  @Authenticated
   public ResponseApi<WiFiInfoResponse> checkPoint(
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
@@ -116,6 +121,7 @@ public class AttendanceController {
   }
 
   @GetMapping("/filter")
+  @Authenticated
   public ResponseApi<PaginatedData<AttendanceFilterResponse>> filterAttendanceLogs(
       @RequestParam(required = false) String nameOrEmail,
       @RequestParam(required = false) String attendanceStatus,
@@ -135,6 +141,7 @@ public class AttendanceController {
   }
 
   @GetMapping("/attendance-in-week")
+  @Authenticated
   public ResponseApi<List<AttendanceInWeekApiResponse>> getAttendanceInWeekByUserId() {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(attendanceUseCase.getAttendanceInWeekByUserId(userId).stream().map(attendanceApiMapper::toApiResponse).toList());
