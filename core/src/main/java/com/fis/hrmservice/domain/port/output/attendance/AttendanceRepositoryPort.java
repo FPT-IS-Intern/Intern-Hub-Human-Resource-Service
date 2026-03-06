@@ -1,6 +1,7 @@
 package com.fis.hrmservice.domain.port.output.attendance;
 
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
+import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.FilterAttendanceCommand;
 import com.intern.hub.library.common.dto.PaginatedData;
 
@@ -34,5 +35,5 @@ public interface AttendanceRepositoryPort {
 
   Long getNotAttendancePercent();
 
-  List<AttendanceLogModel> filterAttendance(String keyword, String attendanceStatus);
+  List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 }

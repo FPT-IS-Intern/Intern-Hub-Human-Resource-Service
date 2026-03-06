@@ -3,7 +3,9 @@ package com.fis.hrmservice.infra.persistence.adapter.attendance;
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.attendance.AttendanceRepositoryPort;
+import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.FilterAttendanceCommand;
+import com.fis.hrmservice.infra.mapper.AttendanceInfraMapper;
 import com.fis.hrmservice.infra.persistence.entity.AttendanceLog;
 import com.fis.hrmservice.infra.persistence.repository.attendance.AttendanceLogRepository;
 import com.fis.hrmservice.infra.persistence.repository.user.UserJpaRepository;
@@ -32,6 +34,7 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
 
   private final AttendanceLogRepository attendanceLogRepository;
   private final UserJpaRepository userJpaRepository;
+  private final AttendanceInfraMapper attendanceInfraMapper;
 
   @Override
   public AttendanceLogModel save(AttendanceLogModel attendanceLogModel) {
@@ -119,8 +122,8 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
   }
 
   @Override
-  public List<AttendanceLogModel> filterAttendance(String keyword, String attendanceStatus) {
-    return List.of();
+  public List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId) {
+    return attendanceLogRepository.getAttendanceInWeek(userId).stream().map(attendanceInfraMapper::toAttendanceInWeekCommand).toList();
   }
 
   private AttendanceLog toEntity(AttendanceLogModel model) {

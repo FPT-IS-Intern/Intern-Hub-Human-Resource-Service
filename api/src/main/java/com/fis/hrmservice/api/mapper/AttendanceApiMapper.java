@@ -1,10 +1,12 @@
 package com.fis.hrmservice.api.mapper;
 
 import com.fis.hrmservice.api.dto.response.AttendanceFilterResponse;
+import com.fis.hrmservice.api.dto.response.AttendanceInWeekApiResponse;
 import com.fis.hrmservice.api.dto.response.AttendanceResponse;
 import com.fis.hrmservice.api.dto.response.AttendanceStatusResponse;
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
+import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
 import com.fis.hrmservice.domain.usecase.implement.attendance.AttendanceUseCaseImpl;
@@ -57,5 +59,7 @@ public interface AttendanceApiMapper {
             .atZone(ZoneId.systemDefault())
             .toLocalTime();
   }
+
+  AttendanceInWeekApiResponse toApiResponse(AttendanceInWeekCommand command);
 
 }

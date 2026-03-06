@@ -9,6 +9,7 @@ import com.fis.hrmservice.domain.port.output.attendance.AttendanceRepositoryPort
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.usecase.attendance.AttendanceUseCase;
+import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.FilterAttendanceCommand;
@@ -253,6 +254,11 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         effectiveCheckOutTime,
         processed);
     return processed;
+  }
+
+  @Override
+  public List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId) {
+    return attendanceRepository.getAttendanceInWeekByUserId(userId);
   }
 
   // ==================== Helper Methods ====================

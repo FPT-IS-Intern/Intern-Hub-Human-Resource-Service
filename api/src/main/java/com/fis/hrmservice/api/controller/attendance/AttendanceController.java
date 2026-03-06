@@ -1,9 +1,6 @@
 package com.fis.hrmservice.api.controller.attendance;
 
-import com.fis.hrmservice.api.dto.response.AttendanceFilterResponse;
-import com.fis.hrmservice.api.dto.response.AttendanceResponse;
-import com.fis.hrmservice.api.dto.response.AttendanceStatusResponse;
-import com.fis.hrmservice.api.dto.response.WiFiInfoResponse;
+import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.api.util.WebUtils;
@@ -12,6 +9,7 @@ import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.domain.usecase.attendance.AttendanceUseCase;
+import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
@@ -133,5 +131,11 @@ public class AttendanceController {
                     .totalPages(logs.getTotalPages())
                     .build()
     );
+  }
+
+  @GetMapping("/attendance-in-week")
+  public ResponseApi<List<AttendanceInWeekApiResponse>> getAttendanceInWeekByUserId() {
+    Long userId = UserContext.requiredUserId();
+    return ResponseApi.ok(attendanceUseCase.getAttendanceInWeekByUserId(userId).stream().map(attendanceApiMapper::toApiResponse).toList());
   }
 }
