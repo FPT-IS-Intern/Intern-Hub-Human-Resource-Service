@@ -81,12 +81,10 @@ public class AttendanceController {
       HttpServletRequest servletRequest) {
     Long userId = UserContext.requiredUserId();
     log.info("POST /attendance/check-out - userId: {}", userId);
-
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     CheckOutCommand command = attendanceApiMapper.toCheckOutCommand(userId, 0L, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkOut(command);
     AttendanceResponse response = attendanceApiMapper.toCheckOutResponseFromLog(attendance);
-
     return ResponseApi.ok(response);
   }
 
@@ -96,11 +94,12 @@ public class AttendanceController {
   public ResponseApi<WiFiInfoResponse> checkPoint(
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
-      HttpServletRequest request) {
+      @RequestHeader(value = "X-Real-Ip", required = false) String ipAddress) {
     log.info("GET /attendance/check-point - checking eligibility");
-
-    String clientIp = WebUtils.getClientIpAddress(request);
-    UUID branchIdFromIp = networkCheckPort.resolveCompanyIpBranchId(clientIp).orElse(null);
+    UUID branchIdFromIp = null;
+    if (ipAddress != null && !ipAddress.isBlank()) {
+      branchIdFromIp = networkCheckPort.resolveCompanyIpBranchId(ipAddress).orElse(null);
+    }
     UUID branchIdFromLocation = networkCheckPort.resolveCompanyLocationBranchId(latitude, longitude).orElse(null);
     boolean isCompanyNetwork = branchIdFromIp != null;
     boolean isAtLocation = branchIdFromLocation != null;
@@ -116,7 +115,7 @@ public class AttendanceController {
             .build();
 
     log.info(
-        "Check-point result - IP: {}, GPS: {}, isValid: {}", clientIp, (latitude != null), isValid);
+        "Check-point result - IP: {}, GPS: {}, isValid: {}", ipAddress, (latitude != null), isValid);
     return ResponseApi.ok(response);
   }
 
