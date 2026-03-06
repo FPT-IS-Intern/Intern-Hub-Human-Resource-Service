@@ -34,8 +34,8 @@ spring:
       connection-timeout: 30000
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 20MB
+      max-file-size: 50MB
+      max-request-size: 50MB
 
   jpa:
     hibernate:
