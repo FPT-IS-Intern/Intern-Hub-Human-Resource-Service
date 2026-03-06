@@ -11,7 +11,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AttendanceUseCase {
-  AttendanceStatusModel getAttendanceStatus(Long userId, LocalDate workDate);
+  AttendanceStatusModel getAttendanceStatus(
+      Long userId, LocalDate workDate, String clientIp, Double latitude, Double longitude);
 
   AttendanceLogModel checkIn(CheckInCommand command);
 

@@ -20,5 +20,7 @@ public class AttendanceStatusResponse {
   private boolean canCheckOut;
   private boolean sessionOpen;
   private UUID openSessionBranchId;
+  private UUID currentBranchId;
+  private boolean canResetByBranchChange;
   private String statusMessage;
 }

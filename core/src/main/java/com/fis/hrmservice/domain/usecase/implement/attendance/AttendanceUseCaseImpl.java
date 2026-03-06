@@ -55,13 +55,15 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
   /** Get attendance status for a user on a specific date */
   @Override
   @Transactional(readOnly = true)
-  public AttendanceStatusModel getAttendanceStatus(Long userId, LocalDate workDate) {
+  public AttendanceStatusModel getAttendanceStatus(
+      Long userId, LocalDate workDate, String clientIp, Double latitude, Double longitude) {
     log.info("Getting attendance status for userId: {} on date: {}", userId, workDate);
 
     Optional<AttendanceLogModel> openSessionOpt =
         attendanceRepository.findOpenSessionByUserAndDate(userId, workDate);
     Optional<AttendanceLogModel> latestOpt =
         attendanceRepository.findLatestByUserAndDate(userId, workDate);
+    UUID currentBranchId = resolveCurrentBranchId(clientIp, latitude, longitude);
 
     if (openSessionOpt.isEmpty() && latestOpt.isEmpty()) {
       return AttendanceStatusModel.builder()
@@ -76,6 +78,8 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
           .canCheckOut(false)
           .sessionOpen(false)
           .openSessionBranchId(null)
+          .currentBranchId(currentBranchId)
+          .canResetByBranchChange(false)
           .statusMessage(null)
           .build();
     }
@@ -97,6 +101,17 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     boolean isSessionOpen = openSessionOpt.isPresent();
     UUID openSessionBranchId = isSessionOpen ? openSessionOpt.get().getCheckInBranchId() : null;
+    boolean hasCompletedSession = attendance.getCheckInTime() > 0 && attendance.getCheckOutTime() > 0;
+    UUID lastCompletedBranchId =
+        attendance.getCheckOutBranchId() != null
+            ? attendance.getCheckOutBranchId()
+            : attendance.getCheckInBranchId();
+    boolean canResetByBranchChange =
+        hasCompletedSession
+            && currentBranchId != null
+            && lastCompletedBranchId != null
+            && !currentBranchId.equals(lastCompletedBranchId);
+    boolean canCheckIn = !isSessionOpen && (!hasCompletedSession || canResetByBranchChange);
     String statusMessage = null;
     if (isSessionOpen) {
       String branchName =
@@ -104,6 +119,8 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
               .resolveBranchName(openSessionBranchId)
               .orElse(openSessionBranchId != null ? openSessionBranchId.toString() : "khác");
       statusMessage = String.format("Bạn đã checkin Onsite ở %s", branchName);
+    } else if (hasCompletedSession && !canResetByBranchChange) {
+      statusMessage = "Ban da hoan thanh check-in/check-out o chi nhanh hien tai";
     }
 
     return AttendanceStatusModel.builder()
@@ -114,10 +131,12 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         .isCheckOutValid(isCheckOutValid)
         .checkInMessage(generateCheckInMessage(attendance.getCheckInTime()))
         .checkOutMessage(generateCheckOutMessage(attendance.getCheckOutTime()))
-        .canCheckIn(!isSessionOpen)
+        .canCheckIn(canCheckIn)
         .canCheckOut(isSessionOpen)
         .sessionOpen(isSessionOpen)
         .openSessionBranchId(openSessionBranchId)
+        .currentBranchId(currentBranchId)
+        .canResetByBranchChange(canResetByBranchChange)
         .statusMessage(statusMessage)
         .build();
   }
@@ -293,6 +312,14 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     }
 
     return branchIdFromIp != null ? branchIdFromIp : branchIdFromLocation;
+  }
+
+  private UUID resolveCurrentBranchId(String clientIp, Double latitude, Double longitude) {
+    UUID branchIdFromIp = networkCheckPort.resolveCompanyIpBranchId(clientIp).orElse(null);
+    if (branchIdFromIp != null) {
+      return branchIdFromIp;
+    }
+    return networkCheckPort.resolveCompanyLocationBranchId(latitude, longitude).orElse(null);
   }
 
   private boolean validateCheckInTime(long checkInTimeMillis) {

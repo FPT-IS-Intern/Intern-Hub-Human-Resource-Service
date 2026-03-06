@@ -18,6 +18,7 @@ import com.intern.hub.starter.security.annotation.Authenticated;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -43,12 +44,17 @@ public class AttendanceController {
   /** Get current attendance status for a user */
   @GetMapping("/status")
   @Authenticated
-  public ResponseApi<AttendanceStatusResponse> getAttendanceStatus() {
+  public ResponseApi<AttendanceStatusResponse> getAttendanceStatus(
+      @RequestParam(required = false) Double latitude,
+      @RequestParam(required = false) Double longitude,
+      HttpServletRequest servletRequest) {
     Long userId = UserContext.requiredUserId();
     log.info("GET /attendance/status - userId: {}", userId);
 
     LocalDate today = LocalDate.now(CoreConstant.VIETNAM_ZONE);
-    AttendanceStatusModel status = attendanceUseCase.getAttendanceStatus(userId, today);
+    String clientIp = WebUtils.getClientIpAddress(servletRequest);
+    AttendanceStatusModel status =
+        attendanceUseCase.getAttendanceStatus(userId, today, clientIp, latitude, longitude);
     AttendanceStatusResponse response = attendanceApiMapper.toStatusResponse(status);
 
     return ResponseApi.ok(response);
@@ -81,10 +87,12 @@ public class AttendanceController {
       HttpServletRequest servletRequest) {
     Long userId = UserContext.requiredUserId();
     log.info("POST /attendance/check-out - userId: {}", userId);
+
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
     CheckOutCommand command = attendanceApiMapper.toCheckOutCommand(userId, 0L, clientIp, latitude, longitude);
     AttendanceLogModel attendance = attendanceUseCase.checkOut(command);
     AttendanceResponse response = attendanceApiMapper.toCheckOutResponseFromLog(attendance);
+
     return ResponseApi.ok(response);
   }
 
