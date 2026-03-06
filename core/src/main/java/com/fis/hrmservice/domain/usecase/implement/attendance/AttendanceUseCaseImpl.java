@@ -2,6 +2,7 @@ package com.fis.hrmservice.domain.usecase.implement.attendance;
 
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
+import com.fis.hrmservice.domain.model.constant.AttendanceError;
 import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.model.user.UserModel;
@@ -144,13 +145,17 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         attendanceRepository.existsCheckedInBranchByUserAndDate(
             command.getUserId(), workDate, checkInBranchId);
     if (alreadyCheckedInThisBranch) {
-      throw new BadRequestException("Bạn đã check-in ở văn phòng này trong hôm nay");
+      throw new BadRequestException(
+          AttendanceError.ALREADY_CHECKED_IN.getValue(),
+          "Bạn đã check-in ở văn phòng này trong hôm nay");
     }
 
     Optional<AttendanceLogModel> openAttendanceOpt =
         attendanceRepository.findOpenSessionByUserAndDate(command.getUserId(), workDate);
     if (openAttendanceOpt.isPresent()) {
-      throw new BadRequestException("Bạn phải checkout địa điểm Onsite trước đó");
+      throw new BadRequestException(
+          AttendanceError.OPEN_SESSION_EXISTS.getValue(),
+          "Bạn phải checkout địa điểm Onsite trước đó");
     }
 
     // Validate check-in time (Standard 8:45)
@@ -199,7 +204,11 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     AttendanceLogModel attendance =
         attendanceRepository
             .findOpenSessionByUserAndDate(command.getUserId(), workDate)
-            .orElseThrow(() -> new BadRequestException("Bạn không có phiên check-in mở trong hôm nay"));
+            .orElseThrow(
+                () ->
+                    new BadRequestException(
+                        AttendanceError.OPEN_SESSION_NOT_FOUND.getValue(),
+                        "Bạn không có phiên check-in mở trong hôm nay"));
 
     // Validate check-out time
     boolean isValid = validateCheckOutTime(checkOutTime);
@@ -270,7 +279,9 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
           clientIp,
           latitude,
           longitude);
-      throw new BadRequestException("Bạn cần kết nối với Wi-Fi công ty hoặc ở văn phòng " + action);
+      throw new BadRequestException(
+          AttendanceError.OUT_OF_RANGE.getValue(),
+          "Bạn cần kết nối với Wi-Fi công ty hoặc ở văn phòng " + action);
     }
 
     return branchIdFromIp != null ? branchIdFromIp : branchIdFromLocation;
