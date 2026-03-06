@@ -9,7 +9,6 @@ import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.domain.usecase.attendance.AttendanceUseCase;
-import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckInCommand;
 import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("hrm/attendance")
 @EnableGlobalExceptionHandler
 @Slf4j
+@CrossOrigin("*")
 @Tag(name = "Attendance Management", description = "APIs for attendance check-in and check-out")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -41,7 +41,8 @@ public class AttendanceController {
 
   /** Get current attendance status for a user */
   @GetMapping("/status")
-  public ResponseApi<AttendanceStatusResponse> getAttendanceStatus(@RequestParam Long userId) {
+  public ResponseApi<AttendanceStatusResponse> getAttendanceStatus() {
+    Long userId = UserContext.requiredUserId();
     log.info("GET /attendance/status - userId: {}", userId);
 
     LocalDate today = LocalDate.now(CoreConstant.VIETNAM_ZONE);
@@ -57,7 +58,7 @@ public class AttendanceController {
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
       HttpServletRequest servletRequest) {
-    Long userId = UserContext.requiredUserId(); // dùng cái này đi cha
+    Long userId = UserContext.requiredUserId();
     log.info("POST /attendance/check-in - userId: {}", userId);
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
@@ -71,10 +72,10 @@ public class AttendanceController {
   /** Process check-out */
   @PostMapping("/check-out")
   public ResponseApi<AttendanceResponse> checkOut(
-      @RequestParam Long userId,
       @RequestParam(required = false) Double latitude,
       @RequestParam(required = false) Double longitude,
       HttpServletRequest servletRequest) {
+    Long userId = UserContext.requiredUserId();
     log.info("POST /attendance/check-out - userId: {}", userId);
 
     String clientIp = WebUtils.getClientIpAddress(servletRequest);
