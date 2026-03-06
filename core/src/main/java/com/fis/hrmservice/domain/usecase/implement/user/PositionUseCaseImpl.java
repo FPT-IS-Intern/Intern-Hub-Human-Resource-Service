@@ -17,4 +17,11 @@ public class PositionUseCaseImpl {
   public List<PositionModel> listAllPosition() {
     return positionRepositoryPort.findAll();
   }
+
+  public List<Long> findExistingPositionIds(List<Long> positionIds) {
+    if (positionIds == null || positionIds.isEmpty()) {
+      return List.of();
+    }
+    return positionRepositoryPort.findExistingPositionIds(positionIds);
+  }
 }

@@ -4,6 +4,7 @@ import com.fis.hrmservice.domain.model.common.BaseDomain;
 import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import java.time.LocalDate;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,4 +26,6 @@ public class AttendanceLogModel extends BaseDomain {
   String source;
   boolean isCheckInValid;
   boolean isCheckOutValid;
+  UUID checkInBranchId;
+  UUID checkOutBranchId;
 }

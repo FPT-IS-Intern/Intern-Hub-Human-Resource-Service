@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,6 +39,12 @@ public class AttendanceLog extends AuditEntity {
   @Size(max = 50)
   @Column(name = "source", length = 50)
   private String source;
+
+  @Column(name = "check_in_branch_id")
+  private UUID checkInBranchId;
+
+  @Column(name = "check_out_branch_id")
+  private UUID checkOutBranchId;
 
   @Column(name = "created_at")
   private Long createdAt;

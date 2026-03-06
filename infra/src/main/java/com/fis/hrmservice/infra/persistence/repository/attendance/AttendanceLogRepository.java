@@ -2,10 +2,12 @@ package com.fis.hrmservice.infra.persistence.repository.attendance;
 
 import com.fis.hrmservice.infra.persistence.entity.AttendanceLog;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +31,16 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
     ORDER BY al.workDate DESC, al.checkInTime DESC
 """)
   Page<AttendanceLog> filterAttendanceLogs(@Param("nameOrKeyword") String nameOrKeyword, @Param("status") String attendanceStatus, Pageable pageable);
+
+  List<AttendanceLog> findAllByUser_IdAndWorkDateOrderByCheckInTimeDesc(Long userId, LocalDate workDate);
+
+  List<AttendanceLog> findAllByWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeAsc(LocalDate workDate);
+
+  Optional<AttendanceLog> findFirstByUser_IdAndWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeDesc(
+      Long userId, LocalDate workDate);
+
+  Optional<AttendanceLog> findFirstByUser_IdAndWorkDateOrderByCheckInTimeDesc(
+      Long userId, LocalDate workDate);
+
+  boolean existsByUser_IdAndWorkDateAndCheckInBranchId(Long userId, LocalDate workDate, UUID branchId);
 }

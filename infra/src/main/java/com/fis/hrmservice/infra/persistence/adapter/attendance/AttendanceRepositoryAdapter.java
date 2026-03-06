@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.intern.hub.library.common.dto.PaginatedData;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,41 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
 
   @Override
   public Optional<AttendanceLogModel> findByUserIdAndDate(Long userId, LocalDate workDate) {
-    return attendanceLogRepository.findByUser_IdAndWorkDate(userId, workDate).map(this::toModel);
+    List<AttendanceLogModel> logs = findAllByUserIdAndDate(userId, workDate);
+    return logs.isEmpty() ? Optional.empty() : Optional.of(logs.get(0));
+  }
+
+  @Override
+  public List<AttendanceLogModel> findAllByUserIdAndDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository.findAllByUser_IdAndWorkDateOrderByCheckInTimeDesc(userId, workDate).stream()
+        .map(this::toModel)
+        .toList();
+  }
+
+  @Override
+  public List<AttendanceLogModel> findAllOpenByDate(LocalDate workDate) {
+    return attendanceLogRepository.findAllByWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeAsc(workDate).stream()
+        .map(this::toModel)
+        .toList();
+  }
+
+  @Override
+  public Optional<AttendanceLogModel> findOpenSessionByUserAndDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository
+        .findFirstByUser_IdAndWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeDesc(userId, workDate)
+        .map(this::toModel);
+  }
+
+  @Override
+  public Optional<AttendanceLogModel> findLatestByUserAndDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository
+        .findFirstByUser_IdAndWorkDateOrderByCheckInTimeDesc(userId, workDate)
+        .map(this::toModel);
+  }
+
+  @Override
+  public boolean existsCheckedInBranchByUserAndDate(Long userId, LocalDate workDate, UUID branchId) {
+    return attendanceLogRepository.existsByUser_IdAndWorkDateAndCheckInBranchId(userId, workDate, branchId);
   }
 
   @Override
@@ -113,6 +148,8 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
     }
     entity.setAttendanceStatus(model.getAttendanceStatus());
     entity.setSource(model.getSource());
+    entity.setCheckInBranchId(model.getCheckInBranchId());
+    entity.setCheckOutBranchId(model.getCheckOutBranchId());
     // Audit fields are handled by AuditEntity listener or manually if needed
     return entity;
   }
@@ -153,6 +190,8 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
                 : 0L)
         .attendanceStatus(entity.getAttendanceStatus())
         .source(entity.getSource())
+        .checkInBranchId(entity.getCheckInBranchId())
+        .checkOutBranchId(entity.getCheckOutBranchId())
         .build();
   }
 }

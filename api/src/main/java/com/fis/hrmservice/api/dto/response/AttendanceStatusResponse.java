@@ -2,6 +2,7 @@ package com.fis.hrmservice.api.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,4 +16,9 @@ public class AttendanceStatusResponse {
   private boolean isCheckOutValid;
   private String checkInMessage;
   private String checkOutMessage;
+  private boolean canCheckIn;
+  private boolean canCheckOut;
+  private boolean sessionOpen;
+  private UUID openSessionBranchId;
+  private String statusMessage;
 }
