@@ -120,7 +120,7 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
               .orElse(openSessionBranchId != null ? openSessionBranchId.toString() : "khác");
       statusMessage = String.format("Bạn đã checkin Onsite ở %s", branchName);
     } else if (hasCompletedSession && !canResetByBranchChange) {
-      statusMessage = "Ban da hoan thanh check-in/check-out o chi nhanh hien tai";
+      statusMessage = "Bạn đã hoàn thành check-in/check-out ở đi địa điểm hiện tại";
     }
 
     return AttendanceStatusModel.builder()
@@ -308,7 +308,7 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
           longitude);
       throw new BadRequestException(
           AttendanceError.OUT_OF_RANGE.getValue(),
-          "Bạn cần kết nối với Wi-Fi công ty hoặc ở văn phòng " + action);
+          "Hệ thống đang ghi nhận vị trí của bạn sai (hoặc ngoài bán kính cho phép) hoặc chưa có phiếu làm Remote. Vui lòng tạo phiếu ");
     }
 
     return branchIdFromIp != null ? branchIdFromIp : branchIdFromLocation;
