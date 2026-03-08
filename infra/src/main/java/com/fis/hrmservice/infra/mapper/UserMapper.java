@@ -32,6 +32,10 @@ public interface UserMapper {
   UserModel toModel(User entity);
 
   @Mapping(target = "id", source = "userId")
+  @Mapping(target = "department", ignore = true)
+  @Mapping(target = "isFaceRegistry", ignore = true)
+  @Mapping(target = "avatar", ignore = true)
+  @Mapping(target = "cv", ignore = true)
   void updateEntity(UserModel model, @MappingTarget User entity);
 
   List<UserModel> toModelList(List<User> entities);
