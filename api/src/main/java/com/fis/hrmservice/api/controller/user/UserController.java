@@ -12,6 +12,7 @@ import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
+import com.fis.hrmservice.domain.usecase.command.user.RegisterFaceCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 import com.fis.hrmservice.domain.usecase.implement.user.*;
 import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
@@ -56,6 +57,8 @@ public class UserController {
   CreateAuthIdentityPort createAuthIdentityPort;
 
   SupervisorUseCaseImpl supervisorUseCase;
+
+  RegisterFaceUseCaseImpl registerFaceUseCase;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<?> registerUser(
@@ -192,5 +195,31 @@ public class UserController {
         supervisorUseCase.listAllSupervisor().stream()
             .map(userApiMapper::toSupervisorResponse)
             .toList());
+  }
+
+  @PostMapping(value = "/me/face-registry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Authenticated
+  public ResponseApi<String> registerFace(
+      @RequestParam("userName") String userName,
+      @RequestPart("files") List<MultipartFile> files) {
+
+    if (files == null || files.size() != 9) {
+      return ResponseApi.ok("Vui lòng cung cấp đúng 9 ảnh khuôn mặt");
+    }
+
+    Long userId = UserContext.requiredUserId();
+
+    RegisterFaceCommand command = RegisterFaceCommand.builder()
+        .userId(userId)
+        .userName(userName)
+        .files(files)
+        .build();
+
+    UserModel result = registerFaceUseCase.registerFace(command);
+
+    if (Boolean.TRUE.equals(result.getIsFaceRegistry())) {
+      return ResponseApi.ok("Đăng ký khuôn mặt thành công");
+    }
+    return ResponseApi.ok("Đăng ký khuôn mặt thất bại, vui lòng thử lại");
   }
 }

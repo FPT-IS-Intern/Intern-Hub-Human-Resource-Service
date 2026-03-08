@@ -88,4 +88,9 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
 
   @Query("SELECT u FROM User u WHERE u.position.name = 'STAFF'")
   List<User> listAllSupervisor();
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.isFaceRegistry = :isFaceRegistry WHERE u.id = :userId")
+  int updateIsFaceRegistry(@Param("userId") Long userId, @Param("isFaceRegistry") boolean isFaceRegistry);
 }

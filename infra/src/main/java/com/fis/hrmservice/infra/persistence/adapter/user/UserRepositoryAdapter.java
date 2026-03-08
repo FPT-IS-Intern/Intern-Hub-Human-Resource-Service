@@ -107,4 +107,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   public List<UserModel> listAllSupervisor() {
     return userJpaRepository.listAllSupervisor().stream().map(userMapper::toModel).toList();
   }
+
+  @Override
+  public int updateIsFaceRegistry(Long userId, boolean isFaceRegistry) {
+    return userJpaRepository.updateIsFaceRegistry(userId, isFaceRegistry);
+  }
 }

@@ -13,4 +13,5 @@ public class InternalUserResponse {
   String avatarUrl;
   String email;
   String role;
+  Boolean isFaceRegistry;
 }

@@ -32,4 +32,6 @@ public class UserModel extends BaseDomain {
 
   AvatarModel avatar;
   CvModel cv;
+
+  Boolean isFaceRegistry;
 }

@@ -33,4 +33,6 @@ public interface UserRepositoryPort {
   int internshipChanging();
 
   List<UserModel> listAllSupervisor();
+
+  int updateIsFaceRegistry(Long userId, boolean isFaceRegistry);
 }
