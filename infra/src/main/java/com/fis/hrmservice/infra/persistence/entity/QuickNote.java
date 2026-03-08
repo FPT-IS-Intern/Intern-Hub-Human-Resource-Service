@@ -19,12 +19,12 @@ public class QuickNote extends AuditEntity {
   private Long id;
 
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "intern_id", nullable = false)
   private User intern;
 
   //  @NotNull
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.EAGER, optional = false)
   @JoinColumn(name = "writer_id", nullable = false)
   private User writer;
 

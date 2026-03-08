@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
@@ -30,6 +31,9 @@ public interface UserMapper {
   @Mapping(target = "department", source = "department", qualifiedByName = "departmentToString")
   UserModel toModel(User entity);
 
+  @Mapping(target = "id", source = "userId")
+  void updateEntity(UserModel model, @MappingTarget User entity);
+
   List<UserModel> toModelList(List<User> entities);
 
   /* ===================== MODEL -> ENTITY ===================== */
@@ -37,10 +41,9 @@ public interface UserMapper {
   @Mapping(target = "id", source = "userId")
   @Mapping(target = "mentor", qualifiedByName = "mentorToEntity")
   @Mapping(target = "position", source = "position", qualifiedByName = "positionToEntity")
-  @Mapping(target = "dateOfBirth", source = "dateOfBirth")
   @Mapping(target = "avatar", qualifiedByName = "avatarToEntity")
   @Mapping(target = "cv", qualifiedByName = "cvToEntity")
-  @Mapping(target = "department", source = "department", qualifiedByName = "stringToDepartment")
+  @Mapping(target = "department", ignore = true)
   @Mapping(target = "isFaceRegistry", ignore = true)
   User toEntity(UserModel model);
 
@@ -145,7 +148,10 @@ public interface UserMapper {
 
   @Named("stringToDepartment")
   default Department stringToDepartment(String name) {
-    // Cannot reverse-map department name to full entity — leave null (id unknown)
-    return null;
+    if (name == null) return null;
+
+    Department d = new Department();
+    d.setName(name);
+    return d;
   }
 }

@@ -145,7 +145,7 @@ public class UserController {
 
     if (model == null) {
       return ResponseApi.ok("Update user profile không thành công");
-    }
+    } 
     return ResponseApi.ok("Update user profile thành công");
   }
 
