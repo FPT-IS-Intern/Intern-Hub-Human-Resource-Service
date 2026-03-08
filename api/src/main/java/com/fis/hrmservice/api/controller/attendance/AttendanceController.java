@@ -128,7 +128,7 @@ public class AttendanceController {
   }
 
   @GetMapping("/filter")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<PaginatedData<AttendanceFilterResponse>> filterAttendanceLogs(
           @RequestParam(required = false) String nameOrEmail,
           @RequestParam(required = false) String attendanceStatus,
