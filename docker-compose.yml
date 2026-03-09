@@ -34,6 +34,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       SCHEMA_NAME: ${SCHEMA_NAME}
       SPRING_PROFILES_ACTIVE: dev
+      OTEL_SDK_DISABLED: ${OTEL_SDK_DISABLED}
 
     depends_on:
       db:
