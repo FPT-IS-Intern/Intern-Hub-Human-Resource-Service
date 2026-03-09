@@ -15,6 +15,8 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 public class SupervisorResponse {
   @JsonSerialize(using = ToStringSerializer.class)
   Long userId;
-
+  String role;
   String fullName;
+  String nickName;
+  String avatarUrl;
 }

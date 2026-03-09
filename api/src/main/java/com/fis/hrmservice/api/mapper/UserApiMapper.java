@@ -68,6 +68,7 @@ public interface UserApiMapper {
   @Mapping(target = "role", ignore = true)
   InternalUserResponse toInternalUserResponse(UserModel model);
 
+  @Mapping(target = "nickName", expression = "java(nickName(model.getFullName()))")
   SupervisorResponse toSupervisorResponse(UserModel model);
 
   // ===== Filter =====
@@ -84,5 +85,22 @@ public interface UserApiMapper {
 
   default long getFileSize(MultipartFile file) {
     return file != null ? file.getSize() : 0L;
+  }
+
+  default String nickName(String fullName) {
+    if (fullName == null || fullName.trim().isEmpty()) {
+      return "";
+    }
+
+    String[] parts = fullName.trim().split("\\s+");
+
+    String lastName = parts[parts.length - 1]; // tên
+    StringBuilder initials = new StringBuilder();
+
+    for (int i = 0; i < parts.length - 1; i++) {
+      initials.append(parts[i].charAt(0));
+    }
+
+    return lastName + initials.toString().toUpperCase();
   }
 }
