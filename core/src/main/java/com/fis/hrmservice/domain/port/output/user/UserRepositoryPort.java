@@ -37,4 +37,6 @@ public interface UserRepositoryPort {
   int updateIsFaceRegistry(Long userId, boolean isFaceRegistry);
 
   UserModel create(UserModel user);
+
+  List<UserModel> listMemberListBySupervisorId(Long supervisorId);
 }

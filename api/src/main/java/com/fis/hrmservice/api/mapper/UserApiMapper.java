@@ -86,4 +86,12 @@ public interface UserApiMapper {
     return file != null ? file.getSize() : 0L;
   }
 
+  @Mapping(target = "no", ignore = true)
+  @Mapping(target = "avatarUrl", source = "avatar.avatarUrl")
+  @Mapping(target = "fullName", source = "fullName")
+  @Mapping(source = "sysStatus", target = "sysStatus")
+  @Mapping(target = "companyEmail", source = "companyEmail")
+  @Mapping(target = "role", ignore = true)
+  @Mapping(target = "position", source = "position.name")
+  SupervisorMemberResponse toSupervisorMemberResponse(UserModel model);
 }

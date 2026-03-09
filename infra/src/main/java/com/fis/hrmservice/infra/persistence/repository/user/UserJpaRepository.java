@@ -100,4 +100,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
   @Transactional
   @Query("UPDATE User u SET u.isFaceRegistry = :isFaceRegistry WHERE u.id = :userId")
   int updateIsFaceRegistry(@Param("userId") Long userId, @Param("isFaceRegistry") boolean isFaceRegistry);
+
+  @Query("SELECT u FROM User u WHERE u.mentor.id = :supervisorId")
+  List<User> listMemberListBySupervisorId(@Param("supervisorId") Long supervisorId);
 }

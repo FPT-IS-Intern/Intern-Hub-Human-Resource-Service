@@ -3,10 +3,7 @@ package com.fis.hrmservice.api.controller.user;
 import com.fis.hrmservice.api.dto.request.FilterRequest;
 import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
 import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
-import com.fis.hrmservice.api.dto.response.FilterResponse;
-import com.fis.hrmservice.api.dto.response.InternalUserResponse;
-import com.fis.hrmservice.api.dto.response.SupervisorResponse;
-import com.fis.hrmservice.api.dto.response.UserResponse;
+import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.domain.model.user.UserModel;
@@ -59,6 +56,8 @@ public class UserController {
   SupervisorUseCaseImpl supervisorUseCase;
 
   RegisterFaceUseCaseImpl registerFaceUseCase;
+
+  SupervisorMemberUserCaseImpl supervisorMemberUserCase;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<?> registerUser(
@@ -247,5 +246,11 @@ public class UserController {
       return ResponseApi.ok("Đăng ký khuôn mặt thành công");
     }
     return ResponseApi.ok("Đăng ký khuôn mặt thất bại, vui lòng thử lại");
+  }
+
+  @GetMapping("/members")
+  public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId() {
+    Long userId = UserContext.requiredUserId();
+    return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
 }
