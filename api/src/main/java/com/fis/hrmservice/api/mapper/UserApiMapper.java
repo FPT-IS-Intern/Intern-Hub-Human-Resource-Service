@@ -68,7 +68,7 @@ public interface UserApiMapper {
   @Mapping(target = "role", ignore = true)
   InternalUserResponse toInternalUserResponse(UserModel model);
 
-  @Mapping(target = "nickName", expression = "java(nickName(model.getFullName()))")
+  @Mapping(target = "nickName", expression = "java(model.getFullName())")
   SupervisorResponse toSupervisorResponse(UserModel model);
 
   // ===== Filter =====
