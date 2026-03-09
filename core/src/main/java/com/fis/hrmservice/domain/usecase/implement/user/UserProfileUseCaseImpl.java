@@ -90,7 +90,7 @@ public class UserProfileUseCaseImpl {
               "cvs/",
               user.getUserId(),
               20971520L,
-              "(?i).*\\.(docx|pdf)$"
+              "application/(pdf|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|vnd.ms-excel|vnd.openxmlformats-officedocument.spreadsheetml.sheet)|image/(png|jpeg|jpg)"
       );
 
       CvModel cv = Optional.ofNullable(
