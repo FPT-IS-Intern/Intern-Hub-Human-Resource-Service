@@ -64,10 +64,10 @@ public class User extends AuditEntity {
   @Column(name = "sys_status", length = 20)
   private UserStatus sysStatus;
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
   private Avatar avatar;
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
   private Cv cv;
 
   @ColumnDefault("false")
