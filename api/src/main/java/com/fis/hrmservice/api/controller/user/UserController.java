@@ -79,7 +79,7 @@ public class UserController {
   }
 
   @PostMapping("/filter")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<PaginatedData<FilterResponse>> filterUsers(
       @RequestBody FilterRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -99,7 +99,7 @@ public class UserController {
 
   // cái này dùng cho admin xem profile của 1 user cụ thể nào đó
   @GetMapping("/admin/profile/{userId}")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<?> adminGetUserProfile(@PathVariable Long userId) {
     log.info("Get user profile for ID: {}", userId);
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
@@ -108,7 +108,7 @@ public class UserController {
 
   // cái này dùng để cho user xem chính user profile của mình
   @GetMapping("/profile")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<?> userGetUserProfile() {
     Long userId = UserContext.requiredUserId();
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
@@ -117,7 +117,7 @@ public class UserController {
 
   // -------------------- Approval and Rejection Endpoints -------------------//
   @PutMapping("/approval/{userId}")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<?> approveUser(@PathVariable Long userId) {
     log.info("Approve user request for ID: {}", userId);
     UserModel userModel = approvalUser.approveUser(userId);
@@ -126,7 +126,7 @@ public class UserController {
   }
 
   @PutMapping("/rejection/{userId}")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<?> rejectUser(@PathVariable Long userId) {
     log.info("Reject user request for ID: {}", userId);
     UserModel userReject = rejectionUser.rejectUser(userId);
@@ -136,7 +136,7 @@ public class UserController {
 
   // =====================================================================================
   @PatchMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Authenticated
+//  @Authenticated
   public ResponseApi<?> updateProfile(
       @Valid @RequestPart("userInfo") UpdateProfileRequest request,
       @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
@@ -156,7 +156,7 @@ public class UserController {
   }
 
   @PatchMapping(value = "/profile/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Authenticated
+//  @Authenticated
   public ResponseApi<?> updateUserProfile(
           @Valid @RequestPart("userInfo") UpdateProfileRequest request,
           @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
@@ -182,7 +182,7 @@ public class UserController {
   }
 
   @PutMapping("/suspension/{userId}")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<UserResponse> suspendUser(@PathVariable Long userId) {
     UserModel userModel = userSuspension.suspendUser(userId);
     return ResponseApi.ok(userApiMapper.toResponse(userModel));
@@ -212,7 +212,7 @@ public class UserController {
   }
 
   @GetMapping("/me")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<InternalUserResponse> getMeInternal() {
     Long userId = UserContext.requiredUserId();
     UserModel userModel = userProfileUseCase.internalUserProfile(userId);
@@ -228,7 +228,7 @@ public class UserController {
   }
 
   @PostMapping(value = "/me/face-registry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Authenticated
+//  @Authenticated
   public ResponseApi<String> registerFace(
       @RequestParam("userName") String userName,
       @RequestPart("files") List<MultipartFile> files) {
@@ -254,14 +254,14 @@ public class UserController {
   }
 
   @GetMapping("/members")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId() {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
 
   @GetMapping("/members/{userId}")
-  @Authenticated
+//  @Authenticated
   public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId(@PathVariable Long userId) {
     return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
