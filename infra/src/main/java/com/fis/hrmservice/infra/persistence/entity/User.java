@@ -74,4 +74,12 @@ public class User extends AuditEntity {
   @Column(name = "is_face_registry")
   private Boolean isFaceRegistry;
 
+  @ColumnDefault("false")
+  @Column(name = "is_learner")
+  private Boolean isLearner;
+
+  @Size(max = 100)
+  @Column(name = "username", length = 100)
+  private String username;
+
 }

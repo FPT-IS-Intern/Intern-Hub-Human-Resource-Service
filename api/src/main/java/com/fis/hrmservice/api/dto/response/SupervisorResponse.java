@@ -16,7 +16,7 @@ public class SupervisorResponse {
   @JsonSerialize(using = ToStringSerializer.class)
   Long userId;
   String role;
-  String fullName;
+  String username;
   String nickName;
   String avatarUrl;
 }
