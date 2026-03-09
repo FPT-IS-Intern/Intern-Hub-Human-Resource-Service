@@ -79,6 +79,7 @@ public class UserController {
   }
 
   @PostMapping("/filter")
+  @Authenticated
   public ResponseApi<PaginatedData<FilterResponse>> filterUsers(
       @RequestBody FilterRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -98,6 +99,7 @@ public class UserController {
 
   // cái này dùng cho admin xem profile của 1 user cụ thể nào đó
   @GetMapping("/admin/profile/{userId}")
+  @Authenticated
   public ResponseApi<?> adminGetUserProfile(@PathVariable Long userId) {
     log.info("Get user profile for ID: {}", userId);
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
@@ -115,6 +117,7 @@ public class UserController {
 
   // -------------------- Approval and Rejection Endpoints -------------------//
   @PutMapping("/approval/{userId}")
+  @Authenticated
   public ResponseApi<?> approveUser(@PathVariable Long userId) {
     log.info("Approve user request for ID: {}", userId);
     UserModel userModel = approvalUser.approveUser(userId);
@@ -123,6 +126,7 @@ public class UserController {
   }
 
   @PutMapping("/rejection/{userId}")
+  @Authenticated
   public ResponseApi<?> rejectUser(@PathVariable Long userId) {
     log.info("Reject user request for ID: {}", userId);
     UserModel userReject = rejectionUser.rejectUser(userId);
@@ -178,6 +182,7 @@ public class UserController {
   }
 
   @PutMapping("/suspension/{userId}")
+  @Authenticated
   public ResponseApi<UserResponse> suspendUser(@PathVariable Long userId) {
     UserModel userModel = userSuspension.suspendUser(userId);
     return ResponseApi.ok(userApiMapper.toResponse(userModel));
@@ -249,8 +254,15 @@ public class UserController {
   }
 
   @GetMapping("/members")
+  @Authenticated
   public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId() {
     Long userId = UserContext.requiredUserId();
+    return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
+  }
+
+  @GetMapping("/members/{userId}")
+  @Authenticated
+  public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId(@PathVariable Long userId) {
     return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
 }
