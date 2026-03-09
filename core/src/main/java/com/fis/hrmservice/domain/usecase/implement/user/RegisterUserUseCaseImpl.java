@@ -57,7 +57,7 @@ public class RegisterUserUseCaseImpl {
     // 3️⃣ Build user
     UserModel user = buildUserModel(command, position);
 
-    // 4️⃣ Save user
+    // 4️⃣ create user
     UserModel savedUser = userRepositoryPort.create(user);
     if (savedUser == null) {
       throw new ConflictDataException("Cannot save user");
@@ -94,7 +94,7 @@ public class RegisterUserUseCaseImpl {
               "cvs/" + command.getCv().getOriginalFilename(),
               savedUser.getUserId(),
               20971520L,
-              "(?i).*\\.(docx|pdf)$"
+              "application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       );
 
       CvModel cv =
