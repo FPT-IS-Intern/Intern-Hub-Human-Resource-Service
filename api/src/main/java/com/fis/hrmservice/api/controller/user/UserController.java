@@ -152,6 +152,32 @@ public class UserController {
     return ResponseApi.ok("Update user profile thành công");
   }
 
+  @PatchMapping(value = "/profile/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Authenticated
+  public ResponseApi<?> updateUserProfile(
+          @Valid @RequestPart("userInfo") UpdateProfileRequest request,
+          @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
+          @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
+          @PathVariable String userId) {
+    Long userIdParse;
+
+    try {
+      userIdParse = Long.parseLong(userId);
+    } catch (NumberFormatException e) {
+        return ResponseApi.ok("User ID không hợp lệ");
+    }
+
+    request.setCvFile(cvFile);
+    request.setAvatarFile(avatarFile);
+
+    UserModel model = userProfileUseCase.updateProfileUser(userApiMapper.toUpdateUserProfileCommand(request), userIdParse);
+
+    if (model == null) {
+      return ResponseApi.ok("Update user profile không thành công");
+    }
+    return ResponseApi.ok("Update user profile thành công");
+  }
+
   @PutMapping("/suspension/{userId}")
   public ResponseApi<UserResponse> suspendUser(@PathVariable Long userId) {
     UserModel userModel = userSuspension.suspendUser(userId);

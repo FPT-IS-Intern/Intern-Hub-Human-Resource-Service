@@ -1,6 +1,6 @@
 package com.fis.hrmservice.api.dto.response;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuickNoteResponse {
-  LocalDate createDate;
+  LocalDateTime createDate;
   String content;
 }

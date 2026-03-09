@@ -4,7 +4,7 @@ import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -34,7 +34,7 @@ public class QuickNote extends AuditEntity {
 
   @NotNull
   @Column(name = "write_date", nullable = false)
-  private LocalDate writeDate;
+  private LocalDateTime writeDate;
 
   @Size(max = 50)
   @Column(name = "status", length = 50)

@@ -26,22 +26,29 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
   User findMentorById(Long id);
 
   @Query(
-      """
-                SELECT u FROM User u
-                WHERE
-                    (:#{#command.keyword} IS NULL OR :#{#command.keyword} = ''
-                        OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :#{#command.keyword}, '%'))
-                        OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :#{#command.keyword}, '%'))
-                    )
-                AND (
-                    :#{#command.sysStatuses} IS NULL
-                    OR u.sysStatus IN :#{#command.sysStatuses}
-                )
-                AND (
-                    :#{#command.positions} IS NULL
-                    OR u.position.name IN :#{#command.positions}
-                )
-            """)
+          """
+          SELECT u FROM User u
+          WHERE
+              (:#{#command.keyword} IS NULL OR :#{#command.keyword} = ''
+                  OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :#{#command.keyword}, '%'))
+                  OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :#{#command.keyword}, '%'))
+              )
+          AND (
+              :#{#command.sysStatuses} IS NULL
+              OR u.sysStatus IN :#{#command.sysStatuses}
+          )
+          AND (
+              :#{#command.positions} IS NULL
+              OR u.position.name IN :#{#command.positions}
+          )
+          ORDER BY 
+              CASE 
+                  WHEN u.sysStatus = 'APPROVED' THEN 0
+                  ELSE 1
+              END,
+              u.fullName ASC
+          """
+  )
   Page<User> filterUser(@Param("command") FilterUserCommand command, Pageable pageable);
 
   @Modifying
