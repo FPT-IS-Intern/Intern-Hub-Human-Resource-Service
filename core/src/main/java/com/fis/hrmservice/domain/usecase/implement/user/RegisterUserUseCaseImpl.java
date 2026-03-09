@@ -58,7 +58,7 @@ public class RegisterUserUseCaseImpl {
     UserModel user = buildUserModel(command, position);
 
     // 4️⃣ Save user
-    UserModel savedUser = userRepositoryPort.save(user);
+    UserModel savedUser = userRepositoryPort.create(user);
     if (savedUser == null) {
       throw new ConflictDataException("Cannot save user");
     }

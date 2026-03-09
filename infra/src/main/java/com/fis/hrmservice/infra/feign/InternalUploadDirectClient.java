@@ -1,6 +1,5 @@
 package com.fis.hrmservice.infra.feign;
 
-import com.fis.hrmservice.infra.model.InternalUploadDirectResponse;
 import com.intern.hub.library.common.dto.ResponseApi;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

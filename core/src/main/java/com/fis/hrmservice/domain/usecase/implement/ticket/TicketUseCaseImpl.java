@@ -114,7 +114,7 @@ public class TicketUseCaseImpl {
   }
 
   @Transactional
-  public TicketModel approveRegistrationTicketByTicketId(Long ticketId) {
+  public TicketModel approveRegistrationTicketByTicketId(Long ticketId, String roleId) {
 
     TicketModel ticket =
             ticketRepositoryPort.updateRegistrationTicketStatus(ticketId, TicketStatus.APPROVED);

@@ -40,6 +40,17 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
+  @Transactional
+  public UserModel create(UserModel user) {
+
+    User entity = userMapper.toEntity(user);
+
+    User saved = userJpaRepository.save(entity);
+
+    return userMapper.toModel(saved);
+  }
+
+  @Override
   public Optional<UserModel> findById(Long userId) {
     return userJpaRepository.findById(userId).map(userMapper::toModel);
   }
