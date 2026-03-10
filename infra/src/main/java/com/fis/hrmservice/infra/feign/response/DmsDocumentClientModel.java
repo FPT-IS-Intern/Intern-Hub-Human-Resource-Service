@@ -1,4 +1,4 @@
-package com.fis.hrmservice.infra.feign;
+package com.fis.hrmservice.infra.feign.response;
 
 public record DmsDocumentClientModel(
         Long id,

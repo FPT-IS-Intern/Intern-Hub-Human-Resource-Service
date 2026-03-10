@@ -1,4 +1,4 @@
-package com.fis.hrmservice.infra.feign;
+package com.fis.hrmservice.infra.feign.client;
 
 import com.fis.hrmservice.infra.model.AttendanceLocationResponse;
 import com.fis.hrmservice.infra.model.BoPortalAllowedIpRangeResponse;

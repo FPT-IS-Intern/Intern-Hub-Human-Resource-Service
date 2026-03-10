@@ -1,5 +1,6 @@
 package com.fis.hrmservice.api.controller.ticket;
 
+import com.fis.hrmservice.api.dto.request.ApproveTicketRequest;
 import com.fis.hrmservice.api.dto.request.FilterRegistrationRequest;
 import com.fis.hrmservice.api.dto.response.FirstThreeRegistrationResponse;
 import com.fis.hrmservice.api.dto.response.ListRegistrationResponse;
@@ -73,8 +74,8 @@ public class TicketController {
   @PutMapping("/approve/{ticketId}")
   public ResponseApi<?> approveRegistrationRequest(
           @PathVariable Long ticketId,
-          @RequestBody String id) {
-    return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId, id));
+          @RequestBody ApproveTicketRequest request) {
+    return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId, request.getRoleId()));
   }
 
   @PutMapping("/reject/{ticketId}")

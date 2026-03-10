@@ -1,5 +1,6 @@
 package com.fis.hrmservice.domain.port.output.feign;
 
+import com.fis.hrmservice.domain.model.resonse.SetUserRoleCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.UserRoleCoreResponse;
 
 public interface CreateAuthIdentityPort {
@@ -11,4 +12,6 @@ public interface CreateAuthIdentityPort {
   void lockAuthIdentity(Long userId);
 
   UserRoleCoreResponse getRoleByUserId(Long userId);
+
+  void setUserRole(Long userId, Long roleId);
 }

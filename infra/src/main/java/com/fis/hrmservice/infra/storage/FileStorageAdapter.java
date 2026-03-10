@@ -1,8 +1,8 @@
 package com.fis.hrmservice.infra.storage;
 
 import com.fis.hrmservice.domain.port.output.user.FileStoragePort;
-import com.fis.hrmservice.infra.feign.DmsDocumentClientModel;
-import com.fis.hrmservice.infra.feign.InternalUploadDirectClient;
+import com.fis.hrmservice.infra.feign.response.DmsDocumentClientModel;
+import com.fis.hrmservice.infra.feign.client.InternalUploadDirectClient;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.InternalErrorException;

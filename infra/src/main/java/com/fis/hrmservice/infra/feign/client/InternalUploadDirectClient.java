@@ -1,5 +1,6 @@
-package com.fis.hrmservice.infra.feign;
+package com.fis.hrmservice.infra.feign.client;
 
+import com.fis.hrmservice.infra.feign.response.DmsDocumentClientModel;
 import com.intern.hub.library.common.dto.ResponseApi;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

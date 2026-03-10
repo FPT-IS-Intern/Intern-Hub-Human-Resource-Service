@@ -1,12 +1,10 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
+import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.user.AvatarModel;
 import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.output.user.AvatarRepositoryPort;
-import com.fis.hrmservice.domain.port.output.user.CvRepositoryPort;
-import com.fis.hrmservice.domain.port.output.user.FileStoragePort;
-import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
+import com.fis.hrmservice.domain.port.output.user.*;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.fis.hrmservice.domain.utils.helper.UpdateHelper;
@@ -30,6 +28,7 @@ public class UserProfileUseCaseImpl {
   FileStoragePort fileStoragePort;
   AvatarRepositoryPort avatarRepositoryPort;
   CvRepositoryPort cvRepositoryPort;
+  PositionRepositoryPort positionRepositoryPort;
 
   public UserModel getUserProfile(Long userId) {
     return userRepositoryPort
@@ -83,6 +82,25 @@ public class UserProfileUseCaseImpl {
             user::setPhoneNumber,
             (o, n) -> Objects.equals(trim(o), trim(n)));
 
+    // ===== Update Position =====
+    if (command.getPosition() != null) {
+      Long currentPositionId = user.getPosition() != null ? user.getPosition().getPositionId() : null;
+      if (!Objects.equals(command.getPosition(), currentPositionId)) {
+        user.setPosition(positionRepositoryPort.findById(command.getPosition())
+                .orElseThrow(() -> new NotFoundException("Position not found with id: " + command.getPosition())));
+        userFieldChanged = true;
+      }
+    }
+
+    // ===== Update SysStatus =====
+    if (command.getSysStatus() != null && !command.getSysStatus().isBlank()) {
+      String currentStatus = user.getSysStatus() != null ? user.getSysStatus().name() : null;
+      if (!Objects.equals(command.getSysStatus(), currentStatus)) {
+        user.setSysStatus(UserStatus.valueOf(command.getSysStatus()));
+        userFieldChanged = true;
+      }
+    }
+
     // ===== Upload CV =====
     if (command.getCvFile() != null && !command.getCvFile().isEmpty()) {
       String cvObjectKey = fileStoragePort.uploadFile(
@@ -90,7 +108,7 @@ public class UserProfileUseCaseImpl {
               "cvs/",
               user.getUserId(),
               20971520L,
-              "application/(pdf|msword|vnd.openxmlformats-officedocument.wordprocessingml.document|vnd.ms-excel|vnd.openxmlformats-officedocument.spreadsheetml.sheet)|image/(png|jpeg|jpg)"
+              "application/(pdf|vnd\\.openxmlformats-officedocument\\.wordprocessingml\\.document)"
       );
 
       CvModel cv = Optional.ofNullable(
@@ -134,10 +152,10 @@ public class UserProfileUseCaseImpl {
     }
 
     if (userFieldChanged) {
-      return userRepositoryPort.save(user);
+      userRepositoryPort.save(user);
     }
 
-    // Reload lại user để trả về data mới nhất (bao gồm cv/avatar đã update)
+    // Luôn reload lại user để trả về data mới nhất (bao gồm cv/avatar/position/sysStatus đã update)
     return userRepositoryPort.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
   }

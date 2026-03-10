@@ -1,4 +1,4 @@
-package com.fis.hrmservice.infra.feign;
+package com.fis.hrmservice.infra.feign.response;
 
 import lombok.Builder;
 import lombok.Getter;

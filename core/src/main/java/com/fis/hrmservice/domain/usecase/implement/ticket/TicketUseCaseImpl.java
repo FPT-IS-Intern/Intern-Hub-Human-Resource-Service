@@ -116,8 +116,21 @@ public class TicketUseCaseImpl {
   @Transactional
   public TicketModel approveRegistrationTicketByTicketId(Long ticketId, String roleId) {
 
+    // 1. Validate roleId
+    Long roleIdParsed;
+    try {
+      roleIdParsed = Long.parseLong(roleId);
+    } catch (NumberFormatException e) {
+      throw new ConflictDataException("Role ID must be a number");
+    }
+
+    // 2. Update ticket status
     TicketModel ticket =
             ticketRepositoryPort.updateRegistrationTicketStatus(ticketId, TicketStatus.APPROVED);
+
+    if (ticket == null) {
+      throw new NotFoundException("Ticket not found: " + ticketId);
+    }
 
     UserModel user = ticket.getRequester();
 
@@ -129,19 +142,46 @@ public class TicketUseCaseImpl {
       throw new ConflictDataException("User is not in APPROVED state");
     }
 
-    // 🔥 Chỉ gọi Auth sau khi transaction commit
+    Long userId = user.getUserId();
+    String email = user.getCompanyEmail();
+
+    log.info("Approving registration ticket {} for userId {}", ticketId, userId);
+
+    // 3. Gọi Auth service sau commit
     TransactionSynchronizationManager.registerSynchronization(
             new TransactionSynchronization() {
+
               @Override
               public void afterCommit() {
+
+                // Create auth identity
                 try {
-                  createAuthIdentityPort.createAuthIdentity(
-                          user.getUserId(),
-                          user.getCompanyEmail()
+                  createAuthIdentityPort.createAuthIdentity(userId, email);
+                  log.info("Auth identity created for userId {}", userId);
+                } catch (Exception e) {
+                  log.error(
+                          "Failed to create auth identity for userId {}",
+                          userId,
+                          e
+                  );
+                  return;
+                }
+
+                // Assign role
+                try {
+                  createAuthIdentityPort.setUserRole(userId, roleIdParsed);
+                  log.info(
+                          "Role {} assigned to userId {}",
+                          roleIdParsed,
+                          userId
                   );
                 } catch (Exception e) {
-                  log.error("Failed to create auth identity after commit for userId: {}",
-                          user.getUserId(), e);
+                  log.error(
+                          "Failed to assign role {} to userId {}",
+                          roleIdParsed,
+                          userId,
+                          e
+                  );
                 }
               }
             }

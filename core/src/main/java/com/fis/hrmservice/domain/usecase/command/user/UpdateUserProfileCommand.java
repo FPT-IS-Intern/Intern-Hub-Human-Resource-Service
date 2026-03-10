@@ -21,4 +21,7 @@ public class UpdateUserProfileCommand {
   String phoneNumber;
   MultipartFile cvFile;
   MultipartFile avatarFile;
+  Long position;
+  String sysStatus;
+  Long role;
 }

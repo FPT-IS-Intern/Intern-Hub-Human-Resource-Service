@@ -1,7 +1,7 @@
 package com.fis.hrmservice.infra.service;
 
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
-import com.fis.hrmservice.infra.feign.BoPortalFeignClient;
+import com.fis.hrmservice.infra.feign.client.BoPortalFeignClient;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
