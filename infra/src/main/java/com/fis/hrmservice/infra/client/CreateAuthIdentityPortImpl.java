@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.client;
 
+import com.fis.hrmservice.domain.model.resonse.ListRoleCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.SetUserRoleCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.UserRoleCoreResponse;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
@@ -7,6 +8,7 @@ import com.fis.hrmservice.infra.feign.client.AuthIdentityFeignClient;
 import com.fis.hrmservice.infra.feign.request.AssignRoleRequest;
 import com.fis.hrmservice.infra.mapper.FeignInfraMapper;
 import com.fis.hrmservice.infra.model.CreateUserPassIdentityRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -41,5 +43,12 @@ public class CreateAuthIdentityPortImpl implements CreateAuthIdentityPort {
   @Override
   public void setUserRole(Long userId, Long roleId) {
     authIdentityFeignClient.setUserRole(userId, new AssignRoleRequest(roleId));
+  }
+
+  @Override
+  public List<ListRoleCoreResponse> getAllRoles() {
+    return authIdentityFeignClient.getAllRoles().data().stream()
+        .map(feignInfraMapper::toListRoleCoreResponse)
+        .toList();
   }
 }
