@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("hrm/roles")
+@RequestMapping("hrm/users/roles")
 @Tag(name = "Role Management", description = "APIs for role management")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleController {
