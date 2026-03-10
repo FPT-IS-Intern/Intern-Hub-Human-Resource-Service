@@ -9,10 +9,8 @@ import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.ReportingPolicy;
+
+import org.mapstruct.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Mapper(
@@ -68,7 +66,29 @@ public interface UserApiMapper {
   @Mapping(target = "role", ignore = true)
   InternalUserResponse toInternalUserResponse(UserModel model);
 
+  @Mapping(target = "fullName", source = "fullName")
+  @Mapping(target = "nickName", source = "fullName", qualifiedByName = "buildNickName")
+  @Mapping(target = "avatarUrl", source = "avatar.avatarUrl")
+  @Mapping(target = "role", ignore = true)
   SupervisorResponse toSupervisorResponse(UserModel model);
+
+  @Named("buildNickName")
+  default String buildNickName(String fullName) {
+    if (fullName == null || fullName.isBlank()) return null;
+
+    String[] parts = fullName.trim().split("\\s+");
+
+    if (parts.length == 1) return fullName;
+
+    String lastName = parts[parts.length - 1];
+    StringBuilder initials = new StringBuilder();
+
+    for (int i = 0; i < parts.length - 1; i++) {
+      initials.append(parts[i].charAt(0));
+    }
+
+    return lastName + initials;
+  }
 
   // ===== Filter =====
   FilterUserCommand toCommand(FilterRequest request);
