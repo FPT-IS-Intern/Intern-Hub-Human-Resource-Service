@@ -147,41 +147,19 @@ public class TicketUseCaseImpl {
 
     log.info("Approving registration ticket {} for userId {}", ticketId, userId);
 
-    // 3. Gọi Auth service sau commit
     TransactionSynchronizationManager.registerSynchronization(
             new TransactionSynchronization() {
-
               @Override
               public void afterCommit() {
-
-                // Create auth identity
                 try {
                   createAuthIdentityPort.createAuthIdentity(userId, email);
                   log.info("Auth identity created for userId {}", userId);
-                } catch (Exception e) {
-                  log.error(
-                          "Failed to create auth identity for userId {}",
-                          userId,
-                          e
-                  );
-                  return;
-                }
 
-                // Assign role
-                try {
                   createAuthIdentityPort.setUserRole(userId, roleIdParsed);
-                  log.info(
-                          "Role {} assigned to userId {}",
-                          roleIdParsed,
-                          userId
-                  );
+                  log.info("Role {} assigned to userId {}", roleIdParsed, userId);
+
                 } catch (Exception e) {
-                  log.error(
-                          "Failed to assign role {} to userId {}",
-                          roleIdParsed,
-                          userId,
-                          e
-                  );
+                  log.error("Failed to sync user {} to auth service", userId, e);
                 }
               }
             }
