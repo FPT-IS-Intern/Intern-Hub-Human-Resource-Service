@@ -31,7 +31,7 @@ public class UserResponse {
 
   String role;
   String cvUrl;
-  String superVisorName;
+  String superVisorId;
   LocalDate internshipStartDate;
   LocalDate internshipEndDate;
 

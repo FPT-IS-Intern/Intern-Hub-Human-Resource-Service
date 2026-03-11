@@ -29,7 +29,7 @@ public interface UserApiMapper {
   @Mapping(target = "avatarUrl", expression = "java(getAvatarUrl(model))")
   @Mapping(target = "cvUrl", expression = "java(getCvUrl(model))")
   @Mapping(target = "positionCode", source = "position.name")
-  @Mapping(target = "superVisorName", source = "mentor.fullName")
+  @Mapping(target = "superVisorId", source = "mentor.userId")
   UserResponse toResponse(UserModel model);
 
   default String getAvatarUrl(UserModel model) {

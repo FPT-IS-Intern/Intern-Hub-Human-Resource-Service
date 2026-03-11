@@ -155,9 +155,6 @@ public class TicketUseCaseImpl {
                   createAuthIdentityPort.createAuthIdentity(userId, email);
                   log.info("Auth identity created for userId {}", userId);
 
-                  createAuthIdentityPort.setUserRole(userId, roleIdParsed);
-                  log.info("Role {} assigned to userId {}", roleIdParsed, userId);
-
                 } catch (Exception e) {
                   log.error("Failed to sync user {} to auth service", userId, e);
                 }

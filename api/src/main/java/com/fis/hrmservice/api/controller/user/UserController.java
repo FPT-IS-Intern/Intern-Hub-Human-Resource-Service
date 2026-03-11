@@ -16,6 +16,8 @@ import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -60,6 +62,7 @@ public class UserController {
   SupervisorMemberUserCaseImpl supervisorMemberUserCase;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @HasPermission(action = Action.CREATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> registerUser(
       @RequestPart("userInfo") RegisterUserRequest request,
       @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,
@@ -80,6 +83,7 @@ public class UserController {
 
   @PostMapping("/filter")
 //  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<PaginatedData<FilterResponse>> filterUsers(
       @RequestBody FilterRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -100,6 +104,7 @@ public class UserController {
   // cái này dùng cho admin xem profile của 1 user cụ thể nào đó
   @GetMapping("/admin/profile/{userId}")
 //  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> adminGetUserProfile(@PathVariable Long userId) {
     log.info("Get user profile for ID: {}", userId);
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
