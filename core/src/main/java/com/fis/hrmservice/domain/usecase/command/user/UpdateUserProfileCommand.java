@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateUserProfileCommand {
+  String userId;
   String fullName;
   String companyEmail;
   LocalDate dateOfBirth;

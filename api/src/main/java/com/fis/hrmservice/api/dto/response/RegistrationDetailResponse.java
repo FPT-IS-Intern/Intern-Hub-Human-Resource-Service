@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegistrationDetailResponse {
+  String userId;
   String avatarUrl;
   String positionName;
   String cvUrl;

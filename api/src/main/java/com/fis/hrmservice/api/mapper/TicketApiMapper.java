@@ -84,18 +84,19 @@ public interface TicketApiMapper {
   FirstThreeRegistrationResponse toFirstThreeRegistrationResponse(TicketModel ticketModel);
 
   @Mappings({
-    @Mapping(target = "avatarUrl", source = "requester.avatar.avatarUrl"),
-    @Mapping(target = "positionName", source = "requester.position.name"),
-    @Mapping(target = "cvUrl", source = "requester.cv.cvUrl"),
-    @Mapping(target = "internshipStartDate", source = "requester.internshipStartDate"),
-    @Mapping(target = "internshipEndDate", source = "requester.internshipEndDate"),
-    @Mapping(target = "fullName", source = "requester.fullName"),
-    @Mapping(target = "idNumber", source = "requester.idNumber"),
-    @Mapping(target = "dateOfBirth", source = "requester.dateOfBirth"),
-    @Mapping(target = "phoneNumber", source = "requester.phoneNumber"),
-    @Mapping(target = "companyEmail", source = "requester.companyEmail"),
-    @Mapping(target = "address", source = "requester.address"),
-    @Mapping(target = "sysStatus", source = "sysStatus")
+          @Mapping(target = "userId", source = "requester.userId"),
+          @Mapping(target = "avatarUrl", source = "requester.avatar.avatarUrl"),
+          @Mapping(target = "positionName", source = "requester.position.name"),
+          @Mapping(target = "cvUrl", source = "requester.cv.cvUrl"),
+          @Mapping(target = "internshipStartDate", source = "requester.internshipStartDate"),
+          @Mapping(target = "internshipEndDate", source = "requester.internshipEndDate"),
+          @Mapping(target = "fullName", source = "requester.fullName"),
+          @Mapping(target = "idNumber", source = "requester.idNumber"),
+          @Mapping(target = "dateOfBirth", source = "requester.dateOfBirth"),
+          @Mapping(target = "phoneNumber", source = "requester.phoneNumber"),
+          @Mapping(target = "companyEmail", source = "requester.companyEmail"),
+          @Mapping(target = "address", source = "requester.address"),
+          @Mapping(target = "sysStatus", source = "sysStatus")
   })
   RegistrationDetailResponse toRegistrationDetailResponse(TicketModel ticketModel);
 
