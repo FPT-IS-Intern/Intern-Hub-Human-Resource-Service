@@ -94,9 +94,11 @@ public class UserProfileUseCaseImpl {
 
     // ===== Update SysStatus =====
     if (command.getSysStatus() != null && !command.getSysStatus().isBlank()) {
-      String currentStatus = user.getSysStatus() != null ? user.getSysStatus().name() : null;
-      if (!Objects.equals(command.getSysStatus(), currentStatus)) {
-        user.setSysStatus(UserStatus.valueOf(command.getSysStatus()));
+
+      UserStatus newStatus = UserStatus.valueOf(command.getSysStatus());
+
+      if (!Objects.equals(user.getSysStatus(), newStatus)) {
+        user.setSysStatus(newStatus);
         userFieldChanged = true;
       }
     }

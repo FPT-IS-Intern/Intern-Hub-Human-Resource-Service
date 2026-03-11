@@ -21,5 +21,4 @@ public class UpdateProfileRequest {
   MultipartFile avatarFile;
   Long position;
   String sysStatus;
-  Long role;
 }

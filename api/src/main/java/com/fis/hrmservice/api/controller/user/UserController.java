@@ -62,7 +62,7 @@ public class UserController {
   SupervisorMemberUserCaseImpl supervisorMemberUserCase;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @HasPermission(action = Action.CREATE, resource = "quan-ly-nguoi-dung")
+//  @HasPermission(action = Action.CREATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> registerUser(
       @RequestPart("userInfo") RegisterUserRequest request,
       @RequestPart(value = "avatarFile", required = false) MultipartFile avatarFile,

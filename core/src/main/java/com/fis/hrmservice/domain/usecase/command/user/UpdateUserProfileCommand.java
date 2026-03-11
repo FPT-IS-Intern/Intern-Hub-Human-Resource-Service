@@ -24,5 +24,4 @@ public class UpdateUserProfileCommand {
   MultipartFile avatarFile;
   Long position;
   String sysStatus;
-  Long role;
 }
