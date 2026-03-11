@@ -83,7 +83,7 @@ public class UserController {
 
   @PostMapping("/filter")
 //  @Authenticated
-  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<PaginatedData<FilterResponse>> filterUsers(
       @RequestBody FilterRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -104,7 +104,7 @@ public class UserController {
   // cái này dùng cho admin xem profile của 1 user cụ thể nào đó
   @GetMapping("/admin/profile/{userId}")
 //  @Authenticated
-  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> adminGetUserProfile(@PathVariable Long userId) {
     log.info("Get user profile for ID: {}", userId);
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
