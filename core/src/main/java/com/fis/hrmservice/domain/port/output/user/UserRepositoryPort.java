@@ -39,4 +39,6 @@ public interface UserRepositoryPort {
   UserModel create(UserModel user);
 
   List<UserModel> listMemberListBySupervisorId(Long supervisorId);
+
+  List<UserModel> findAllActiveUsers();
 }

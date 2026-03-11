@@ -1,5 +1,6 @@
 package com.fis.hrmservice.api.controller.attendance;
 
+import com.fis.hrmservice.api.dto.request.FilterAttendanceRequest;
 import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
@@ -127,16 +128,15 @@ public class AttendanceController {
     return ResponseApi.ok(response);
   }
 
-  @GetMapping("/filter")
+  @PostMapping("/filter")
 //  @Authenticated
   public ResponseApi<PaginatedData<AttendanceFilterResponse>> filterAttendanceLogs(
-          @RequestParam(required = false) String nameOrEmail,
-          @RequestParam(required = false) String attendanceStatus,
+          @RequestBody FilterAttendanceRequest request,
           @RequestParam(defaultValue = "0") int page,
           @RequestParam(defaultValue = "10") int size) {
 
     PaginatedData<AttendanceLogModel> logs =
-            attendanceUseCase.filterAttendance(nameOrEmail, attendanceStatus, page, size);
+            attendanceUseCase.filterAttendance(request.getNameOrEmail(), request.getStartDate(), request.getEndDate(), request.getAttendanceStatus(), page, size);
 
     List<AttendanceFilterResponse> responses =
             logs.getItems().stream()

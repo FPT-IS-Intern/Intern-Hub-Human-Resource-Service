@@ -45,11 +45,6 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
     return toModel(savedEntity);
   }
 
-  @Override
-  public Optional<AttendanceLogModel> findByUserIdAndDate(Long userId, LocalDate workDate) {
-    List<AttendanceLogModel> logs = findAllByUserIdAndDate(userId, workDate);
-    return logs.isEmpty() ? Optional.empty() : Optional.of(logs.get(0));
-  }
 
   @Override
   public List<AttendanceLogModel> findAllByUserIdAndDate(Long userId, LocalDate workDate) {
@@ -97,8 +92,12 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
 
     Pageable pageable = PageRequest.of(page, size);
 
+    String statusStr = command.getAttendanceStatus() != null ? command.getAttendanceStatus().name() : null;
+    String startDateStr = command.getStartDate() != null ? command.getStartDate().toString() : null;
+    String endDateStr = command.getEndDate() != null ? command.getEndDate().toString() : null;
+
     Page<AttendanceLog> result =
-            attendanceLogRepository.filterAttendanceLogs(command.getNameOrEmail(), command.getAttendanceStatus(), pageable);
+            attendanceLogRepository.filterAttendanceLogs(command.getNameOrEmail(), statusStr, startDateStr, endDateStr, pageable);
 
     List<AttendanceLogModel> items =
             result.getContent().stream()
@@ -130,6 +129,21 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
   @Override
   public List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId) {
     return attendanceLogRepository.getAttendanceInWeek(userId).stream().map(attendanceInfraMapper::toAttendanceInWeekCommand).toList();
+  }
+
+  @Override
+  public boolean existsByUserIdAndWorkDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository.existsByUser_IdAndWorkDate(userId, workDate);
+  }
+
+  @Override
+  public Optional<AttendanceLogModel> findByUserAndDate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository.findByUser_IdAndWorkDate(userId, workDate).map(this::toModel);
+  }
+
+  @Override
+  public Optional<AttendanceLogModel> findByUserAndDateForUpdate(Long userId, LocalDate workDate) {
+    return attendanceLogRepository.findByUserIdAndWorkDateForUpdate(userId, workDate).map(this::toModel);
   }
 
   private AttendanceLog toEntity(AttendanceLogModel model) {

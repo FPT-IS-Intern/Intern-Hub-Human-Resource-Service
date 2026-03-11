@@ -18,7 +18,7 @@ public interface AttendanceUseCase {
 
   AttendanceLogModel checkOut(CheckOutCommand command);
 
-  PaginatedData<AttendanceLogModel> filterAttendance(String nameOrEmail, String attendanceStatus, int page, int size);
+  PaginatedData<AttendanceLogModel> filterAttendance(String nameOrEmail, LocalDate startDate, LocalDate endDate, String attendanceStatus, int page, int size);
 
   int autoCheckoutOpenAttendances(long checkOutTimeMillis);
 

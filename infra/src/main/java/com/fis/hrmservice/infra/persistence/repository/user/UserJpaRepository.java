@@ -25,6 +25,14 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
 
   User findMentorById(Long id);
 
+  @Query("""
+        SELECT u
+        FROM User u
+        WHERE u.sysStatus = 'APPROVED'
+        AND u.isLearner = true
+    """)
+  List<User> findAllActiveUsers();
+
   @Query(
           """
           SELECT u FROM User u

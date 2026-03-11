@@ -17,10 +17,8 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueCheckStrategy;
-import org.mapstruct.ReportingPolicy;
+
+import org.mapstruct.*;
 
 @Mapper(
     componentModel = "spring",
@@ -53,14 +51,25 @@ public interface AttendanceApiMapper {
 
   @Mapping(target = "fullName", source = "user.fullName")
   @Mapping(target = "companyEmail", source = "user.companyEmail")
-  @Mapping(target = "department", source = "user.department")
   @Mapping(target = "attendanceDate", source = "workDate")
-  @Mapping(target = "checkInTime", expression = "java(convertToLocalTime(model.getCheckInTime()))")
-  @Mapping(target = "checkOutTime", expression = "java(convertToLocalTime(model.getCheckOutTime()))")
+  @Mapping(target = "checkInTime", source = "checkInTime", qualifiedByName = "toLocalTime")
+  @Mapping(target = "checkOutTime", source = "checkOutTime", qualifiedByName = "toLocalTime")
   @Mapping(target = "workingMethod", source = "source")
-  @Mapping(target = "status", expression = "java(model.getAttendanceStatus() != null ? model.getAttendanceStatus().getValue() : null)")
+  @Mapping(target = "status", source = "attendanceStatus.value")
+  @Mapping(target = "workLocation", ignore = true)
   @Mapping(target = "no", ignore = true)
   AttendanceFilterResponse toFilterResponseItem(AttendanceLogModel model);
+
+
+  @Named("toLocalTime")
+  default LocalTime toLocalTime(long epochMillis) {
+    if (epochMillis == 0) {
+      return null;
+    }
+    return Instant.ofEpochMilli(epochMillis)
+            .atZone(ZoneId.systemDefault())
+            .toLocalTime();
+  }
 
   List<AttendanceFilterResponse> toFilterResponseList(List<AttendanceLogModel> models);
 

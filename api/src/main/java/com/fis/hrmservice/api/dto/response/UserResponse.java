@@ -37,4 +37,7 @@ public class UserResponse {
 
   /** Trạng thái người dùng */
   String sysStatus;
+
+  @JsonSerialize(using = ToStringSerializer.class)
+  Long roleId;
 }

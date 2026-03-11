@@ -16,10 +16,10 @@ public class AttendanceFilterResponse {
     Integer no;
     String fullName;
     String companyEmail;
-    String department;
     LocalDate attendanceDate;
     LocalTime checkInTime;
     LocalTime checkOutTime;
     String workingMethod;
     String status;
+    String workLocation;
 }

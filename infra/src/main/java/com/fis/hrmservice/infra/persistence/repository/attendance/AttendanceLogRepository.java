@@ -1,8 +1,8 @@
 package com.fis.hrmservice.infra.persistence.repository.attendance;
 
-import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.fis.hrmservice.infra.model.AttendanceInWeekResponse;
 import com.fis.hrmservice.infra.persistence.entity.AttendanceLog;
+import jakarta.persistence.LockModeType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -11,30 +11,58 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Long> {
+
   Optional<AttendanceLog> findByUser_IdAndWorkDate(Long userId, LocalDate workDate);
 
+  boolean existsByUser_IdAndWorkDate(Long userId, LocalDate workDate);
 
-  @Query("""
-    SELECT al
-    FROM AttendanceLog al
-    JOIN FETCH al.user u
-    LEFT JOIN FETCH u.department d
-    WHERE
-        (:nameOrKeyword IS NULL OR :nameOrKeyword = ''
-         OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :nameOrKeyword, '%'))
-         OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :nameOrKeyword, '%')))
-        AND (:status IS NULL OR al.attendanceStatus = :status)
-    ORDER BY al.workDate DESC, al.checkInTime DESC
-""")
+  /**
+   * Pessimistic write lock — used when checking-in after ABSENT mark to prevent race conditions.
+   */
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT al FROM AttendanceLog al WHERE al.user.id = :userId AND al.workDate = :workDate")
+  Optional<AttendanceLog> findByUserIdAndWorkDateForUpdate(
+      @Param("userId") Long userId, @Param("workDate") LocalDate workDate);
+
+  @Query(value = """
+          SELECT al.*
+          FROM attendance_logs al
+          JOIN users u ON u.user_id = al.user_id
+          LEFT JOIN departments d ON d.department_id = u.department_id
+          WHERE
+              (:nameOrKeyword = '' OR
+               LOWER(u.full_name) LIKE LOWER(('%' || :nameOrKeyword || '%')) OR
+               LOWER(u.company_email) LIKE LOWER(('%' || :nameOrKeyword || '%')))
+              AND (:status IS NULL OR al.attendance_status = :status)
+              AND (:startDate::date IS NULL OR al.work_date >= :startDate::date)
+              AND (:endDate::date IS NULL OR al.work_date <= :endDate::date)
+          ORDER BY al.work_date DESC, al.check_in_time DESC
+          """,
+          countQuery = """
+          SELECT COUNT(*)
+          FROM attendance_logs al
+          JOIN users u ON u.user_id = al.user_id
+          WHERE
+              (:nameOrKeyword = '' OR
+               LOWER(u.full_name) LIKE LOWER(('%' || :nameOrKeyword || '%')) OR
+               LOWER(u.company_email) LIKE LOWER(('%' || :nameOrKeyword || '%')))
+              AND (:status IS NULL OR al.attendance_status = :status)
+              AND (:startDate::date IS NULL OR al.work_date >= :startDate::date)
+              AND (:endDate::date IS NULL OR al.work_date <= :endDate::date)
+          """,
+          nativeQuery = true)
   Page<AttendanceLog> filterAttendanceLogs(
           @Param("nameOrKeyword") String nameOrKeyword,
-          @Param("status") AttendanceStatus status,
+          @Param("status") String status,
+          @Param("startDate") String startDate,
+          @Param("endDate") String endDate,
           Pageable pageable);
 
   @Query(value = """
@@ -68,3 +96,5 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
 
   boolean existsByUser_IdAndWorkDateAndCheckInBranchId(Long userId, LocalDate workDate, UUID branchId);
 }
+
+

@@ -13,8 +13,6 @@ import java.util.UUID;
 public interface AttendanceRepositoryPort {
   AttendanceLogModel save(AttendanceLogModel attendanceLog);
 
-  Optional<AttendanceLogModel> findByUserIdAndDate(Long userId, LocalDate workDate);
-
   List<AttendanceLogModel> findAllByUserIdAndDate(Long userId, LocalDate workDate);
 
   List<AttendanceLogModel> findAllOpenByDate(LocalDate workDate);
@@ -24,6 +22,20 @@ public interface AttendanceRepositoryPort {
   Optional<AttendanceLogModel> findLatestByUserAndDate(Long userId, LocalDate workDate);
 
   boolean existsCheckedInBranchByUserAndDate(Long userId, LocalDate workDate, UUID branchId);
+
+  boolean existsByUserIdAndWorkDate(Long userId, LocalDate workDate);
+
+  /**
+   * Finds the single attendance record for a user on a date.
+   * Used for normal reads (e.g. status check).
+   */
+  Optional<AttendanceLogModel> findByUserAndDate(Long userId, LocalDate workDate);
+
+  /**
+   * Finds the attendance record with a pessimistic write lock.
+   * Must be used inside a transaction when modifying the record (e.g. ABSENT → CHECK_IN_LATE).
+   */
+  Optional<AttendanceLogModel> findByUserAndDateForUpdate(Long userId, LocalDate workDate);
 
   AttendanceLogModel update(AttendanceLogModel attendanceLog);
 
@@ -37,3 +49,4 @@ public interface AttendanceRepositoryPort {
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 }
+

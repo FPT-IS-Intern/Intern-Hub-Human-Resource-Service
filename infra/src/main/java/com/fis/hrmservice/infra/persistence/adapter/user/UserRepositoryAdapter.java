@@ -56,6 +56,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
+  public List<UserModel> findAllActiveUsers() {
+    return userJpaRepository.findAllActiveUsers().stream().map(userMapper::toModel).toList();
+  }
+
+  @Override
   public Optional<UserModel> findById(Long userId) {
     return userJpaRepository.findById(userId).map(userMapper::toModel);
   }
