@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("hrm/attendance")
 @EnableGlobalExceptionHandler
 @Slf4j
-@CrossOrigin("*")
+//@CrossOrigin("*")
 @Tag(name = "Attendance Management", description = "APIs for attendance check-in and check-out")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
