@@ -1,12 +1,12 @@
 package com.fis.hrmservice.domain.model.resonse;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRoleCoreResponse {
     String id;
     String name;

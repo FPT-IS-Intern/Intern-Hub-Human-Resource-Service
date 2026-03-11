@@ -8,15 +8,19 @@ import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.intern.hub.library.common.dto.PaginatedData;
 import java.util.List;
 import java.util.Map;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FilterUseCaseImpl {
 
-  private final UserRepositoryPort userRepositoryPort;
-  private final AvatarRepositoryPort avatarRepositoryPort;
+  UserRepositoryPort userRepositoryPort;
+  AvatarRepositoryPort avatarRepositoryPort;
 
   public PaginatedData<UserModel> filterUsers(FilterUserCommand command, int page, int size) {
 

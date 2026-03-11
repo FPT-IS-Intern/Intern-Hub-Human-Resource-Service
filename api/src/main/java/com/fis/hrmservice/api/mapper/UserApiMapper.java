@@ -47,14 +47,6 @@ public interface UserApiMapper {
   @Mapping(source = "sysStatus", target = "sysStatus")
   FilterResponse toFilterResponse(UserModel model);
 
-  @Mapping(target = "position", source = "position.name")
-  @Mapping(target = "superVisorName", source = "mentor.fullName")
-  @Mapping(target = "role", ignore = true) // UserModel chưa có
-  @Mapping(target = "scoreAward", ignore = true) // UserModel chưa có
-  @Mapping(target = "budgetPoints", ignore = true)
-  // UserModel chưa có
-  ProfileResponse toProfileResponse(UserModel model);
-
   InternalUserProfileResponse toInternalUserProfile(UserModel model);
 
   List<FilterResponse> toFilterResponseList(List<UserModel> userModelList);
@@ -63,7 +55,6 @@ public interface UserApiMapper {
 
   @Mapping(target = "email", source = "companyEmail")
   @Mapping(target = "avatarUrl", expression = "java(getAvatarUrl(model))")
-  @Mapping(target = "role", ignore = true)
   InternalUserResponse toInternalUserResponse(UserModel model);
 
   @Mapping(target = "fullName", source = "fullName")

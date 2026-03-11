@@ -20,7 +20,10 @@ import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.library.common.utils.Snowflake;
 import java.util.List;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,25 +34,18 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Service
 @Transactional
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketUseCaseImpl {
 
-  private final TicketRepositoryPort ticketRepositoryPort;
+  TicketRepositoryPort ticketRepositoryPort;
 
-  private final LeaveRequestRepositoryPort leaveRequestRepositoryPort;
+  TicketTypeRepositoryPort ticketTypeRepositoryPort;
 
-  private final TicketTypeRepositoryPort ticketTypeRepositoryPort;
+  UserRepositoryPort userRepositoryPort;
 
-  private final RemoteRequestRepositoryPort remoteRequestRepositoryPort;
+  CreateAuthIdentityPort createAuthIdentityPort;
 
-  private final WorkLocationRepositoryPort workLocationRepositoryPort;
-
-  private final UserRepositoryPort userRepositoryPort;
-
-  private final TicketApprovalRepositoryPort ticketApprovalRepositoryPort;
-
-  private final CreateAuthIdentityPort createAuthIdentityPort;
-
-  private final Snowflake snowflake;
+  Snowflake snowflake;
 
   /* ================= BASE TICKET ================= */
 
@@ -114,15 +110,7 @@ public class TicketUseCaseImpl {
   }
 
   @Transactional
-  public TicketModel approveRegistrationTicketByTicketId(Long ticketId, String roleId) {
-
-    // 1. Validate roleId
-    Long roleIdParsed;
-    try {
-      roleIdParsed = Long.parseLong(roleId);
-    } catch (NumberFormatException e) {
-      throw new ConflictDataException("Role ID must be a number");
-    }
+  public TicketModel approveRegistrationTicketByTicketId(Long ticketId) {
 
     // 2. Update ticket status
     TicketModel ticket =

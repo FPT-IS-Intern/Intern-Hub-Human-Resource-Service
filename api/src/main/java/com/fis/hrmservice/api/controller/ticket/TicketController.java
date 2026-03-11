@@ -73,9 +73,8 @@ public class TicketController {
 
   @PutMapping("/approve/{ticketId}")
   public ResponseApi<?> approveRegistrationRequest(
-          @PathVariable Long ticketId,
-          @RequestBody ApproveTicketRequest request) {
-    return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId, request.getRoleId()));
+          @PathVariable Long ticketId) {
+    return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId));
   }
 
   @PutMapping("/reject/{ticketId}")

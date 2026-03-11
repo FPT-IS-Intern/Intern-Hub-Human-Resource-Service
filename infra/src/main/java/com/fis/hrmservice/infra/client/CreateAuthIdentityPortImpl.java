@@ -37,7 +37,11 @@ public class CreateAuthIdentityPortImpl implements CreateAuthIdentityPort {
 
   @Override
   public UserRoleCoreResponse getRoleByUserId(Long userId) {
-    return feignInfraMapper.toUserRoleCoreResponse(authIdentityFeignClient.getRoleByUserId(userId));
+    var response = authIdentityFeignClient.getRoleByUserId(userId);
+    if (response != null && response.data() != null) {
+      return feignInfraMapper.toUserRoleCoreResponse(response.data());
+    }
+    return null;
   }
 
   @Override

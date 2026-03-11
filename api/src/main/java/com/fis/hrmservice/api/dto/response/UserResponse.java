@@ -28,8 +28,6 @@ public class UserResponse {
 
   /** Công việc */
   String positionCode;
-
-  String role;
   String cvUrl;
   String superVisorId;
   LocalDate internshipStartDate;
@@ -38,6 +36,5 @@ public class UserResponse {
   /** Trạng thái người dùng */
   String sysStatus;
 
-  @JsonSerialize(using = ToStringSerializer.class)
-  Long roleId;
+  String roleId;
 }

@@ -20,14 +20,14 @@ public interface AuthIdentityFeignClient {
   @PostMapping("/auth/internal/identities/userpass")
   void createAuthIdentity(@RequestBody CreateUserPassIdentityRequest request);
 
-  @PostMapping("auth/internal/identity/lock/{userId}")
+  @PostMapping("/auth/internal/identity/lock/{userId}")
   void lockAuthIdentity(@PathVariable Long userId);
 
-  @PostMapping("auth/internal/identity/un-lock/{userId}")
+  @PostMapping("/auth/internal/identity/un-lock/{userId}")
   void unlockAuthIdentity(@PathVariable Long userId);
 
-  @PostMapping("/auth/authz/roles/by-user/{userId}")
-  UserRoleInfraResponse getRoleByUserId(@PathVariable Long userId);
+  @GetMapping("/auth/authz/roles/by-user/{userId}")
+  ResponseApi<UserRoleInfraResponse> getRoleByUserId(@PathVariable Long userId);
 
   @PostMapping("/auth/authz/users/{userId}/role")
   void setUserRole(@PathVariable Long userId, @RequestBody AssignRoleRequest request);

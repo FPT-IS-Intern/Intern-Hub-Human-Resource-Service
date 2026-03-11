@@ -4,6 +4,7 @@ import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.user.AvatarModel;
 import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.user.*;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
@@ -15,9 +16,11 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -29,11 +32,12 @@ public class UserProfileUseCaseImpl {
   AvatarRepositoryPort avatarRepositoryPort;
   CvRepositoryPort cvRepositoryPort;
   PositionRepositoryPort positionRepositoryPort;
+  CreateAuthIdentityPort createAuthIdentityPort;
 
   public UserModel getUserProfile(Long userId) {
     return userRepositoryPort
-        .findById(userId)
-        .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+            .findById(userId)
+            .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
   }
 
   @Transactional
@@ -95,11 +99,20 @@ public class UserProfileUseCaseImpl {
     // ===== Update SysStatus =====
     if (command.getSysStatus() != null && !command.getSysStatus().isBlank()) {
 
-      UserStatus newStatus = UserStatus.valueOf(command.getSysStatus());
+      UserStatus newStatus = UserStatus.valueOf(command.getSysStatus().toUpperCase());
+      UserStatus oldStatus = user.getSysStatus();
 
-      if (!Objects.equals(user.getSysStatus(), newStatus)) {
+      if (!Objects.equals(oldStatus, newStatus)) {
+
         user.setSysStatus(newStatus);
         userFieldChanged = true;
+
+        // call auth service
+        if (newStatus == UserStatus.SUSPENDED) {
+          createAuthIdentityPort.lockAuthIdentity(user.getUserId());
+        } else if (newStatus == UserStatus.APPROVED) {
+          createAuthIdentityPort.unlockAuthIdentity(user.getUserId());
+        }
       }
     }
 

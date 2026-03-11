@@ -34,4 +34,7 @@ public class UserModel extends BaseDomain {
   CvModel cv;
 
   Boolean isFaceRegistry;
+
+  String roleId;
+  String role;
 }

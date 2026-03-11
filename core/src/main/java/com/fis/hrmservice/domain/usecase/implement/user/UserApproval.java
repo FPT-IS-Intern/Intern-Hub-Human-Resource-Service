@@ -6,7 +6,9 @@ import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserApproval {
 
-  private final UserRepositoryPort userRepositoryPort;
+  UserRepositoryPort userRepositoryPort;
 
-  private final CreateAuthIdentityPort createAuthIdentityPort;
+  CreateAuthIdentityPort createAuthIdentityPort;
 
   @Transactional(rollbackFor = Exception.class)
   public UserModel approveUser(Long userId) {
