@@ -37,12 +37,12 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
           JOIN users u ON u.user_id = al.user_id
           LEFT JOIN departments d ON d.department_id = u.department_id
           WHERE
-              (:nameOrKeyword = '' OR
-               LOWER(u.full_name) LIKE LOWER(('%' || :nameOrKeyword || '%')) OR
-               LOWER(u.company_email) LIKE LOWER(('%' || :nameOrKeyword || '%')))
-              AND (:status IS NULL OR al.attendance_status = :status)
-              AND (:startDate::date IS NULL OR al.work_date >= :startDate::date)
-              AND (:endDate::date IS NULL OR al.work_date <= :endDate::date)
+              (CAST(:nameOrKeyword AS text) IS NULL OR CAST(:nameOrKeyword AS text) = ''
+               OR LOWER(u.full_name) LIKE LOWER('%' || CAST(:nameOrKeyword AS text) || '%')
+               OR LOWER(u.company_email) LIKE LOWER('%' || CAST(:nameOrKeyword AS text) || '%'))
+              AND (CAST(:status AS text) IS NULL OR al.attendance_status = CAST(:status AS text))
+              AND (CAST(:startDate AS date) IS NULL OR al.work_date >= CAST(:startDate AS date))
+              AND (CAST(:endDate AS date) IS NULL OR al.work_date <= CAST(:endDate AS date))
           ORDER BY al.work_date DESC, al.check_in_time DESC
           """,
           countQuery = """
@@ -50,19 +50,19 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
           FROM attendance_logs al
           JOIN users u ON u.user_id = al.user_id
           WHERE
-              (:nameOrKeyword = '' OR
-               LOWER(u.full_name) LIKE LOWER(('%' || :nameOrKeyword || '%')) OR
-               LOWER(u.company_email) LIKE LOWER(('%' || :nameOrKeyword || '%')))
-              AND (:status IS NULL OR al.attendance_status = :status)
-              AND (:startDate::date IS NULL OR al.work_date >= :startDate::date)
-              AND (:endDate::date IS NULL OR al.work_date <= :endDate::date)
+              (CAST(:nameOrKeyword AS text) IS NULL OR CAST(:nameOrKeyword AS text) = ''
+               OR LOWER(u.full_name) LIKE LOWER('%' || CAST(:nameOrKeyword AS text) || '%')
+               OR LOWER(u.company_email) LIKE LOWER('%' || CAST(:nameOrKeyword AS text) || '%'))
+              AND (CAST(:status AS text) IS NULL OR al.attendance_status = CAST(:status AS text))
+              AND (CAST(:startDate AS date) IS NULL OR al.work_date >= CAST(:startDate AS date))
+              AND (CAST(:endDate AS date) IS NULL OR al.work_date <= CAST(:endDate AS date))
           """,
           nativeQuery = true)
   Page<AttendanceLog> filterAttendanceLogs(
           @Param("nameOrKeyword") String nameOrKeyword,
           @Param("status") String status,
-          @Param("startDate") String startDate,
-          @Param("endDate") String endDate,
+          @Param("startDate") LocalDate startDate,
+          @Param("endDate") LocalDate endDate,
           Pageable pageable);
 
   @Query(value = """

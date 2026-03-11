@@ -93,11 +93,14 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
     Pageable pageable = PageRequest.of(page, size);
 
     String statusStr = command.getAttendanceStatus() != null ? command.getAttendanceStatus().name() : null;
-    String startDateStr = command.getStartDate() != null ? command.getStartDate().toString() : null;
-    String endDateStr = command.getEndDate() != null ? command.getEndDate().toString() : null;
 
     Page<AttendanceLog> result =
-            attendanceLogRepository.filterAttendanceLogs(command.getNameOrEmail(), statusStr, startDateStr, endDateStr, pageable);
+            attendanceLogRepository.filterAttendanceLogs(
+                    command.getNameOrEmail(),
+                    statusStr,
+                    command.getStartDate(),
+                    command.getEndDate(),
+                    pageable);
 
     List<AttendanceLogModel> items =
             result.getContent().stream()

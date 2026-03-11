@@ -439,8 +439,12 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
             int page,
             int size) {
 
-        AttendanceStatus statusEnum = null;
+        // normalize empty string
+        if (nameOrEmail != null && nameOrEmail.isBlank()) {
+            nameOrEmail = null;
+        }
 
+        AttendanceStatus statusEnum = null;
         if (attendanceStatus != null && !attendanceStatus.isBlank()) {
             statusEnum = AttendanceStatus.valueOf(attendanceStatus);
         }
