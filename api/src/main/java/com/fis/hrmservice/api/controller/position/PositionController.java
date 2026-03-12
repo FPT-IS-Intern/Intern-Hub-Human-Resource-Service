@@ -1,5 +1,6 @@
 package com.fis.hrmservice.api.controller.position;
 
+import com.fis.hrmservice.api.dto.request.AddPositionRequest;
 import com.fis.hrmservice.api.dto.response.PositionListResponse;
 import com.fis.hrmservice.api.mapper.PositionApiMapper;
 import com.fis.hrmservice.domain.usecase.implement.user.PositionUseCaseImpl;
@@ -9,10 +10,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +30,10 @@ public class PositionController {
         positionUseCase.listAllPosition().stream()
             .map(positionMapper::toPositionListResponse)
             .toList());
+  }
+
+  @PostMapping("/creating-position")
+  public ResponseApi<?> createPosition(@RequestBody AddPositionRequest request) {
+    return ResponseApi.ok(positionUseCase.addPosition(positionMapper.toAddPositionCommand(request)));
   }
 }

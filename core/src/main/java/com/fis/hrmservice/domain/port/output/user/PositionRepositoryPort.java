@@ -12,4 +12,6 @@ public interface PositionRepositoryPort {
   List<PositionModel> findAll();
 
   List<Long> findExistingPositionIds(List<Long> positionIds);
+
+  PositionModel addPosition(PositionModel position);
 }

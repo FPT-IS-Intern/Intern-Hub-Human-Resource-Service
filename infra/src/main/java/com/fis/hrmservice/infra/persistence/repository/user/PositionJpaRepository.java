@@ -18,7 +18,16 @@ public interface PositionJpaRepository extends JpaRepository<Position, Long> {
   @NullMarked
   Optional<Position> findById(Long id);
 
-  @Query("SELECT p FROM Position p")
+  @Query("""
+SELECT p FROM Position p
+ORDER BY 
+CASE 
+    WHEN p.name IN ('PO','PM','PMO') THEN 1
+    WHEN p.name LIKE 'Staff%' OR p.name = 'STAFF' THEN 2
+    WHEN p.name LIKE 'Intern%' OR p.name = 'INTERN' THEN 3
+    ELSE 4
+END
+""")
   List<Position> findAll();
 
   @Query(

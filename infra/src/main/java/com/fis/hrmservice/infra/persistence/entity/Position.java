@@ -6,13 +6,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "positions")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Position extends AuditEntity {
   @Id
   @Column(name = "position_id", nullable = false)
