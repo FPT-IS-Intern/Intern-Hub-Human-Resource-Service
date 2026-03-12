@@ -158,4 +158,18 @@ public class AttendanceController {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(attendanceUseCase.getAttendanceInWeekByUserId(userId).stream().map(attendanceApiMapper::toApiResponse).toList());
   }
+
+  @GetMapping("/on-time-percentage")
+  public ResponseApi<Long> getOnTimePercentage() {
+    return ResponseApi.ok(attendanceUseCase.getCheckInOnTimePercent());
+  }
+  @GetMapping("/late-time-percentage")
+    public ResponseApi<Long> getLateTimePercentage() {
+        return ResponseApi.ok(attendanceUseCase.getCheckInLateTimePercent());
+    }
+
+  @GetMapping("/absent-percentage")
+  public ResponseApi<Long> getAbsentPercentage() {
+    return ResponseApi.ok(attendanceUseCase.getAbsentPercentage());
+  }
 }

@@ -23,4 +23,8 @@ public interface AttendanceUseCase {
   int autoCheckoutOpenAttendances(long checkOutTimeMillis);
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
+
+  Long getAbsentPercentage();
+  Long getCheckInOnTimePercent();
+  Long getCheckInLateTimePercent();
 }

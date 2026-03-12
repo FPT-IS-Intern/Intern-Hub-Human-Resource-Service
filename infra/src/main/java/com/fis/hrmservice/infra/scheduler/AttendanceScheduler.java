@@ -13,10 +13,16 @@ public class AttendanceScheduler {
 
     private final CheckAbsentAttendanceUseCase checkAbsentAttendanceUseCase;
 
-    // 8:45 AM mỗi ngày
-    @Scheduled(cron = "0 45 8 * * *")
+    // 8:45 AM mỗi ngày (Vietnam timezone)
+    @Scheduled(cron = "0 45 8 * * *", zone = "Asia/Ho_Chi_Minh")
     public void checkAbsentAttendance() {
         log.info("Start checking absent attendance");
-        checkAbsentAttendanceUseCase.execute();
+        long start = System.currentTimeMillis();
+        try {
+            checkAbsentAttendanceUseCase.execute();
+            log.info("Finished checking absent attendance in {}ms", System.currentTimeMillis() - start);
+        } catch (Exception e) {
+            log.error("Failed to check absent attendance after {}ms", System.currentTimeMillis() - start, e);
+        }
     }
 }

@@ -95,6 +95,34 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
       Long userId, LocalDate workDate);
 
   boolean existsByUser_IdAndWorkDateAndCheckInBranchId(Long userId, LocalDate workDate, UUID branchId);
+
+  @Query(value = """
+          SELECT (COUNT(*) * 100) / (SELECT COUNT(*) FROM users)
+          FROM users u
+          WHERE NOT EXISTS (
+              SELECT 1 
+              FROM attendance_logs a
+              WHERE a.user_id = u.user_id
+                AND a.work_date = CURRENT_DATE
+          )
+          """, nativeQuery = true)
+  Long getAbsentPercentage();
+
+  @Query(value = """
+          SELECT (COUNT(DISTINCT user_id) * 100) / (SELECT COUNT(*) FROM users)
+          FROM attendance_logs
+          WHERE work_date = CURRENT_DATE
+            AND attendance_status = 'CHECK_IN_LATE'
+          """, nativeQuery = true)
+  Long getLatePercentage();
+
+  @Query(value = """
+          SELECT (COUNT(DISTINCT user_id) * 100) / (SELECT COUNT(*) FROM users)
+          FROM attendance_logs
+          WHERE work_date = CURRENT_DATE
+            AND attendance_status = 'CHECK_IN_ON_TIME'
+          """, nativeQuery = true)
+  Long getOnTimePercentage();
 }
 
 

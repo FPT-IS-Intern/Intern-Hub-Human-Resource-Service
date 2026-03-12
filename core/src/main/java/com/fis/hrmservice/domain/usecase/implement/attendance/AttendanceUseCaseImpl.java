@@ -339,6 +339,21 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         return attendanceRepository.getAttendanceInWeekByUserId(userId);
     }
 
+    @Override
+    public Long getAbsentPercentage() {
+        return attendanceRepository.getNotAttendancePercent();
+    }
+
+    @Override
+    public Long getCheckInOnTimePercent() {
+        return attendanceRepository.getCheckInOnTimePercent();
+    }
+
+    @Override
+    public Long getCheckInLateTimePercent() {
+        return attendanceRepository.getCheckInLateTimePercent();
+    }
+
     // ==================== Helper Methods ====================
 
     private UUID validateCompanyAccess(
@@ -462,4 +477,5 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
                 size
         );
     }
+
 }
