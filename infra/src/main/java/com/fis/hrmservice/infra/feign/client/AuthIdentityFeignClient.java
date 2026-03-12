@@ -20,7 +20,7 @@ public interface AuthIdentityFeignClient {
   @PutMapping("/auth/internal/identity/lock/{userId}")
   void lockAuthIdentity(@PathVariable Long userId);
 
-  @PutMapping("/auth/internal/identity/un-lock/{userId}")
+  @PutMapping("/auth/internal/identity/unlock/{userId}")
   void unlockAuthIdentity(@PathVariable Long userId);
 
   @GetMapping("/auth/authz/roles/by-user/{userId}")
