@@ -48,6 +48,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
           AND (
               :#{#command.positions} IS NULL
               OR u.position.name IN :#{#command.positions}
+              OR u.position.name LIKE CONCAT('%', :#{#command.positions}, '%') 
           )
           ORDER BY 
               CASE 
@@ -101,7 +102,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
           nativeQuery = true)
   int internshipChanging();
 
-  @Query("SELECT u FROM User u WHERE u.position.name = 'STAFF'")
+  @Query("SELECT u FROM User u JOIN u.position p WHERE LOWER(p.name) LIKE '%staff%'")
   List<User> listAllSupervisor();
 
   @Modifying
@@ -111,4 +112,8 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
 
   @Query("SELECT u FROM User u WHERE u.mentor.id = :supervisorId")
   List<User> listMemberListBySupervisorId(@Param("supervisorId") Long supervisorId);
+
+  @Modifying
+  @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id = :userId")
+  void assignMentor(@Param("userId") Long userId, @Param("mentorId") Long mentorId);
 }

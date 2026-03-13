@@ -61,6 +61,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
+  public void assignMentor(Long userId, Long mentorId) {
+    userJpaRepository.assignMentor(userId, mentorId);
+  }
+
+  @Override
   public Optional<UserModel> findById(Long userId) {
     return userJpaRepository.findById(userId).map(userMapper::toModel);
   }

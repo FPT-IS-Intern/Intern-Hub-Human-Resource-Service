@@ -270,4 +270,10 @@ public class UserController {
   public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId(@PathVariable Long userId) {
     return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
+
+  @PatchMapping("/assign-mentor/{userId}/{mentorId}")
+  public ResponseApi<?> assignMentor(@PathVariable Long userId, @PathVariable Long mentorId) {
+    supervisorUseCase.assignMentor(userId, mentorId);
+    return ResponseApi.noContent();
+  }
 }

@@ -18,4 +18,8 @@ public class SupervisorUseCaseImpl {
   public List<UserModel> listAllSupervisor() {
     return userRepositoryPort.listAllSupervisor();
   }
+
+  public void assignMentor(Long userId, Long mentorId) {
+    userRepositoryPort.assignMentor(userId, mentorId);
+  }
 }
