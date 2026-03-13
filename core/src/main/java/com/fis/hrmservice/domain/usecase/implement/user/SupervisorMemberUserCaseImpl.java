@@ -28,7 +28,7 @@ public class SupervisorMemberUserCaseImpl {
             throw new NotFoundException("User not found with id: " + userId);
         }
 
-        if (!model.get().getPosition().getName().equalsIgnoreCase("STAFF")) {
+        if (!model.get().getPosition().getName().toLowerCase().contains("STAFF".toLowerCase())) {
             throw new ConflictDataException("User is not a staff member");
         }
 
