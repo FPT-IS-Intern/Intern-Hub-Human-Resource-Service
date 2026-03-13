@@ -4,8 +4,6 @@ import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.intern.hub.library.common.dto.PaginatedData;
-import org.springframework.security.core.userdetails.User;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -44,5 +42,5 @@ public interface UserRepositoryPort {
 
   List<UserModel> findAllActiveUsers();
 
-  void assignMentor(Long userId, Long mentorId);
+  int assignMentor(Long userId, Long mentorId);
 }

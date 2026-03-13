@@ -61,8 +61,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
-  public void assignMentor(Long userId, Long mentorId) {
-    userJpaRepository.assignMentor(userId, mentorId);
+  @Transactional
+  public int assignMentor(Long userId, Long mentorId) {
+    return userJpaRepository.assignMentor(userId, mentorId);
   }
 
   @Override

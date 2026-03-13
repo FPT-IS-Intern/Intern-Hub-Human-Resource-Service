@@ -114,6 +114,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
   List<User> listMemberListBySupervisorId(@Param("supervisorId") Long supervisorId);
 
   @Modifying
+  @Transactional
   @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id = :userId")
-  void assignMentor(@Param("userId") Long userId, @Param("mentorId") Long mentorId);
+  int assignMentor(@Param("userId") Long userId, @Param("mentorId") Long mentorId);
 }
