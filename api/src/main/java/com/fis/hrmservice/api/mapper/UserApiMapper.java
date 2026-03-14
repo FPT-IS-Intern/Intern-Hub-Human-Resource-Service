@@ -4,6 +4,7 @@ import com.fis.hrmservice.api.dto.request.FilterRequest;
 import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
 import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
 import com.fis.hrmservice.api.dto.response.*;
+import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
@@ -41,11 +42,59 @@ public interface UserApiMapper {
   }
 
   @Mapping(source = "companyEmail", target = "email")
-  @Mapping(source = "position.name", target = "position")
+  @Mapping(target = "position", expression = "java(getDisplayPosition(model.getPosition()))")
+  @Mapping(target = "role", expression = "java(getDisplayRole(model.getPosition()))")
   @Mapping(source = "avatar.avatarUrl", target = "avatarUrl")
   @Mapping(source = "fullName", target = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
   FilterResponse toFilterResponse(UserModel model);
+
+  default String getDisplayRole(PositionModel positionModel) {
+    String rawName = positionModel != null ? positionModel.getName() : null;
+    if (rawName == null || rawName.isBlank()) {
+      return null;
+    }
+
+    String normalized = rawName.trim();
+    String[] parts = normalized.split("\\s+");
+    if (parts.length >= 2) {
+      return parts[0];
+    }
+
+    String upperName = normalized.toUpperCase();
+    if (upperName.startsWith("INTERN") && upperName.length() > 6) {
+      return "INTERN";
+    }
+    if (upperName.startsWith("STAFF") && upperName.length() > 5) {
+      return "STAFF";
+    }
+
+    return normalized;
+  }
+
+  default String getDisplayPosition(PositionModel positionModel) {
+    String rawName = positionModel != null ? positionModel.getName() : null;
+    if (rawName == null || rawName.isBlank()) {
+      return null;
+    }
+
+    String normalized = rawName.trim();
+    String[] parts = normalized.split("\\s+");
+    if (parts.length >= 2) {
+      return String.join(" ", java.util.Arrays.copyOfRange(parts, 1, parts.length));
+    }
+
+    String upperName = normalized.toUpperCase();
+    if (upperName.startsWith("INTERN") && upperName.length() > 6) {
+      return normalized.substring(6).trim();
+    }
+    if (upperName.startsWith("STAFF") && upperName.length() > 5) {
+      return normalized.substring(5).trim();
+    }
+
+    // One-word codes like PO/PM/PMO belong to role only.
+    return null;
+  }
 
   InternalUserProfileResponse toInternalUserProfile(UserModel model);
 

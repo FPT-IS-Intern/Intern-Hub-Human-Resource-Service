@@ -46,9 +46,33 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
               OR u.sysStatus IN :#{#command.sysStatuses}
           )
           AND (
+              :#{#command.roles} IS NULL
+              OR UPPER(
+                  CASE
+                      WHEN LOCATE(' ', u.position.name) > 0
+                          THEN SUBSTRING(u.position.name, 1, LOCATE(' ', u.position.name) - 1)
+                      WHEN UPPER(u.position.name) LIKE 'INTERN%' AND LENGTH(u.position.name) > 6
+                          THEN 'INTERN'
+                      WHEN UPPER(u.position.name) LIKE 'STAFF%' AND LENGTH(u.position.name) > 5
+                          THEN 'STAFF'
+                      ELSE u.position.name
+                  END
+              ) IN :#{#command.roles}
+          )
+          AND (
               :#{#command.positions} IS NULL
-              OR u.position.name IN :#{#command.positions}
-              OR u.position.name LIKE CONCAT('%', :#{#command.positions}, '%') 
+              OR UPPER(u.position.name) IN :#{#command.positions}
+              OR UPPER(
+                  CASE
+                      WHEN LOCATE(' ', u.position.name) > 0
+                          THEN SUBSTRING(u.position.name, LOCATE(' ', u.position.name) + 1)
+                      WHEN UPPER(u.position.name) LIKE 'INTERN%' AND LENGTH(u.position.name) > 6
+                          THEN SUBSTRING(u.position.name, 7)
+                      WHEN UPPER(u.position.name) LIKE 'STAFF%' AND LENGTH(u.position.name) > 5
+                          THEN SUBSTRING(u.position.name, 6)
+                      ELSE ''
+                  END
+              ) IN :#{#command.positions}
           )
           ORDER BY 
               CASE 

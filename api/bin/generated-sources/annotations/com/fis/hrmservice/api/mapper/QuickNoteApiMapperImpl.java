@@ -1,14 +1,18 @@
 package com.fis.hrmservice.api.mapper;
 
 import com.fis.hrmservice.api.dto.request.CreateQuickNoteRequest;
+import com.fis.hrmservice.api.dto.response.QuickNoteResponse;
+import com.fis.hrmservice.domain.model.user.QuickNoteModel;
 import com.fis.hrmservice.domain.usecase.command.quicknote.QuickNoteCommand;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-10T10:06:38+0700",
-    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-03-14T15:33:11+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class QuickNoteApiMapperImpl implements QuickNoteApiMapper {
@@ -24,5 +28,33 @@ public class QuickNoteApiMapperImpl implements QuickNoteApiMapper {
         quickNoteCommand.setContent( request.getContent() );
 
         return quickNoteCommand;
+    }
+
+    @Override
+    public QuickNoteResponse toResponse(QuickNoteModel model) {
+        if ( model == null ) {
+            return null;
+        }
+
+        QuickNoteResponse quickNoteResponse = new QuickNoteResponse();
+
+        quickNoteResponse.setCreateDate( model.getWriteDate() );
+        quickNoteResponse.setContent( model.getContent() );
+
+        return quickNoteResponse;
+    }
+
+    @Override
+    public List<QuickNoteResponse> toResponse(List<QuickNoteModel> models) {
+        if ( models == null ) {
+            return null;
+        }
+
+        List<QuickNoteResponse> list = new ArrayList<QuickNoteResponse>( models.size() );
+        for ( QuickNoteModel quickNoteModel : models ) {
+            list.add( toResponse( quickNoteModel ) );
+        }
+
+        return list;
     }
 }

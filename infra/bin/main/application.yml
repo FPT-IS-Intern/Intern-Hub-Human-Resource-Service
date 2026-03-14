@@ -3,7 +3,7 @@ server:
 
 security:
   internal-secret: ${INTERNAL_SECRET_KEY:defaultSecretValue}
-  internal-path-prefix: /hrm-service/internal/
+  internal-path-prefix: /hrm/internal/
 
 # Optional: JPA Auditing configuration
 audit:
@@ -17,29 +17,85 @@ snowflake:
   machine-id: 1
 
 spring:
+  jackson:
+    time-zone: ${TIMEZONE_CONFIG:Asia/Ho_Chi_Minh}
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?currentSchema=${SCHEMA_NAME}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}?currentSchema=${SCHEMA_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 2
+      maximum-pool-size: 2
+      minimum-idle: 1
       max-lifetime: 300000
       idle-timeout: 120000
       keepalive-time: 60000
       validation-timeout: 5000
       connection-timeout: 30000
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     open-in-view: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: ${TIMEZONE_CONFIG:Asia/Ho_Chi_Minh}
   application:
-    name: hrm
+    name: hrm-service
+
+services:
+  gateway:
+    url: ${GATEWAY_URL:http://localhost:8765}
+  dms:
+    url: ${DMS_SERVICE_URL:http://localhost:8084}
+
+feign:
+  client:
+    config:
+      auth:
+        url: ${AUTH_SERVICE_URL:https://internhub-v2.bbtech.io.vn/api}
+      bo-portal:
+        url: ${BO_PORTAL_SERVICE_URL:http://localhost:8386}
+
+management:
+  opentelemetry:
+    resource-attributes:
+      "service.name": ${spring.application.name}
+      "service.version": "1.0.5"
+      "deployment.environment": ${DEPLOY_ENV:dev}
+  logging:
+    export:
+      otlp:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+  otlp:
+    metrics:
+      export:
+        enabled: false
+
+
+face-recognition:
+  api-key: ${FACE_REGISTRY_API_KEY:defaultFaceRegistryApiKey}
+  api-url: ${FACE_REGISTRY_API_URL:http://localhost:8085}
+
+common:
+  context:
+    enabled: true
+
+  logging:
+    request: true
+    response: true
+  object-mapper:
+    enabled: true
+    serialize-long-as-string: true

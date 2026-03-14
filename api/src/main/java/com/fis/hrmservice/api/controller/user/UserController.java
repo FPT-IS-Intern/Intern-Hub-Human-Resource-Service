@@ -36,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User Management", description = "APIs for user registration and management")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-//@CrossOrigin(origins = "http://localhost:4205")
+@CrossOrigin(origins = "http://localhost:4205")
 public class UserController {
 
   RegisterUserUseCaseImpl registerUserUseCase;

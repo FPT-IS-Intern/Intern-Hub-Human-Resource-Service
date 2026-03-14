@@ -1,6 +1,5 @@
 package com.fis.hrmservice.infra.mapper;
 
-import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
 import com.fis.hrmservice.infra.persistence.entity.Ticket;
 import javax.annotation.processing.Generated;
@@ -9,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-10T10:06:37+0700",
-    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-03-14T15:33:03+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class TicketMapperImpl implements TicketMapper {
@@ -30,9 +29,7 @@ public class TicketMapperImpl implements TicketMapper {
 
         ticketModel.ticketId( ticket.getId() );
         ticketModel.requester( userMapper.toModel( ticket.getUser() ) );
-        if ( ticket.getStatus() != null ) {
-            ticketModel.sysStatus( Enum.valueOf( TicketStatus.class, ticket.getStatus() ) );
-        }
+        ticketModel.sysStatus( ticket.getStatus() );
         ticketModel.ticketType( ticketTypeMapper.toModel( ticket.getTicketType() ) );
         ticketModel.startAt( ticket.getStartAt() );
         ticketModel.endAt( ticket.getEndAt() );
@@ -51,9 +48,7 @@ public class TicketMapperImpl implements TicketMapper {
 
         ticket.setId( ticketModel.getTicketId() );
         ticket.setUser( userMapper.toEntity( ticketModel.getRequester() ) );
-        if ( ticketModel.getSysStatus() != null ) {
-            ticket.setStatus( ticketModel.getSysStatus().name() );
-        }
+        ticket.setStatus( ticketModel.getSysStatus() );
         ticket.setTicketType( ticketTypeMapper.toEntity( ticketModel.getTicketType() ) );
         ticket.setEndAt( ticketModel.getEndAt() );
         ticket.setReason( ticketModel.getReason() );

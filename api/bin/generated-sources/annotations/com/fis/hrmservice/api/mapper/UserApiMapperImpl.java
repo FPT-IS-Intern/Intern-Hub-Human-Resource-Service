@@ -5,11 +5,12 @@ import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
 import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
 import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.dto.response.InternalUserProfileResponse;
-import com.fis.hrmservice.api.dto.response.ProfileResponse;
+import com.fis.hrmservice.api.dto.response.InternalUserResponse;
+import com.fis.hrmservice.api.dto.response.SupervisorMemberResponse;
+import com.fis.hrmservice.api.dto.response.SupervisorResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.user.AvatarModel;
-import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
@@ -22,8 +23,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-10T10:06:38+0700",
-    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-03-14T15:33:10+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class UserApiMapperImpl implements UserApiMapper {
@@ -36,6 +37,12 @@ public class UserApiMapperImpl implements UserApiMapper {
 
         RegisterUserCommand.RegisterUserCommandBuilder registerUserCommand = RegisterUserCommand.builder();
 
+        if ( request.getAvatar() != null ) {
+            registerUserCommand.avatar( request.getAvatar() );
+        }
+        if ( request.getCv() != null ) {
+            registerUserCommand.cv( request.getCv() );
+        }
         if ( request.getEmail() != null ) {
             registerUserCommand.email( request.getEmail() );
         }
@@ -64,13 +71,6 @@ public class UserApiMapperImpl implements UserApiMapper {
             registerUserCommand.internshipEndDate( request.getInternshipEndDate() );
         }
 
-        registerUserCommand.cvFileName( getFileName(request.getCv()) );
-        registerUserCommand.cvContentType( getContentType(request.getCv()) );
-        registerUserCommand.cvSize( getFileSize(request.getCv()) );
-        registerUserCommand.avatarFileName( getFileName(request.getAvatar()) );
-        registerUserCommand.avatarContentType( getContentType(request.getAvatar()) );
-        registerUserCommand.avatarSize( getFileSize(request.getAvatar()) );
-
         return registerUserCommand.build();
     }
 
@@ -85,30 +85,19 @@ public class UserApiMapperImpl implements UserApiMapper {
         if ( model.getCompanyEmail() != null ) {
             userResponse.email( model.getCompanyEmail() );
         }
-        if ( model.getDateOfBirth() != null ) {
-            userResponse.dateOfBirth( model.getDateOfBirth() );
-        }
-        if ( model.getSysStatus() != null ) {
-            userResponse.status( model.getSysStatus().name() );
-        }
-        String avatarUrl = modelAvatarAvatarUrl( model );
-        if ( avatarUrl != null ) {
-            userResponse.avatarUrl( avatarUrl );
-        }
-        String cvUrl = modelCvCvUrl( model );
-        if ( cvUrl != null ) {
-            userResponse.cvUrl( cvUrl );
-        }
         String name = modelPositionName( model );
         if ( name != null ) {
             userResponse.positionCode( name );
         }
-        String fullName = modelMentorFullName( model );
-        if ( fullName != null ) {
-            userResponse.superVisorName( fullName );
+        Long userId = modelMentorUserId( model );
+        if ( userId != null ) {
+            userResponse.superVisorId( String.valueOf( userId ) );
         }
         if ( model.getAddress() != null ) {
             userResponse.address( model.getAddress() );
+        }
+        if ( model.getDateOfBirth() != null ) {
+            userResponse.dateOfBirth( model.getDateOfBirth() );
         }
         if ( model.getFullName() != null ) {
             userResponse.fullName( model.getFullName() );
@@ -125,9 +114,18 @@ public class UserApiMapperImpl implements UserApiMapper {
         if ( model.getPhoneNumber() != null ) {
             userResponse.phoneNumber( model.getPhoneNumber() );
         }
+        if ( model.getRoleId() != null ) {
+            userResponse.roleId( model.getRoleId() );
+        }
+        if ( model.getSysStatus() != null ) {
+            userResponse.sysStatus( model.getSysStatus().name() );
+        }
         if ( model.getUserId() != null ) {
             userResponse.userId( model.getUserId() );
         }
+
+        userResponse.avatarUrl( getAvatarUrl(model) );
+        userResponse.cvUrl( getCvUrl(model) );
 
         return userResponse.build();
     }
@@ -143,10 +141,6 @@ public class UserApiMapperImpl implements UserApiMapper {
         if ( model.getCompanyEmail() != null ) {
             filterResponse.email( model.getCompanyEmail() );
         }
-        String name = modelPositionName( model );
-        if ( name != null ) {
-            filterResponse.position( name );
-        }
         String avatarUrl = modelAvatarAvatarUrl( model );
         if ( avatarUrl != null ) {
             filterResponse.avatarUrl( avatarUrl );
@@ -161,54 +155,10 @@ public class UserApiMapperImpl implements UserApiMapper {
             filterResponse.userId( model.getUserId() );
         }
 
+        filterResponse.position( getDisplayPosition(model.getPosition()) );
+        filterResponse.role( getDisplayRole(model.getPosition()) );
+
         return filterResponse.build();
-    }
-
-    @Override
-    public ProfileResponse toProfileResponse(UserModel model) {
-        if ( model == null ) {
-            return null;
-        }
-
-        ProfileResponse.ProfileResponseBuilder profileResponse = ProfileResponse.builder();
-
-        String name = modelPositionName( model );
-        if ( name != null ) {
-            profileResponse.position( name );
-        }
-        String fullName = modelMentorFullName( model );
-        if ( fullName != null ) {
-            profileResponse.superVisorName( fullName );
-        }
-        if ( model.getAddress() != null ) {
-            profileResponse.address( model.getAddress() );
-        }
-        if ( model.getCompanyEmail() != null ) {
-            profileResponse.companyEmail( model.getCompanyEmail() );
-        }
-        if ( model.getDateOfBirth() != null ) {
-            profileResponse.dateOfBirth( model.getDateOfBirth() );
-        }
-        if ( model.getFullName() != null ) {
-            profileResponse.fullName( model.getFullName() );
-        }
-        if ( model.getIdNumber() != null ) {
-            profileResponse.idNumber( model.getIdNumber() );
-        }
-        if ( model.getInternshipEndDate() != null ) {
-            profileResponse.internshipEndDate( model.getInternshipEndDate() );
-        }
-        if ( model.getInternshipStartDate() != null ) {
-            profileResponse.internshipStartDate( model.getInternshipStartDate() );
-        }
-        if ( model.getPhoneNumber() != null ) {
-            profileResponse.phoneNumber( model.getPhoneNumber() );
-        }
-        if ( model.getSysStatus() != null ) {
-            profileResponse.sysStatus( model.getSysStatus().name() );
-        }
-
-        return profileResponse.build();
     }
 
     @Override
@@ -278,8 +228,68 @@ public class UserApiMapperImpl implements UserApiMapper {
         if ( request.getAvatarFile() != null ) {
             updateUserProfileCommand.avatarFile( request.getAvatarFile() );
         }
+        if ( request.getPosition() != null ) {
+            updateUserProfileCommand.position( request.getPosition() );
+        }
+        if ( request.getSysStatus() != null ) {
+            updateUserProfileCommand.sysStatus( request.getSysStatus() );
+        }
 
         return updateUserProfileCommand.build();
+    }
+
+    @Override
+    public InternalUserResponse toInternalUserResponse(UserModel model) {
+        if ( model == null ) {
+            return null;
+        }
+
+        InternalUserResponse internalUserResponse = new InternalUserResponse();
+
+        if ( model.getCompanyEmail() != null ) {
+            internalUserResponse.setEmail( model.getCompanyEmail() );
+        }
+        if ( model.getFullName() != null ) {
+            internalUserResponse.setFullName( model.getFullName() );
+        }
+        if ( model.getIsFaceRegistry() != null ) {
+            internalUserResponse.setIsFaceRegistry( model.getIsFaceRegistry() );
+        }
+        if ( model.getRole() != null ) {
+            internalUserResponse.setRole( model.getRole() );
+        }
+        if ( model.getRoleId() != null ) {
+            internalUserResponse.setRoleId( Long.parseLong( model.getRoleId() ) );
+        }
+
+        internalUserResponse.setAvatarUrl( getAvatarUrl(model) );
+
+        return internalUserResponse;
+    }
+
+    @Override
+    public SupervisorResponse toSupervisorResponse(UserModel model) {
+        if ( model == null ) {
+            return null;
+        }
+
+        SupervisorResponse.SupervisorResponseBuilder supervisorResponse = SupervisorResponse.builder();
+
+        if ( model.getFullName() != null ) {
+            supervisorResponse.fullName( model.getFullName() );
+        }
+        if ( model.getFullName() != null ) {
+            supervisorResponse.nickName( buildNickName( model.getFullName() ) );
+        }
+        String avatarUrl = modelAvatarAvatarUrl( model );
+        if ( avatarUrl != null ) {
+            supervisorResponse.avatarUrl( avatarUrl );
+        }
+        if ( model.getUserId() != null ) {
+            supervisorResponse.userId( model.getUserId() );
+        }
+
+        return supervisorResponse.build();
     }
 
     @Override
@@ -309,20 +319,33 @@ public class UserApiMapperImpl implements UserApiMapper {
         return filterUserCommand.build();
     }
 
-    private String modelAvatarAvatarUrl(UserModel userModel) {
-        AvatarModel avatar = userModel.getAvatar();
-        if ( avatar == null ) {
+    @Override
+    public SupervisorMemberResponse toSupervisorMemberResponse(UserModel model) {
+        if ( model == null ) {
             return null;
         }
-        return avatar.getAvatarUrl();
-    }
 
-    private String modelCvCvUrl(UserModel userModel) {
-        CvModel cv = userModel.getCv();
-        if ( cv == null ) {
-            return null;
+        SupervisorMemberResponse.SupervisorMemberResponseBuilder supervisorMemberResponse = SupervisorMemberResponse.builder();
+
+        String avatarUrl = modelAvatarAvatarUrl( model );
+        if ( avatarUrl != null ) {
+            supervisorMemberResponse.avatarUrl( avatarUrl );
         }
-        return cv.getCvUrl();
+        if ( model.getFullName() != null ) {
+            supervisorMemberResponse.fullName( model.getFullName() );
+        }
+        if ( model.getSysStatus() != null ) {
+            supervisorMemberResponse.sysStatus( model.getSysStatus().name() );
+        }
+        if ( model.getCompanyEmail() != null ) {
+            supervisorMemberResponse.companyEmail( model.getCompanyEmail() );
+        }
+        String name = modelPositionName( model );
+        if ( name != null ) {
+            supervisorMemberResponse.position( name );
+        }
+
+        return supervisorMemberResponse.build();
     }
 
     private String modelPositionName(UserModel userModel) {
@@ -333,11 +356,19 @@ public class UserApiMapperImpl implements UserApiMapper {
         return position.getName();
     }
 
-    private String modelMentorFullName(UserModel userModel) {
+    private Long modelMentorUserId(UserModel userModel) {
         UserModel mentor = userModel.getMentor();
         if ( mentor == null ) {
             return null;
         }
-        return mentor.getFullName();
+        return mentor.getUserId();
+    }
+
+    private String modelAvatarAvatarUrl(UserModel userModel) {
+        AvatarModel avatar = userModel.getAvatar();
+        if ( avatar == null ) {
+            return null;
+        }
+        return avatar.getAvatarUrl();
     }
 }

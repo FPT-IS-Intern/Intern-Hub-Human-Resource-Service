@@ -1,8 +1,6 @@
 package com.fis.hrmservice.infra.mapper;
 
-import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.infra.persistence.entity.Position;
 import com.fis.hrmservice.infra.persistence.entity.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-10T10:06:37+0700",
-    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-03-14T15:33:04+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -27,6 +25,10 @@ public class UserMapperImpl implements UserMapper {
 
         userModel.userId( entity.getId() );
         userModel.mentor( mentorToModel( entity.getMentor() ) );
+        userModel.position( positionToModel( entity.getPosition() ) );
+        userModel.avatar( avatarToModel( entity.getAvatar() ) );
+        userModel.cv( cvToModel( entity.getCv() ) );
+        userModel.department( departmentToString( entity.getDepartment() ) );
         userModel.fullName( entity.getFullName() );
         userModel.companyEmail( entity.getCompanyEmail() );
         userModel.phoneNumber( entity.getPhoneNumber() );
@@ -36,9 +38,44 @@ public class UserMapperImpl implements UserMapper {
         userModel.sysStatus( entity.getSysStatus() );
         userModel.internshipStartDate( entity.getInternshipStartDate() );
         userModel.internshipEndDate( entity.getInternshipEndDate() );
-        userModel.position( positionToPositionModel( entity.getPosition() ) );
+        userModel.isFaceRegistry( entity.getIsFaceRegistry() );
 
         return userModel.build();
+    }
+
+    @Override
+    public void updateEntity(UserModel model, User entity) {
+        if ( model == null ) {
+            return;
+        }
+
+        entity.setMentor( mentorToEntity( model.getMentor() ) );
+        entity.setPosition( positionToEntity( model.getPosition() ) );
+        entity.setAvatar( avatarToEntity( model.getAvatar() ) );
+        entity.setCv( cvToEntity( model.getCv() ) );
+        entity.setCreatedAt( model.getCreatedAt() );
+        entity.setUpdatedAt( model.getUpdatedAt() );
+        if ( model.getCreatedBy() != null ) {
+            entity.setCreatedBy( Long.parseLong( model.getCreatedBy() ) );
+        }
+        else {
+            entity.setCreatedBy( null );
+        }
+        if ( model.getUpdatedBy() != null ) {
+            entity.setUpdatedBy( Long.parseLong( model.getUpdatedBy() ) );
+        }
+        else {
+            entity.setUpdatedBy( null );
+        }
+        entity.setAddress( model.getAddress() );
+        entity.setCompanyEmail( model.getCompanyEmail() );
+        entity.setDateOfBirth( model.getDateOfBirth() );
+        entity.setFullName( model.getFullName() );
+        entity.setIdNumber( model.getIdNumber() );
+        entity.setInternshipEndDate( model.getInternshipEndDate() );
+        entity.setInternshipStartDate( model.getInternshipStartDate() );
+        entity.setPhoneNumber( model.getPhoneNumber() );
+        entity.setSysStatus( model.getSysStatus() );
     }
 
     @Override
@@ -66,7 +103,8 @@ public class UserMapperImpl implements UserMapper {
         user.setId( model.getUserId() );
         user.setMentor( mentorToEntity( model.getMentor() ) );
         user.setPosition( positionToEntity( model.getPosition() ) );
-        user.setDateOfBirth( model.getDateOfBirth() );
+        user.setAvatar( avatarToEntity( model.getAvatar() ) );
+        user.setCv( cvToEntity( model.getCv() ) );
         user.setCreatedAt( model.getCreatedAt() );
         user.setUpdatedAt( model.getUpdatedAt() );
         if ( model.getCreatedBy() != null ) {
@@ -77,6 +115,7 @@ public class UserMapperImpl implements UserMapper {
         }
         user.setAddress( model.getAddress() );
         user.setCompanyEmail( model.getCompanyEmail() );
+        user.setDateOfBirth( model.getDateOfBirth() );
         user.setFullName( model.getFullName() );
         user.setIdNumber( model.getIdNumber() );
         user.setInternshipEndDate( model.getInternshipEndDate() );
@@ -99,18 +138,5 @@ public class UserMapperImpl implements UserMapper {
         }
 
         return list;
-    }
-
-    protected PositionModel positionToPositionModel(Position position) {
-        if ( position == null ) {
-            return null;
-        }
-
-        PositionModel.PositionModelBuilder positionModel = PositionModel.builder();
-
-        positionModel.name( position.getName() );
-        positionModel.description( position.getDescription() );
-
-        return positionModel.build();
     }
 }
