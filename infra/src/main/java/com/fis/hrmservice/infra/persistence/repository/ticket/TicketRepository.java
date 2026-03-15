@@ -3,6 +3,8 @@ package com.fis.hrmservice.infra.persistence.repository.ticket;
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
 import com.fis.hrmservice.infra.persistence.entity.Ticket;
+
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -123,4 +125,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       "UPDATE Ticket t set t.status = :ticketStatus where t.id = :ticketId and t.ticketType.typeName = 'REGISTRATION'")
   int updateRegistrationTicketStatus(
       @Param("ticketStatus") TicketStatus ticketStatus, @Param("ticketId") Long ticketId);
+
+  @Query(
+      """
+      SELECT COUNT(t) > 0 FROM Ticket t
+      WHERE t.user.userId = :userId
+      AND :date BETWEEN t.startAt AND t.endAt
+      AND t.status = 'APPROVED'
+      """)
+  boolean existsApprovedTicketByUserIdAndDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 }

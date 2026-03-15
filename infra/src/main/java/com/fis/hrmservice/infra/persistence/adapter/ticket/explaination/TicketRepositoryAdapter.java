@@ -15,6 +15,7 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -155,5 +156,10 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   @Override
   public int getAllRegistrationTicketPending() {
     return ticketRepository.allPendingRegistrationCount();
+  }
+
+  @Override
+  public boolean existsApprovedTicketByUserIdAndDate(Long userId, LocalDate date) {
+    return ticketRepository.existsApprovedTicketByUserIdAndDate(userId, date);
   }
 }
