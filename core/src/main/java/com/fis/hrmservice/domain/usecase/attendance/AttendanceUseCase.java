@@ -8,6 +8,7 @@ import com.fis.hrmservice.domain.usecase.command.attendance.CheckOutCommand;
 import com.intern.hub.library.common.dto.PaginatedData;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AttendanceUseCase {
@@ -24,7 +25,7 @@ public interface AttendanceUseCase {
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 
-  Long getAbsentPercentage();
-  Long getCheckInOnTimePercent();
-  Long getCheckInLateTimePercent();
+  Long getAbsentPercentage(LocalDate fromDate, LocalDate toDate);
+  Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
+  Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
 }

@@ -5,6 +5,9 @@ import com.fis.hrmservice.api.dto.response.PositionListResponse;
 import com.fis.hrmservice.api.mapper.PositionApiMapper;
 import com.fis.hrmservice.domain.usecase.implement.user.PositionUseCaseImpl;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.AccessLevel;
@@ -33,6 +36,8 @@ public class PositionController {
   }
 
   @PostMapping("/creating-position")
+  @Authenticated
+  @HasPermission(action = Action.CREATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> createPosition(@RequestBody AddPositionRequest request) {
     return ResponseApi.ok(positionUseCase.addPosition(positionMapper.toAddPositionCommand(request)));
   }

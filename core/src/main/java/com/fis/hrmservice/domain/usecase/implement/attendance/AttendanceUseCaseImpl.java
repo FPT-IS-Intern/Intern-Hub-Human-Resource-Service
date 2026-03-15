@@ -19,11 +19,7 @@ import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.library.common.utils.Snowflake;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -340,18 +336,18 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     }
 
     @Override
-    public Long getAbsentPercentage() {
-        return attendanceRepository.getNotAttendancePercent();
+    public Long getAbsentPercentage(LocalDate fromDate, LocalDate toDate) {
+        return attendanceRepository.getNotAttendancePercent(fromDate, toDate);
     }
 
     @Override
-    public Long getCheckInOnTimePercent() {
-        return attendanceRepository.getCheckInOnTimePercent();
+    public Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate) {
+        return attendanceRepository.getCheckInOnTimePercent(fromDate, toDate);
     }
 
     @Override
-    public Long getCheckInLateTimePercent() {
-        return attendanceRepository.getCheckInLateTimePercent();
+    public Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate) {
+        return attendanceRepository.getCheckInLateTimePercent(fromDate, toDate);
     }
 
     // ==================== Helper Methods ====================

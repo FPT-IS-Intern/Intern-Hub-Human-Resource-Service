@@ -4,6 +4,7 @@ import com.fis.hrmservice.infra.model.AttendanceInWeekResponse;
 import com.fis.hrmservice.infra.persistence.entity.AttendanceLog;
 import jakarta.persistence.LockModeType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,26 +104,29 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
               SELECT 1 
               FROM attendance_logs a
               WHERE a.user_id = u.user_id
-                AND a.work_date = CURRENT_DATE
+                AND a.work_date BETWEEN :fromDate AND :toDate
           )
           """, nativeQuery = true)
-  Long getAbsentPercentage();
+  Long getAbsentPercentage(@Param("fromDate") LocalDate fromDate,
+                           @Param("toDate") LocalDate toDate);
 
   @Query(value = """
           SELECT (COUNT(DISTINCT user_id) * 100) / (SELECT COUNT(*) FROM users)
           FROM attendance_logs
-          WHERE work_date = CURRENT_DATE
+          WHERE work_date BETWEEN :fromDate AND :toDate
             AND attendance_status = 'CHECK_IN_LATE'
           """, nativeQuery = true)
-  Long getLatePercentage();
+  Long getLatePercentage(@Param("fromDate") LocalDate fromDate,
+                         @Param("toDate") LocalDate toDate);
 
   @Query(value = """
           SELECT (COUNT(DISTINCT user_id) * 100) / (SELECT COUNT(*) FROM users)
           FROM attendance_logs
-          WHERE work_date = CURRENT_DATE
+          WHERE work_date BETWEEN :fromDate AND :toDate
             AND attendance_status = 'CHECK_IN_ON_TIME'
           """, nativeQuery = true)
-  Long getOnTimePercentage();
+  Long getOnTimePercentage(@Param("fromDate") LocalDate fromDate,
+                           @Param("toDate") LocalDate toDate);
 }
 
 

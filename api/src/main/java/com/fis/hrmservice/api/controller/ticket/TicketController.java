@@ -11,6 +11,9 @@ import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicket
 import com.fis.hrmservice.domain.usecase.implement.ticket.TicketUseCaseImpl;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
+import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.AccessLevel;
@@ -34,6 +37,8 @@ public class TicketController {
   TicketApiMapper ticketApiMapper;
 
   @PostMapping("/registration-ticket")
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+  @Authenticated
   public ResponseApi<PaginatedData<ListRegistrationResponse>> listRegistrationTicket(
       @RequestBody FilterRegistrationRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -56,6 +61,8 @@ public class TicketController {
   @GetMapping(
       value = "/first-three-registration-ticket",
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<List<FirstThreeRegistrationResponse>> firstThreeRegistrationTicket() {
     return ResponseApi.ok(
         ticketUseCaseImpl.firstThreeRegistrationTicket().stream()
@@ -64,6 +71,8 @@ public class TicketController {
   }
 
   @GetMapping("/registration-ticket-detail/{ticketId}")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<RegistrationDetailResponse> getDetailRegistrationTicket(
       @PathVariable Long ticketId) {
     return ResponseApi.ok(
@@ -72,37 +81,51 @@ public class TicketController {
   }
 
   @PutMapping("/approve/{ticketId}")
+  @Authenticated
+  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> approveRegistrationRequest(
           @PathVariable Long ticketId) {
     return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId));
   }
 
   @PutMapping("/reject/{ticketId}")
+  @Authenticated
+  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> rejectRegistrationRequest(@PathVariable Long ticketId) {
     return ResponseApi.ok(ticketUseCaseImpl.rejectRegistrationTicketByTicketId(ticketId));
   }
 
   @PutMapping("/suspend/{ticketId}")
+  @Authenticated
+  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> suspendRegistrationRequest(@PathVariable Long ticketId) {
     return ResponseApi.ok(ticketUseCaseImpl.suspendRegistrationTicketByTicketId(ticketId));
   }
 
   @GetMapping("/approval")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<Integer> allRegistrationTicket() {
     return ResponseApi.ok(ticketUseCaseImpl.allRegistrationTicket());
   }
 
   @GetMapping("/approved")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<Integer> allApprovedRegistrationTicket() {
     return ResponseApi.ok(ticketUseCaseImpl.allApprovedRegistrationTicket());
   }
 
   @GetMapping("/rejected")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<Integer> allRejectedRegistrationTicket() {
     return ResponseApi.ok(ticketUseCaseImpl.allRejectedRegistrationTicket());
   }
 
   @GetMapping("/pending")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<Integer> allPendingRegistrationTicket() {
     return ResponseApi.ok(ticketUseCaseImpl.allPendingRegistrationTicket());
   }

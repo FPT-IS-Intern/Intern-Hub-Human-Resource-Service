@@ -1,5 +1,6 @@
 package com.fis.hrmservice.api.controller.attendance;
 
+import com.fis.hrmservice.api.dto.request.AttendanceStatisticGraphRequest;
 import com.fis.hrmservice.api.dto.request.FilterAttendanceRequest;
 import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.api.mapper.AttendanceApiMapper;
@@ -16,9 +17,12 @@ import com.intern.hub.library.common.annotation.EnableGlobalExceptionHandler;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.starter.security.annotation.Authenticated;
+import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -129,7 +133,8 @@ public class AttendanceController {
   }
 
   @PostMapping("/filter")
-//  @Authenticated
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<PaginatedData<AttendanceFilterResponse>> filterAttendanceLogs(
           @RequestBody FilterAttendanceRequest request,
           @RequestParam(defaultValue = "0") int page,
@@ -154,22 +159,21 @@ public class AttendanceController {
 
   @GetMapping("/attendance-in-week")
   @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<List<AttendanceInWeekApiResponse>> getAttendanceInWeekByUserId() {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(attendanceUseCase.getAttendanceInWeekByUserId(userId).stream().map(attendanceApiMapper::toApiResponse).toList());
   }
 
-  @GetMapping("/on-time-percentage")
-  public ResponseApi<Long> getOnTimePercentage() {
-    return ResponseApi.ok(attendanceUseCase.getCheckInOnTimePercent());
-  }
-  @GetMapping("/late-time-percentage")
-    public ResponseApi<Long> getLateTimePercentage() {
-        return ResponseApi.ok(attendanceUseCase.getCheckInLateTimePercent());
-    }
-
-  @GetMapping("/absent-percentage")
-  public ResponseApi<Long> getAbsentPercentage() {
-    return ResponseApi.ok(attendanceUseCase.getAbsentPercentage());
+  @PostMapping("/attendance-statistic-graph")
+  public ResponseApi<AttendanceStatisticGraph> getAttendanceStatisticGraph(
+          @RequestBody AttendanceStatisticGraphRequest request
+          ) {
+    AttendanceStatisticGraph attendanceStatisticGraph = AttendanceStatisticGraph.builder()
+            .onTimePercentage(attendanceUseCase.getCheckInOnTimePercent(request.getFromDate(), request.getToDate()))
+            .latePercentage(attendanceUseCase.getCheckInLateTimePercent(request.getFromDate(), request.getToDate()))
+            .absentPercentage(attendanceUseCase.getAbsentPercentage(request.getFromDate(), request.getToDate()))
+            .build();
+    return ResponseApi.ok(attendanceStatisticGraph);
   }
 }

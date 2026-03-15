@@ -82,8 +82,8 @@ public class UserController {
   }
 
   @PostMapping("/filter")
-//  @Authenticated
-//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<PaginatedData<FilterResponse>> filterUsers(
       @RequestBody FilterRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -103,8 +103,8 @@ public class UserController {
 
   // cái này dùng cho admin xem profile của 1 user cụ thể nào đó
   @GetMapping("/admin/profile/{userId}")
-//  @Authenticated
-//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> adminGetUserProfile(@PathVariable Long userId) {
     log.info("Get user profile for ID: {}", userId);
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
@@ -113,7 +113,7 @@ public class UserController {
 
   // cái này dùng để cho user xem chính user profile của mình
   @GetMapping("/profile")
-//  @Authenticated
+  @Authenticated
   public ResponseApi<?> userGetUserProfile() {
     Long userId = UserContext.requiredUserId();
     UserModel userModel = userProfileUseCase.getUserProfile(userId);
@@ -122,7 +122,8 @@ public class UserController {
 
   // -------------------- Approval and Rejection Endpoints -------------------//
   @PutMapping("/approval/{userId}")
-//  @Authenticated
+  @Authenticated
+  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> approveUser(@PathVariable Long userId) {
     log.info("Approve user request for ID: {}", userId);
     UserModel userModel = approvalUser.approveUser(userId);
@@ -131,7 +132,8 @@ public class UserController {
   }
 
   @PutMapping("/rejection/{userId}")
-//  @Authenticated
+  @Authenticated
+  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> rejectUser(@PathVariable Long userId) {
     log.info("Reject user request for ID: {}", userId);
     UserModel userReject = rejectionUser.rejectUser(userId);
@@ -141,7 +143,7 @@ public class UserController {
 
   // =====================================================================================
   @PatchMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//  @Authenticated
+  @Authenticated
   public ResponseApi<?> updateProfile(
       @Valid @RequestPart("userInfo") UpdateProfileRequest request,
       @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
@@ -161,7 +163,8 @@ public class UserController {
   }
 
   @PatchMapping(value = "/profile/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//  @Authenticated
+  @Authenticated
+  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> updateUserProfile(
           @Valid @RequestPart("userInfo") UpdateProfileRequest request,
           @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
@@ -187,19 +190,24 @@ public class UserController {
   }
 
   @PutMapping("/suspension/{userId}")
-//  @Authenticated
+  @Authenticated
+  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<UserResponse> suspendUser(@PathVariable Long userId) {
     UserModel userModel = userSuspension.suspendUser(userId);
     return ResponseApi.ok(userApiMapper.toResponse(userModel));
   }
 
   @GetMapping("/total-intern")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<Integer> totalInternship() {
     Integer totalIntern = approvalUser.totalIntern();
     return ResponseApi.ok(totalIntern);
   }
 
   @GetMapping("/internship-changing")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<String> internshipChanging() {
     Integer internshipChanging = approvalUser.internshipChanging();
 
@@ -225,6 +233,7 @@ public class UserController {
   }
 
   @GetMapping("/supervisor")
+  @Authenticated
   public ResponseApi<List<SupervisorResponse>> listAllSupervisor() {
     return ResponseApi.ok(
         supervisorUseCase.listAllSupervisor().stream()
@@ -233,7 +242,7 @@ public class UserController {
   }
 
   @PostMapping(value = "/me/face-registry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//  @Authenticated
+  @Authenticated
   public ResponseApi<String> registerFace(
       @RequestParam("userName") String userName,
       @RequestPart("files") List<MultipartFile> files) {
@@ -259,19 +268,21 @@ public class UserController {
   }
 
   @GetMapping("/members")
-//  @Authenticated
+  @Authenticated
   public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId() {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
 
   @GetMapping("/members/{userId}")
-//  @Authenticated
+  @Authenticated
   public ResponseApi<List<SupervisorMemberResponse>> getAllMemberBySupervisorId(@PathVariable Long userId) {
     return ResponseApi.ok(supervisorMemberUserCase.listAllSupervisorMember(userId).stream().map(userApiMapper::toSupervisorMemberResponse).toList());
   }
 
   @PatchMapping("/assign-mentor/{userId}/{mentorId}")
+  @Authenticated
+  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> assignMentor(@PathVariable Long userId, @PathVariable Long mentorId) {
     supervisorUseCase.assignMentor(userId, mentorId);
     return ResponseApi.noContent();

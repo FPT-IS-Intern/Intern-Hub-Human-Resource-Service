@@ -115,18 +115,18 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
   }
 
   @Override
-  public Long getCheckInOnTimePercent() {
-    return attendanceLogRepository.getOnTimePercentage();
+  public Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate) {
+    return attendanceLogRepository.getOnTimePercentage(fromDate, toDate);
   }
 
   @Override
-  public Long getCheckInLateTimePercent() {
-    return attendanceLogRepository.getLatePercentage();
+  public Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate) {
+    return attendanceLogRepository.getLatePercentage(fromDate, toDate);
   }
 
   @Override
-  public Long getNotAttendancePercent() {
-    return attendanceLogRepository.getAbsentPercentage();
+  public Long getNotAttendancePercent(LocalDate fromDate, LocalDate toDate) {
+    return attendanceLogRepository.getAbsentPercentage(fromDate, toDate);
   }
 
   @Override

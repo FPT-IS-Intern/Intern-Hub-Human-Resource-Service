@@ -6,6 +6,7 @@ import com.fis.hrmservice.domain.usecase.command.attendance.FilterAttendanceComm
 import com.intern.hub.library.common.dto.PaginatedData;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,11 +42,11 @@ public interface AttendanceRepositoryPort {
 
   PaginatedData<AttendanceLogModel> filterAttendanceLogs(FilterAttendanceCommand command, int page, int size);
 
-  Long getCheckInOnTimePercent();
+  Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
 
-  Long getCheckInLateTimePercent();
+  Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
 
-  Long getNotAttendancePercent();
+  Long getNotAttendancePercent(LocalDate fromDate, LocalDate toDate);
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 }
