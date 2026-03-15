@@ -3,12 +3,16 @@ package com.fis.hrmservice.api.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
 @Getter
 @Setter
 @Builder
 public class SupervisorMemberResponse {
     int no;
+    @JsonSerialize(using = ToStringSerializer.class)
+    Long userId;
     String avatarUrl;
     String fullName;
     String sysStatus;

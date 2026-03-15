@@ -147,6 +147,7 @@ public interface UserApiMapper {
   }
 
   @Mapping(target = "no", ignore = true)
+  @Mapping(target = "userId", source = "userId")
   @Mapping(target = "avatarUrl", source = "avatar.avatarUrl")
   @Mapping(target = "fullName", source = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
