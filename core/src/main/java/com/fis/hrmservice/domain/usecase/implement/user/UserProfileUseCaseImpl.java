@@ -179,6 +179,38 @@ public class UserProfileUseCaseImpl {
         .toList();
   }
 
+  @Transactional
+  public UserModel lockAccountInternal(Long userId) {
+    return updateAccountStatusAndAuth(userId, UserStatus.SUSPENDED);
+  }
+
+  @Transactional
+  public UserModel unlockAccountInternal(Long userId) {
+    return updateAccountStatusAndAuth(userId, UserStatus.APPROVED);
+  }
+
+  private UserModel updateAccountStatusAndAuth(Long userId, UserStatus targetStatus) {
+    UserModel user =
+        userRepositoryPort
+            .findById(userId)
+            .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+
+    if (!Objects.equals(user.getSysStatus(), targetStatus)) {
+      user.setSysStatus(targetStatus);
+      userRepositoryPort.save(user);
+
+      if (targetStatus == UserStatus.SUSPENDED) {
+        createAuthIdentityPort.lockAuthIdentity(userId);
+      } else if (targetStatus == UserStatus.APPROVED) {
+        createAuthIdentityPort.unlockAuthIdentity(userId);
+      }
+    }
+
+    return userRepositoryPort
+        .findById(userId)
+        .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+  }
+
   private static String trim(CharSequence cs) {
     return cs == null ? null : cs.toString().strip();
   }
