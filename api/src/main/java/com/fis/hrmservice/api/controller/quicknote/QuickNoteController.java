@@ -41,6 +41,7 @@ public class QuickNoteController {
 
   // cái này cho admin xem
   @GetMapping("/{userId}")
+  @Authenticated
   public ResponseApi<List<QuickNoteResponse>> listQuickNoteByUserId(@PathVariable Long userId) {
     return ResponseApi.ok(
         quickNoteApiMapper.toResponse(quickNoteUserUseCase.findAllByUserId(userId)));

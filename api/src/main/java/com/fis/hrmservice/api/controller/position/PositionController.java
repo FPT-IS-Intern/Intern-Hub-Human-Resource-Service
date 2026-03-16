@@ -36,8 +36,8 @@ public class PositionController {
   }
 
   @PostMapping("/creating-position")
-//  @Authenticated
-//  @HasPermission(action = Action.CREATE, resource = "quan-ly-nguoi-dung")
+  @Authenticated
+  @HasPermission(action = Action.CREATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> createPosition(@RequestBody AddPositionRequest request) {
     return ResponseApi.ok(positionUseCase.addPosition(positionMapper.toAddPositionCommand(request)));
   }

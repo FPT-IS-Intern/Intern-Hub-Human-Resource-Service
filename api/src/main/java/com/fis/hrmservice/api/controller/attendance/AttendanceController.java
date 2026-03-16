@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("hrm/attendance")
 @EnableGlobalExceptionHandler
 @Slf4j
-//@CrossOrigin("*")
 @Tag(name = "Attendance Management", description = "APIs for attendance check-in and check-out")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -166,6 +165,8 @@ public class AttendanceController {
   }
 
   @PostMapping("/attendance-statistic-graph")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<AttendanceStatisticGraph> getAttendanceStatisticGraph(
           @RequestBody AttendanceStatisticGraphRequest request
           ) {
@@ -178,6 +179,7 @@ public class AttendanceController {
   }
 
   @GetMapping("/attendance-section")
+  @Authenticated
   public ResponseApi<SectionCardResponse> getAttendanceSection() {
     return ResponseApi.ok(SectionCardResponse.builder()
                     .absentWithLicense(0)
@@ -188,6 +190,8 @@ public class AttendanceController {
   }
 
   @GetMapping("/attendance-section/{userId}")
+  @Authenticated
+  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<SectionCardResponse> getAttendanceSection(@PathVariable Long userId) {
     return ResponseApi.ok(SectionCardResponse.builder()
             .absentWithLicense(0)
