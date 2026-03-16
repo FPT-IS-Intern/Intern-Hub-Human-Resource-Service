@@ -22,12 +22,14 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
 
   Optional<AttendanceLog> findByUser_IdAndWorkDate(Long userId, LocalDate workDate);
 
-  @Query("""
-       SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
-       FROM AttendanceLog a
-       WHERE a.user.id = :userId
-       AND a.workDate = :workDate
-       """)
+  @Query(value = """
+        SELECT EXISTS (
+            SELECT 1
+            FROM attendance_logs
+            WHERE user_id = :userId
+            AND work_date = :workDate
+        )
+        """, nativeQuery = true)
   boolean existsByUserIdAndWorkDate(@Param("userId") Long userId,
                                     @Param("workDate") LocalDate workDate);
 
@@ -105,13 +107,10 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
   boolean existsByUser_IdAndWorkDateAndCheckInBranchId(Long userId, LocalDate workDate, UUID branchId);
 
   @Query(value = """
-          SELECT (COUNT(*) * 100) / (SELECT COUNT(*) FROM users)
-          FROM users u
-          WHERE NOT EXISTS (
-              SELECT 1 
-              FROM attendance_logs a
-              WHERE a.user_id = u.user_id
-                AND a.work_date BETWEEN :fromDate AND :toDate
+          SELECT (COUNT(DISTINCT user_id) * 100) / (SELECT COUNT(*) FROM users)
+          FROM attendance_logs
+          WHERE work_date BETWEEN :fromDate AND :toDate
+            AND attendance_status = 'ABSENT'
           )
           """, nativeQuery = true)
   Long getAbsentPercentage(@Param("fromDate") LocalDate fromDate,

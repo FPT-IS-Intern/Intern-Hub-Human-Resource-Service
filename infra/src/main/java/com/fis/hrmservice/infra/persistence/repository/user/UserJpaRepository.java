@@ -29,7 +29,6 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
         SELECT u
         FROM User u
         WHERE u.sysStatus = 'APPROVED'
-        AND u.isLearner = true
     """)
   List<User> findAllActiveUsers();
 

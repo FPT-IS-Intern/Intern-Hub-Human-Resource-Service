@@ -14,7 +14,7 @@ public class AttendanceScheduler {
     private final CheckAbsentAttendanceUseCase checkAbsentAttendanceUseCase;
 
     // 8:45 AM mỗi ngày (Vietnam timezone) để check ABSENT cho ngày hiện tại
-    @Scheduled(cron = "0 33 11 * * *", zone = "Asia/Ho_Chi_Minh")
+    @Scheduled(cron = "0 15 22 * * *", zone = "Asia/Ho_Chi_Minh")
     public void checkAbsentAttendance() {
         log.info("Start checking absent attendance");
         long start = System.currentTimeMillis();

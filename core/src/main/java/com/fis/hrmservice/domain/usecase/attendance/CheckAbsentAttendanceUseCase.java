@@ -6,9 +6,11 @@ import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.attendance.AttendanceRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
+import com.intern.hub.library.common.utils.DateTimeHelper;
 import com.intern.hub.library.common.utils.Snowflake;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +64,12 @@ public class CheckAbsentAttendanceUseCase {
                         .attendanceId(snowflake.next())
                         .user(user)
                         .workDate(today)
+                        .checkInTime(DateTimeHelper.currentTimeMillis())
+                        .checkOutTime(0)
                         .attendanceStatus(AttendanceStatus.ABSENT)
+                        .checkInBranchId(null)
+                        .checkOutBranchId(null)
+                        .source("WEB")
                         .build();
 
                 attendanceLogRepositoryPort.save(attendanceLog);
