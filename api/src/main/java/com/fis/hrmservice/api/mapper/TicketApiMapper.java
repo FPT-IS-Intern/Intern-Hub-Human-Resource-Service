@@ -85,9 +85,9 @@ public interface TicketApiMapper {
 
   @Mappings({
           @Mapping(target = "userId", source = "requester.userId"),
-          @Mapping(target = "avatarUrl", source = "requester.avatar.avatarUrl"),
+          @Mapping(target = "avatarUrl", source = "requester.avatarUrl"),
           @Mapping(target = "positionName", source = "requester.position.name"),
-          @Mapping(target = "cvUrl", source = "requester.cv.cvUrl"),
+          @Mapping(target = "cvUrl", source = "requester.cvUrl"),
           @Mapping(target = "internshipStartDate", source = "requester.internshipStartDate"),
           @Mapping(target = "internshipEndDate", source = "requester.internshipEndDate"),
           @Mapping(target = "fullName", source = "requester.fullName"),

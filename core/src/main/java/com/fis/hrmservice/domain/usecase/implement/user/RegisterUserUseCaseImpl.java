@@ -4,8 +4,6 @@ import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.constant.TicketType;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
-import com.fis.hrmservice.domain.model.user.AvatarModel;
-import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
@@ -35,8 +33,6 @@ public class RegisterUserUseCaseImpl {
   UserValidationService validationService;
   TicketRepositoryPort ticketRepositoryPort;
   TicketTypeRepositoryPort ticketTypeRepositoryPort;
-  AvatarRepositoryPort avatarRepositoryPort;
-  CvRepositoryPort cvRepositoryPort;
   FileStoragePort fileStoragePort;
 
   @Transactional(rollbackFor = Exception.class)
@@ -74,20 +70,6 @@ public class RegisterUserUseCaseImpl {
                   20971520L,
                   "image/(png|jpeg|jpg)");
 
-      AvatarModel avatar =
-          avatarRepositoryPort.save(
-              AvatarModel.builder()
-                  .avatarId(snowflake.next())
-                  .user(savedUser)
-                  .avatarUrl(avatarObjectKey)
-                  .fileSize(command.getAvatar().getSize())
-                  .fileType(command.getAvatar().getContentType())
-                  .build());
-
-      if (avatar == null) {
-        throw new ConflictDataException("Cannot save avatar");
-      }
-
       // 6️⃣ Upload CV via DMS
       String cvUrl = fileStoragePort.uploadFile(
               command.getCv(),
@@ -97,19 +79,10 @@ public class RegisterUserUseCaseImpl {
               "application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       );
 
-      CvModel cv =
-          cvRepositoryPort.save(
-              CvModel.builder()
-                  .cvId(snowflake.next())
-                  .user(savedUser)
-                  .cvUrl(cvUrl)
-                  .fileSize(command.getCv().getSize())
-                  .fileType(command.getCv().getContentType())
-                  .build());
+      savedUser.setAvatarUrl(avatarObjectKey);
+      savedUser.setCvUrl(cvUrl);
 
-      if (cv == null) {
-        throw new ConflictDataException("Cannot save CV");
-      }
+      userRepositoryPort.save(savedUser);
 
     } catch (Exception e) {
       log.error("Register process failed. Transaction rollback triggered.", e);

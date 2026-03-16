@@ -1,8 +1,6 @@
 package com.fis.hrmservice.api.mapper;
 
-import com.fis.hrmservice.api.dto.request.FilterRequest;
-import com.fis.hrmservice.api.dto.request.RegisterUserRequest;
-import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
+import com.fis.hrmservice.api.dto.request.*;
 import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
@@ -21,30 +19,18 @@ import org.springframework.web.multipart.MultipartFile;
 public interface UserApiMapper {
 
   // ===== Register =====
-  @Mapping(target = "avatar", source = "avatar")
-  @Mapping(target = "cv", source = "cv")
   RegisterUserCommand toCommand(RegisterUserRequest request);
 
   // ===== Response =====
   @Mapping(target = "email", source = "companyEmail")
-  @Mapping(target = "avatarUrl", expression = "java(getAvatarUrl(model))")
-  @Mapping(target = "cvUrl", expression = "java(getCvUrl(model))")
   @Mapping(target = "positionCode", source = "position.name")
   @Mapping(target = "superVisorId", source = "mentor.userId")
   UserResponse toResponse(UserModel model);
 
-  default String getAvatarUrl(UserModel model) {
-    return model.getAvatar() != null ? model.getAvatar().getAvatarUrl() : null;
-  }
-
-  default String getCvUrl(UserModel model) {
-    return model.getCv() != null ? model.getCv().getCvUrl() : null;
-  }
-
   @Mapping(source = "companyEmail", target = "email")
   @Mapping(target = "position", expression = "java(getDisplayPosition(model.getPosition()))")
   @Mapping(target = "role", expression = "java(getDisplayRole(model.getPosition()))")
-  @Mapping(source = "avatar.avatarUrl", target = "avatarUrl")
+  @Mapping(source = "avatarUrl", target = "avatarUrl")
   @Mapping(source = "fullName", target = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
   FilterResponse toFilterResponse(UserModel model);
@@ -103,12 +89,11 @@ public interface UserApiMapper {
   UpdateUserProfileCommand toUpdateUserProfileCommand(UpdateProfileRequest request);
 
   @Mapping(target = "email", source = "companyEmail")
-  @Mapping(target = "avatarUrl", expression = "java(getAvatarUrl(model))")
   InternalUserResponse toInternalUserResponse(UserModel model);
 
   @Mapping(target = "fullName", source = "fullName")
   @Mapping(target = "nickName", source = "fullName", qualifiedByName = "buildNickName")
-  @Mapping(target = "avatarUrl", source = "avatar.avatarUrl")
+  @Mapping(target = "avatarUrl", source = "avatarUrl")
   @Mapping(target = "role", ignore = true)
   SupervisorResponse toSupervisorResponse(UserModel model);
 
@@ -148,7 +133,7 @@ public interface UserApiMapper {
 
   @Mapping(target = "no", ignore = true)
   @Mapping(target = "userId", source = "userId")
-  @Mapping(target = "avatarUrl", source = "avatar.avatarUrl")
+  @Mapping(target = "avatarUrl", source = "avatarUrl")
   @Mapping(target = "fullName", source = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
   @Mapping(target = "companyEmail", source = "companyEmail")

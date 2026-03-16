@@ -112,8 +112,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                         FROM Ticket t
                         JOIN FETCH t.ticketType tt
                         JOIN FETCH t.user u
-                        LEFT JOIN FETCH u.avatar
-                        LEFT JOIN FETCH u.cv
                         WHERE t.id = :ticketId
                           AND tt.typeName = 'REGISTRATION'
                     """)
@@ -129,7 +127,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   @Query(
       """
       SELECT COUNT(t) > 0 FROM Ticket t
-      WHERE t.user.userId = :userId
+      WHERE t.user.id = :userId
       AND :date BETWEEN t.startAt AND t.endAt
       AND t.status = 'APPROVED'
       """)

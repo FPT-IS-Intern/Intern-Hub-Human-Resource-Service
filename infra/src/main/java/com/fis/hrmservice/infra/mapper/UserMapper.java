@@ -1,12 +1,8 @@
 package com.fis.hrmservice.infra.mapper;
 
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
-import com.fis.hrmservice.domain.model.user.AvatarModel;
-import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.infra.persistence.entity.Avatar;
-import com.fis.hrmservice.infra.persistence.entity.Cv;
 import com.fis.hrmservice.infra.persistence.entity.Department;
 import com.fis.hrmservice.infra.persistence.entity.Position;
 import com.fis.hrmservice.infra.persistence.entity.User;
@@ -26,16 +22,12 @@ public interface UserMapper {
   @Mapping(target = "userId", source = "id")
   @Mapping(target = "mentor", qualifiedByName = "mentorToModel")
   @Mapping(target = "position", qualifiedByName = "positionToModel")
-  @Mapping(target = "avatar", qualifiedByName = "avatarToModel")
-  @Mapping(target = "cv", qualifiedByName = "cvToModel")
   @Mapping(target = "department", source = "department", qualifiedByName = "departmentToString")
   UserModel toModel(User entity);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "mentor", qualifiedByName = "mentorToEntity")
   @Mapping(target = "position", source = "position", qualifiedByName = "positionToEntity")
-  @Mapping(target = "avatar", qualifiedByName = "avatarToEntity")
-  @Mapping(target = "cv", qualifiedByName = "cvToEntity")
   @Mapping(target = "department", ignore = true)
   @Mapping(target = "isFaceRegistry", ignore = true)
   @Mapping(target = "isLearner", ignore = true)
@@ -49,8 +41,6 @@ public interface UserMapper {
   @Mapping(target = "id", source = "userId")
   @Mapping(target = "mentor", qualifiedByName = "mentorToEntity")
   @Mapping(target = "position", source = "position", qualifiedByName = "positionToEntity")
-  @Mapping(target = "avatar", qualifiedByName = "avatarToEntity")
-  @Mapping(target = "cv", qualifiedByName = "cvToEntity")
   @Mapping(target = "department", ignore = true)
   @Mapping(target = "isFaceRegistry", ignore = true)
   @Mapping(target = "isLearner", ignore = true)
@@ -104,50 +94,6 @@ public interface UserMapper {
   default LocalDate epochMillisToLocalDate(Long value) {
     if (value == null) return null;
     return Instant.ofEpochMilli(value).atZone(CoreConstant.VIETNAM_ZONE).toLocalDate();
-  }
-
-  @Named("avatarToModel")
-  default AvatarModel avatarToModel(Avatar entity) {
-    if (entity == null) return null;
-    return AvatarModel.builder()
-        .avatarId(entity.getId())
-        .avatarUrl(entity.getAvatarUrl())
-        .fileType(entity.getFileType())
-        .fileSize(entity.getFileSize() != null ? entity.getFileSize() : 0)
-        .build();
-  }
-
-  @Named("cvToModel")
-  default CvModel cvToModel(Cv entity) {
-    if (entity == null) return null;
-    return CvModel.builder()
-        .cvId(entity.getId())
-        .cvUrl(entity.getCvUrl())
-        .fileType(entity.getFileType())
-        .fileSize(entity.getFileSize() != null ? entity.getFileSize() : 0)
-        .build();
-  }
-
-  @Named("avatarToEntity")
-  default Avatar avatarToEntity(AvatarModel model) {
-    if (model == null) return null;
-    Avatar avatar = new Avatar();
-    avatar.setId(model.getAvatarId());
-    avatar.setAvatarUrl(model.getAvatarUrl());
-    avatar.setFileType(model.getFileType());
-    avatar.setFileSize(model.getFileSize());
-    return avatar;
-  }
-
-  @Named("cvToEntity")
-  default Cv cvToEntity(CvModel model) {
-    if (model == null) return null;
-    Cv cv = new Cv();
-    cv.setId(model.getCvId());
-    cv.setCvUrl(model.getCvUrl());
-    cv.setFileType(model.getFileType());
-    cv.setFileSize(model.getFileSize());
-    return cv;
   }
 
   @Named("departmentToString")

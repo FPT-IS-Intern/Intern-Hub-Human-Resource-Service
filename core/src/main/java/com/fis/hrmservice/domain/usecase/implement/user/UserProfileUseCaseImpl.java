@@ -1,8 +1,6 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
 import com.fis.hrmservice.domain.model.constant.UserStatus;
-import com.fis.hrmservice.domain.model.user.AvatarModel;
-import com.fis.hrmservice.domain.model.user.CvModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.user.*;
@@ -29,8 +27,6 @@ public class UserProfileUseCaseImpl {
   UserRepositoryPort userRepositoryPort;
   UserValidationService userValidationService;
   FileStoragePort fileStoragePort;
-  AvatarRepositoryPort avatarRepositoryPort;
-  CvRepositoryPort cvRepositoryPort;
   PositionRepositoryPort positionRepositoryPort;
   CreateAuthIdentityPort createAuthIdentityPort;
 
@@ -126,19 +122,8 @@ public class UserProfileUseCaseImpl {
               "application/(pdf|vnd\\.openxmlformats-officedocument\\.wordprocessingml\\.document)"
       );
 
-      CvModel cv = Optional.ofNullable(
-              cvRepositoryPort.findByUserId(user.getUserId())
-      ).orElseGet(() -> {
-        CvModel newCv = new CvModel();
-        newCv.setUser(user);
-        return newCv;
-      });
-
-      cv.setCvUrl(cvObjectKey);
-      cv.setFileSize(command.getCvFile().getSize());
-      cv.setFileType(command.getCvFile().getContentType());
-
-      cvRepositoryPort.save(cv); // Chỉ save cv, không set lại vào user
+      user.setCvUrl(cvObjectKey);
+      userFieldChanged = true;
     }
 
     // ===== Upload Avatar =====
@@ -151,19 +136,8 @@ public class UserProfileUseCaseImpl {
               "image/(png|jpeg|jpg|webp)"
       );
 
-      AvatarModel avatar = Optional.ofNullable(
-              avatarRepositoryPort.getAvatarByUserId(user.getUserId())
-      ).orElseGet(() -> {
-        AvatarModel newAvatar = new AvatarModel();
-        newAvatar.setUser(user);
-        return newAvatar;
-      });
-
-      avatar.setAvatarUrl(avatarObjectKey);
-      avatar.setFileSize(command.getAvatarFile().getSize());
-      avatar.setFileType(command.getAvatarFile().getContentType());
-
-      avatarRepositoryPort.save(avatar); // Chỉ save avatar, không set lại vào user
+      user.setAvatarUrl(avatarObjectKey);
+      userFieldChanged = true;
     }
 
     if (userFieldChanged) {

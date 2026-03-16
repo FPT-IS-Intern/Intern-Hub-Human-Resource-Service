@@ -64,12 +64,6 @@ public class User extends AuditEntity {
   @Column(name = "sys_status", length = 20)
   private UserStatus sysStatus;
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
-  private Avatar avatar;
-
-  @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
-  private Cv cv;
-
   @ColumnDefault("false")
   @Column(name = "is_face_registry")
   private Boolean isFaceRegistry;
@@ -81,5 +75,11 @@ public class User extends AuditEntity {
   @Size(max = 100)
   @Column(name = "username", length = 100)
   private String username;
+
+  @Column(name = "avatar_url", length = Integer.MAX_VALUE)
+  private String avatarUrl;
+
+  @Column(name = "cv_url", length = Integer.MAX_VALUE)
+  private String cvUrl;
 
 }

@@ -30,11 +30,11 @@ public class UserModel extends BaseDomain {
   UserModel mentor;
   String department;
 
-  AvatarModel avatar;
-  CvModel cv;
-
   Boolean isFaceRegistry;
 
   String roleId;
   String role;
+
+  String avatarUrl;
+  String cvUrl;
 }
