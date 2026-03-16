@@ -28,4 +28,7 @@ public interface AttendanceUseCase {
   Long getAbsentPercentage(LocalDate fromDate, LocalDate toDate);
   Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
   Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
+
+  Integer totalWorkDate(Long userId);
+  Integer totalLateTime(Long userId);
 }

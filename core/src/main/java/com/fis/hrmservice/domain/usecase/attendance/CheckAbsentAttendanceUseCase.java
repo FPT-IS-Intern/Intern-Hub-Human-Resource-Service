@@ -32,11 +32,10 @@ public class CheckAbsentAttendanceUseCase {
     public void execute() {
 
         LocalDate today = LocalDate.now(VIETNAM_ZONE);
-        LocalDate yesterday = today.minusDays(1);
 
-        // Bỏ qua nếu ngày hôm qua là Thứ 7 hoặc Chủ Nhật
-        if (yesterday.getDayOfWeek() == DayOfWeek.SATURDAY || yesterday.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            log.info("Skipping absent attendance check for {} (Weekend)", yesterday);
+        // Bỏ qua nếu hôm nay là Thứ 7 hoặc Chủ Nhật
+        if (today.getDayOfWeek() == DayOfWeek.SATURDAY || today.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            log.info("Skipping absent attendance check for {} (Weekend)", today);
             return;
         }
 
@@ -51,19 +50,10 @@ public class CheckAbsentAttendanceUseCase {
             try {
                 // 1. Kiểm tra xem đã có log attendance chưa
                 boolean checked = attendanceLogRepositoryPort
-                        .existsByUserIdAndWorkDate(user.getUserId(), yesterday);
+                        .existsByUserIdAndWorkDate(user.getUserId(), today);
 
                 if (checked) {
                     skippedCount++;
-                    continue;
-                }
-
-                // 2. Kiểm tra xem có đơn xin nghỉ (Leave/Remote/...) đã được duyệt không
-                boolean hasApprovedTicket = ticketRepositoryPort
-                        .existsApprovedTicketByUserIdAndDate(user.getUserId(), yesterday);
-
-                if (hasApprovedTicket) {
-                    onLeaveCount++;
                     continue;
                 }
 
@@ -71,7 +61,7 @@ public class CheckAbsentAttendanceUseCase {
                 AttendanceLogModel attendanceLog = AttendanceLogModel.builder()
                         .attendanceId(snowflake.next())
                         .user(user)
-                        .workDate(yesterday)
+                        .workDate(today)
                         .attendanceStatus(AttendanceStatus.ABSENT)
                         .build();
 
@@ -85,6 +75,6 @@ public class CheckAbsentAttendanceUseCase {
         }
 
         log.info("Absent attendance check completed for date {}: total={}, marked_absent={}, on_leave={}, already_checked_in={}, errors={}",
-                yesterday, users.size(), absentCount, onLeaveCount, skippedCount, errorCount);
+                today, users.size(), absentCount, onLeaveCount, skippedCount, errorCount);
     }
 }

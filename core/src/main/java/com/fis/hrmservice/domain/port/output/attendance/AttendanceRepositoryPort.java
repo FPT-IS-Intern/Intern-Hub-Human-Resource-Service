@@ -49,5 +49,8 @@ public interface AttendanceRepositoryPort {
   Long getNotAttendancePercent(LocalDate fromDate, LocalDate toDate);
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
+
+  Integer totalWorkDate(Long userId);
+  Integer totalLateTime(Long userId);
 }
 

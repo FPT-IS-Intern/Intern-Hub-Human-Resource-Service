@@ -350,6 +350,16 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         return attendanceRepository.getCheckInLateTimePercent(fromDate, toDate);
     }
 
+    @Override
+    public Integer totalWorkDate(Long userId) {
+        return attendanceRepository.totalWorkDate(userId);
+    }
+
+    @Override
+    public Integer totalLateTime(Long userId) {
+        return attendanceRepository.totalLateTime(userId);
+    }
+
     // ==================== Helper Methods ====================
 
     private UUID validateCompanyAccess(

@@ -176,4 +176,24 @@ public class AttendanceController {
             .build();
     return ResponseApi.ok(attendanceStatisticGraph);
   }
+
+  @GetMapping("/attendance-section")
+  public ResponseApi<SectionCardResponse> getAttendanceSection() {
+    return ResponseApi.ok(SectionCardResponse.builder()
+                    .absentWithLicense(0)
+                    .absentWithoutLicense(0)
+                    .totalWorkDate(attendanceUseCase.totalWorkDate(UserContext.requiredUserId()))
+                    .totalLateDate(attendanceUseCase.totalLateTime(UserContext.requiredUserId()))
+            .build());
+  }
+
+  @GetMapping("/attendance-section/{userId}")
+  public ResponseApi<SectionCardResponse> getAttendanceSection(@PathVariable Long userId) {
+    return ResponseApi.ok(SectionCardResponse.builder()
+            .absentWithLicense(0)
+            .absentWithoutLicense(0)
+            .totalWorkDate(attendanceUseCase.totalWorkDate(userId))
+            .totalLateDate(attendanceUseCase.totalLateTime(userId))
+            .build());
+  }
 }

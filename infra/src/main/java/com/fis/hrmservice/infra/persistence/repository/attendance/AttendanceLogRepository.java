@@ -22,7 +22,14 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
 
   Optional<AttendanceLog> findByUser_IdAndWorkDate(Long userId, LocalDate workDate);
 
-  boolean existsByUser_IdAndWorkDate(Long userId, LocalDate workDate);
+  @Query("""
+       SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
+       FROM AttendanceLog a
+       WHERE a.user.id = :userId
+       AND a.workDate = :workDate
+       """)
+  boolean existsByUserIdAndWorkDate(@Param("userId") Long userId,
+                                    @Param("workDate") LocalDate workDate);
 
   /**
    * Pessimistic write lock — used when checking-in after ABSENT mark to prevent race conditions.
@@ -127,6 +134,22 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
           """, nativeQuery = true)
   Long getOnTimePercentage(@Param("fromDate") LocalDate fromDate,
                            @Param("toDate") LocalDate toDate);
+
+  @Query(value = """
+      SELECT COUNT(*)
+      FROM attendance_logs a
+      WHERE (a.attendance_status LIKE 'CHECK_IN%'
+         OR a.attendance_status LIKE 'CHECK_OUT%')
+      AND a.user_id = :userId
+      """,
+          nativeQuery = true)
+  int totalWorkDate(@Param("userId") Long userId);
+
+  @Query("""
+      SELECT COUNT(a)
+      FROM AttendanceLog a
+      WHERE a.attendanceStatus = 'CHECK_IN_LATE'
+      AND a.user.id = :userId
+      """)
+  int totalLateTime(@Param("userId") Long userId);
 }
-
-

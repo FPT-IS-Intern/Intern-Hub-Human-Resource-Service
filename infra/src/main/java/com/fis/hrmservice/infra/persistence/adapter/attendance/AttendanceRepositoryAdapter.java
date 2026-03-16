@@ -135,8 +135,18 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
   }
 
   @Override
+  public Integer totalWorkDate(Long userId) {
+    return attendanceLogRepository.totalWorkDate(userId);
+  }
+
+  @Override
+  public Integer totalLateTime(Long userId) {
+    return attendanceLogRepository.totalLateTime(userId);
+  }
+
+  @Override
   public boolean existsByUserIdAndWorkDate(Long userId, LocalDate workDate) {
-    return attendanceLogRepository.existsByUser_IdAndWorkDate(userId, workDate);
+    return attendanceLogRepository.existsByUserIdAndWorkDate(userId, workDate);
   }
 
   @Override
