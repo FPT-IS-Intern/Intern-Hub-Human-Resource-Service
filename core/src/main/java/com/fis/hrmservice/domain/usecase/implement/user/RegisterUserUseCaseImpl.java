@@ -77,7 +77,7 @@ public class RegisterUserUseCaseImpl {
             );
 
             Map<String, Object> userInfoTemp =
-                    buildUserInfoTemp(command, position, stagedUserId, avatarObjectKey, cvObjectKey);
+                    buildUserInfoTemp(command, position, stagedUserId, "https://s3.vn-hcm-1.vietnix.cloud/bravos/" + avatarObjectKey, "https://s3.vn-hcm-1.vietnix.cloud/bravos/" + cvObjectKey);
 
             //Create registration ticket with staged profile JSON
             ticketRepositoryPort.save(
