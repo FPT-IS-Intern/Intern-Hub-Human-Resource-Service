@@ -1,5 +1,6 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
+import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
@@ -122,7 +123,7 @@ public class UserProfileUseCaseImpl {
               "application/(pdf|vnd\\.openxmlformats-officedocument\\.wordprocessingml\\.document)"
       );
 
-      user.setCvUrl(cvObjectKey);
+      user.setCvUrl(CoreConstant.S3_PREFIX_URL + cvObjectKey);
       userFieldChanged = true;
     }
 
@@ -136,7 +137,7 @@ public class UserProfileUseCaseImpl {
               "image/(png|jpeg|jpg|webp)"
       );
 
-      user.setAvatarUrl(avatarObjectKey);
+      user.setAvatarUrl(CoreConstant.S3_PREFIX_URL + avatarObjectKey);
       userFieldChanged = true;
     }
 

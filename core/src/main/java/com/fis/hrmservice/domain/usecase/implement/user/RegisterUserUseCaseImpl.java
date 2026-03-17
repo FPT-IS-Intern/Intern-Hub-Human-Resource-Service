@@ -1,5 +1,6 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
+import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.constant.TicketType;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
@@ -77,7 +78,7 @@ public class RegisterUserUseCaseImpl {
             );
 
             Map<String, Object> userInfoTemp =
-                    buildUserInfoTemp(command, position, stagedUserId, "https://s3.vn-hcm-1.vietnix.cloud/bravos/" + avatarObjectKey, "https://s3.vn-hcm-1.vietnix.cloud/bravos/" + cvObjectKey);
+                    buildUserInfoTemp(command, position, stagedUserId, CoreConstant.S3_PREFIX_URL + avatarObjectKey, CoreConstant.S3_PREFIX_URL + cvObjectKey);
 
             //Create registration ticket with staged profile JSON
             ticketRepositoryPort.save(
@@ -93,7 +94,7 @@ public class RegisterUserUseCaseImpl {
                             .sysStatus(TicketStatus.PENDING)
                             .build());
 
-            return buildStagedUserModel(command, position, stagedUserId, avatarObjectKey, cvObjectKey);
+            return buildStagedUserModel(command, position, stagedUserId, CoreConstant.S3_PREFIX_URL + avatarObjectKey, CoreConstant.S3_PREFIX_URL + cvObjectKey);
 
         } catch (Exception e) {
             log.error("Register process failed. Transaction rollback triggered.", e);
