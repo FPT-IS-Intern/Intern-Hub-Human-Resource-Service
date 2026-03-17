@@ -1,7 +1,6 @@
 package com.fis.hrmservice.infra.persistence.repository.ticket;
 
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
-import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
 import com.fis.hrmservice.infra.persistence.entity.Ticket;
 
 import java.time.LocalDate;
@@ -18,31 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-  @Query(
-      """
-                        SELECT t FROM Ticket t
-                        WHERE
-                            (
-                                :nameOrEmail IS NULL
-                                OR LOWER(t.user.fullName) LIKE LOWER(CONCAT('%', :nameOrEmail, '%'))
-                                OR LOWER(t.user.companyEmail) LIKE LOWER(CONCAT('%', :nameOrEmail, '%'))
-                            )
-                        AND
-                            (
-                                :ticketType IS NULL
-                                OR t.ticketType.typeName = :ticketType
-                            )
-                        AND
-                            (
-                                :ticketStatus IS NULL
-                                OR t.status = :ticketStatus
-                            )
-                    """)
-  List<Ticket> filterTicket(
-      @Param("nameOrEmail") String nameOrEmail,
-      @Param("ticketType") String ticketType,
-      @Param("ticketStatus") String ticketStatus);
-
   @Query("SELECT COUNT(t) FROM Ticket t WHERE t.ticketType.typeName = 'REGISTRATION'")
   int allRegistrationCount();
 
@@ -58,49 +32,69 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       "SELECT COUNT(t) FROM Ticket t WHERE t.status = 'APPROVED' AND t.ticketType.typeName = 'REGISTRATION'")
   int allApprovedRegistrationCount();
 
-  @Modifying
   @Query(
-      """
-                        UPDATE Ticket t
-                        SET t.status = 'APPROVED'
-                        WHERE t.id IN :ticketIds
-                    """)
-  int multipleApproval(@Param("ticketIds") List<Long> ticketIds);
-
-  @Query(
-      """
-                        SELECT t
-                        FROM Ticket t
-                        JOIN t.user u
-                        JOIN t.ticketType tt
-                        WHERE (
-                                :keyword IS NULL
-                                OR LOWER(TRIM(u.companyEmail)) LIKE LOWER(CONCAT('%', TRIM(:keyword), '%'))
-                                OR LOWER(TRIM(u.fullName)) LIKE LOWER(CONCAT('%', TRIM(:keyword), '%'))
-                              )
-                          AND (:status IS NULL OR t.status = :status)
-                          AND tt.typeName = 'REGISTRATION'
-                    """)
+      value = """
+          SELECT t.*
+          FROM tickets t
+          JOIN ticket_types tt ON tt.ticket_type_id = t.ticket_type_id
+          WHERE tt.type_name = 'REGISTRATION'
+            AND (
+              CAST(:keyword AS text) IS NULL
+              OR CAST(:keyword AS text) = ''
+              OR LOWER(COALESCE(t.user_info_temp, '{}'::jsonb) ->> 'companyEmail') LIKE LOWER('%' || CAST(:keyword AS text) || '%')
+              OR LOWER(COALESCE(t.user_info_temp, '{}'::jsonb) ->> 'fullName') LIKE LOWER('%' || CAST(:keyword AS text) || '%')
+            )
+            AND (
+              CAST(:status AS text) IS NULL
+              OR CAST(:status AS text) = ''
+              OR t.status = CAST(:status AS text)
+            )
+          ORDER BY t.start_at DESC
+          """,
+      nativeQuery = true)
   List<Ticket> filterTickets(@Param("keyword") String keyword, @Param("status") String status);
 
   @Query(
-      """
-                        SELECT t
-                        FROM Ticket t
-                        JOIN t.user u
-                        JOIN t.ticketType tt
-                        WHERE (
-                                :#{#command.keyword} IS NULL OR :#{#command.keyword} = ''
-                                OR LOWER(TRIM(u.companyEmail)) LIKE LOWER(CONCAT('%', TRIM(:#{#command.keyword}), '%'))
-                                OR LOWER(TRIM(u.fullName)) LIKE LOWER(CONCAT('%', TRIM(:#{#command.keyword}), '%'))
-                              )
-                          AND (:#{#command.ticketStatus} IS NULL OR t.status = :#{#command.ticketStatus})
-
-                          AND tt.typeName = 'REGISTRATION'
-                        ORDER BY t.startAt DESC
-                    """)
+      value = """
+          SELECT t.*
+          FROM tickets t
+          JOIN ticket_types tt ON tt.ticket_type_id = t.ticket_type_id
+          WHERE tt.type_name = 'REGISTRATION'
+            AND (
+              CAST(:keyword AS text) IS NULL
+              OR CAST(:keyword AS text) = ''
+              OR LOWER(COALESCE(t.user_info_temp, '{}'::jsonb) ->> 'companyEmail') LIKE LOWER('%' || CAST(:keyword AS text) || '%')
+              OR LOWER(COALESCE(t.user_info_temp, '{}'::jsonb) ->> 'fullName') LIKE LOWER('%' || CAST(:keyword AS text) || '%')
+            )
+            AND (
+              CAST(:ticketStatus AS text) IS NULL
+              OR CAST(:ticketStatus AS text) = ''
+              OR t.status = CAST(:ticketStatus AS text)
+            )
+          ORDER BY t.start_at DESC
+          """,
+      countQuery = """
+          SELECT COUNT(*)
+          FROM tickets t
+          JOIN ticket_types tt ON tt.ticket_type_id = t.ticket_type_id
+          WHERE tt.type_name = 'REGISTRATION'
+            AND (
+              CAST(:keyword AS text) IS NULL
+              OR CAST(:keyword AS text) = ''
+              OR LOWER(COALESCE(t.user_info_temp, '{}'::jsonb) ->> 'companyEmail') LIKE LOWER('%' || CAST(:keyword AS text) || '%')
+              OR LOWER(COALESCE(t.user_info_temp, '{}'::jsonb) ->> 'fullName') LIKE LOWER('%' || CAST(:keyword AS text) || '%')
+            )
+            AND (
+              CAST(:ticketStatus AS text) IS NULL
+              OR CAST(:ticketStatus AS text) = ''
+              OR t.status = CAST(:ticketStatus AS text)
+            )
+          """,
+      nativeQuery = true)
   Page<Ticket> filterRegistrationTicketPaged(
-      @Param("command") FilterRegistrationTicketCommand command, Pageable pageable);
+      @Param("keyword") String keyword,
+      @Param("ticketStatus") String ticketStatus,
+      Pageable pageable);
 
   @Query(
       "SELECT t from Ticket t WHERE t.ticketType.typeName = 'REGISTRATION' ORDER BY t.startAt DESC limit 3")
@@ -111,7 +105,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                         SELECT t
                         FROM Ticket t
                         JOIN FETCH t.ticketType tt
-                        JOIN FETCH t.user u
+                        LEFT JOIN FETCH t.user u
                         WHERE t.id = :ticketId
                           AND tt.typeName = 'REGISTRATION'
                     """)

@@ -14,6 +14,7 @@ public interface TicketMapper {
 
   @Mapping(source = "id", target = "ticketId")
   @Mapping(source = "user", target = "requester")
+  @Mapping(source = "userInfoTemp", target = "userInfoTemp")
   @Mapping(source = "status", target = "sysStatus")
   TicketModel toModel(Ticket ticket);
 
@@ -21,6 +22,7 @@ public interface TicketMapper {
 
   @Mapping(source = "ticketId", target = "id")
   @Mapping(source = "requester", target = "user")
+  @Mapping(source = "userInfoTemp", target = "userInfoTemp")
   @Mapping(source = "sysStatus", target = "status")
   @Mapping(source = "ticketType", target = "ticketType") // 🔥 THIẾU DÒNG NÀY
   @Mapping(target = "createdAt", ignore = true)

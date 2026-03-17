@@ -13,7 +13,11 @@ import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.utils.Snowflake;
+
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,160 +31,186 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RegisterUserUseCaseImpl {
 
-  UserRepositoryPort userRepositoryPort;
-  PositionRepositoryPort positionRepositoryPort;
-  Snowflake snowflake;
-  UserValidationService validationService;
-  TicketRepositoryPort ticketRepositoryPort;
-  TicketTypeRepositoryPort ticketTypeRepositoryPort;
-  FileStoragePort fileStoragePort;
+    UserRepositoryPort userRepositoryPort;
+    PositionRepositoryPort positionRepositoryPort;
+    Snowflake snowflake;
+    UserValidationService validationService;
+    TicketRepositoryPort ticketRepositoryPort;
+    TicketTypeRepositoryPort ticketTypeRepositoryPort;
+    FileStoragePort fileStoragePort;
 
-  @Transactional(rollbackFor = Exception.class)
-  public UserModel registerUser(RegisterUserCommand command) {
+    @Transactional(rollbackFor = Exception.class)
+    public UserModel registerUser(RegisterUserCommand command) {
 
-    // 1️⃣ Validate business rule
-    validationService.validateRegistration(command);
-    checkForDuplicates(command);
-    validateFiles(command);
-    isOver18(command.getBirthDate());
+        //Validate business rule
+        validationService.validateRegistration(command);
+        checkForDuplicates(command);
+        validateFiles(command);
+        isOver18(command.getBirthDate());
 
-    // 2️⃣ Get position
-    PositionModel position =
-        positionRepositoryPort
-            .findByCode(command.getPositionCode())
-            .orElseThrow(() -> new ConflictDataException("Position không tồn tại"));
+        //Get position
+        PositionModel position =
+                positionRepositoryPort
+                        .findByCode(command.getPositionCode())
+                        .orElseThrow(() -> new ConflictDataException("Position không tồn tại"));
 
-    // 3️⃣ Build user
-    UserModel user = buildUserModel(command, position);
+        Long stagedUserId = snowflake.next();
 
-    // 4️⃣ create user
-    UserModel savedUser = userRepositoryPort.create(user);
-    if (savedUser == null) {
-      throw new ConflictDataException("Cannot save user");
+        try {
+
+//            //Upload Avatar via DMS
+//            String avatarObjectKey =
+//                    fileStoragePort.uploadFile(
+//                            command.getAvatar(),
+//                            "avatars/" + command.getAvatar().getOriginalFilename(),
+//                            stagedUserId,
+//                            20971520L,
+//                            "image/(png|jpeg|jpg)");
+//
+//            //Upload CV via DMS
+//            String cvUrl = fileStoragePort.uploadFile(
+//                    command.getCv(),
+//                    "cvs/" + command.getCv().getOriginalFilename(),
+//                    stagedUserId,
+//                    20971520L,
+//                    "application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+//            );
+
+            Map<String, Object> userInfoTemp =
+                    builduserInfoTemp(command, position, stagedUserId, null, null);
+
+            //Create registration ticket with staged profile JSON
+            ticketRepositoryPort.save(
+                    TicketModel.builder()
+                            .ticketId(snowflake.next())
+                            .requester(null)
+                            .ticketType(
+                                    ticketTypeRepositoryPort.findTicketTypeByCode(
+                                            String.valueOf(TicketType.REGISTRATION)))
+                            .startAt(LocalDate.now())
+                            .endAt(null)
+                            .reason("Đăng ký tài khoản")
+                            .userInfoTemp(userInfoTemp)
+                            .sysStatus(TicketStatus.PENDING)
+                            .build());
+
+            return buildStagedUserModel(command, position, stagedUserId, null, null);
+
+        } catch (Exception e) {
+            log.error("Register process failed. Transaction rollback triggered.", e);
+            throw new ConflictDataException("không thể up avatar và cv lên DMS: " + e.getMessage());
+        }
     }
 
-    try {
+    private void validateFiles(RegisterUserCommand command) {
 
-      // 5️⃣ Upload Avatar via DMS
-      String avatarObjectKey =
-          fileStoragePort.uploadFile(
-              command.getAvatar(),
-              "avatars/" + command.getAvatar().getOriginalFilename(),
-                  savedUser.getUserId(),
-                  20971520L,
-                  "image/(png|jpeg|jpg)");
+        // ===== AVATAR =====
+        if (command.getAvatar() == null || command.getAvatar().isEmpty()) {
+            throw new ConflictDataException("Avatar is required");
+        }
 
-      // 6️⃣ Upload CV via DMS
-      String cvUrl = fileStoragePort.uploadFile(
-              command.getCv(),
-              "cvs/" + command.getCv().getOriginalFilename(),
-              savedUser.getUserId(),
-              20971520L,
-              "application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      );
+        // Check size > 2MB
+        if (command.getAvatar().getSize() > 2 * 1024 * 1024) {
+            throw new ConflictDataException("Avatar vượt quá 2MB");
+        }
 
-      savedUser.setAvatarUrl(avatarObjectKey);
-      savedUser.setCvUrl(cvUrl);
+        String avatarType = command.getAvatar().getContentType();
+        if (avatarType == null || !avatarType.matches("image/(png|jpeg|webp)")) {
+            throw new ConflictDataException("Unsupported avatar type");
+        }
 
-      userRepositoryPort.save(savedUser);
+        // ===== CV =====
+        if (command.getCv() == null || command.getCv().isEmpty()) {
+            throw new ConflictDataException("CV is required");
+        }
 
-    } catch (Exception e) {
-      log.error("Register process failed. Transaction rollback triggered.", e);
-      throw new ConflictDataException("không thể up avatar và cv lên DMS: " + e.getMessage());
-    }
+        // Check size > 10MB
+        if (command.getCv().getSize() > 10 * 1024 * 1024) {
+            throw new ConflictDataException("CV vượt quá 10MB");
+        }
 
-    // 7️⃣ Create registration ticket
-    ticketRepositoryPort.save(
-        TicketModel.builder()
-            .ticketId(snowflake.next())
-            .requester(savedUser)
-            .ticketType(
-                ticketTypeRepositoryPort.findTicketTypeByCode(
-                    String.valueOf(TicketType.REGISTRATION)))
-            .startAt(LocalDate.now())
-            .endAt(null)
-            .reason("Đăng ký tài khoản")
-            .sysStatus(TicketStatus.PENDING)
-            .build());
-
-    return savedUser;
-  }
-
-  private void validateFiles(RegisterUserCommand command) {
-
-    // ===== AVATAR =====
-    if (command.getAvatar() == null || command.getAvatar().isEmpty()) {
-      throw new ConflictDataException("Avatar is required");
-    }
-
-    // Check size > 2MB
-    if (command.getAvatar().getSize() > 2 * 1024 * 1024) {
-      throw new ConflictDataException("Avatar vượt quá 2MB");
-    }
-
-    String avatarType = command.getAvatar().getContentType();
-    if (avatarType == null || !avatarType.matches("image/(png|jpeg|webp)")) {
-      throw new ConflictDataException("Unsupported avatar type");
-    }
-
-    // ===== CV =====
-    if (command.getCv() == null || command.getCv().isEmpty()) {
-      throw new ConflictDataException("CV is required");
-    }
-
-    // Check size > 10MB
-    if (command.getCv().getSize() > 10 * 1024 * 1024) {
-      throw new ConflictDataException("CV vượt quá 10MB");
-    }
-
-    String cvType = command.getCv().getContentType();
-    if (cvType == null
-        || !(cvType.equals("application/pdf")
-            || cvType.equals(
+        String cvType = command.getCv().getContentType();
+        if (cvType == null
+                || !(cvType.equals("application/pdf")
+                || cvType.equals(
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))) {
-      throw new ConflictDataException("CV must be PDF or DOCX");
-    }
-  }
-
-  private void checkForDuplicates(RegisterUserCommand command) {
-
-    if (userRepositoryPort.existsByEmail(command.getEmail())) {
-      throw new ConflictDataException("Tài khoản đã được đăng ký");
+            throw new ConflictDataException("CV must be PDF or DOCX");
+        }
     }
 
-    if (userRepositoryPort.existsByIdNumber(command.getIdNumber())) {
-      throw new ConflictDataException("Số CCCD đã được dùng để đăng ký");
-    }
-  }
+    private void checkForDuplicates(RegisterUserCommand command) {
 
-  private UserModel buildUserModel(RegisterUserCommand command, PositionModel position) {
+        if (userRepositoryPort.existsByEmail(command.getEmail())) {
+            throw new ConflictDataException("Tài khoản đã được đăng ký");
+        }
 
-    UserModel.UserModelBuilder builder =
-        UserModel.builder()
-            .userId(snowflake.next())
-            .position(position)
-            .fullName(command.getFullName())
-            .idNumber(command.getIdNumber())
-            .dateOfBirth(command.getBirthDate())
-            .companyEmail(command.getEmail().toLowerCase())
-            .phoneNumber(command.getPhoneNumber())
-            .address(command.getAddress())
-            .sysStatus(UserStatus.PENDING);
-
-    if (command.isInternRegistration()) {
-      builder
-          .internshipStartDate(command.getInternshipStartDate())
-          .internshipEndDate(command.getInternshipEndDate());
+        if (userRepositoryPort.existsByIdNumber(command.getIdNumber())) {
+            throw new ConflictDataException("Số CCCD đã được dùng để đăng ký");
+        }
     }
 
-    return builder.build();
-  }
+    private UserModel buildStagedUserModel(
+            RegisterUserCommand command,
+            PositionModel position,
+            Long stagedUserId,
+            String avatarUrl,
+            String cvUrl) {
 
-  private void isOver18(LocalDate dateOfBirth) {
-    int thisYear = LocalDate.now().getYear();
+        UserModel.UserModelBuilder builder =
+                UserModel.builder()
+                        .userId(stagedUserId)
+                        .position(position)
+                        .fullName(command.getFullName())
+                        .idNumber(command.getIdNumber())
+                        .dateOfBirth(command.getBirthDate())
+                        .companyEmail(command.getEmail().toLowerCase())
+                        .phoneNumber(command.getPhoneNumber())
+                        .address(command.getAddress())
+                        .avatarUrl(avatarUrl)
+                        .cvUrl(cvUrl)
+                        .sysStatus(UserStatus.PENDING);
 
-    if (thisYear - dateOfBirth.getYear() < 16) {
-      throw new ConflictDataException("Ứng viên phải trên 16 tuổi");
+        if (command.isInternRegistration()) {
+            builder
+                    .internshipStartDate(command.getInternshipStartDate())
+                    .internshipEndDate(command.getInternshipEndDate());
+        }
+
+        return builder.build();
     }
-  }
+
+    private Map<String, Object> builduserInfoTemp(
+            RegisterUserCommand command,
+            PositionModel position,
+            Long stagedUserId,
+            String avatarUrl,
+            String cvUrl) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put("userId", stagedUserId);
+        temp.put("positionId", position.getPositionId());
+        temp.put("positionCode", command.getPositionCode());
+        temp.put("fullName", command.getFullName());
+        temp.put("idNumber", command.getIdNumber());
+        temp.put("dateOfBirth", command.getBirthDate() != null ? command.getBirthDate().toString() : null);
+        temp.put("companyEmail", command.getEmail() != null ? command.getEmail().toLowerCase() : null);
+        temp.put("phoneNumber", command.getPhoneNumber());
+        temp.put("address", command.getAddress());
+        temp.put(
+                "internshipStartDate",
+                command.getInternshipStartDate() != null ? command.getInternshipStartDate().toString() : null);
+        temp.put(
+                "internshipEndDate",
+                command.getInternshipEndDate() != null ? command.getInternshipEndDate().toString() : null);
+        temp.put("avatarUrl", avatarUrl);
+        temp.put("cvUrl", cvUrl);
+        return temp;
+    }
+
+    private void isOver18(LocalDate dateOfBirth) {
+        int thisYear = LocalDate.now().getYear();
+
+        if (thisYear - dateOfBirth.getYear() < 16) {
+            throw new ConflictDataException("Ứng viên phải trên 16 tuổi");
+        }
+    }
 }

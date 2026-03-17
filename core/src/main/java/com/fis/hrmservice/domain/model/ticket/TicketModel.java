@@ -4,6 +4,8 @@ import com.fis.hrmservice.domain.model.common.BaseDomain;
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import java.time.LocalDate;
+import java.util.Map;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,5 +24,6 @@ public class TicketModel extends BaseDomain {
   LocalDate startAt;
   LocalDate endAt;
   String reason;
+  Map<String, Object> userInfoTemp;
   TicketStatus sysStatus;
 }

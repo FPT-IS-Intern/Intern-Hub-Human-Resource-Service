@@ -3,14 +3,12 @@ package com.fis.hrmservice.domain.usecase.implement.ticket;
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.ticket.*;
+import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
-import com.fis.hrmservice.domain.port.output.ticket.TicketApprovalRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
 import com.fis.hrmservice.domain.port.output.ticket.TicketTypeRepositoryPort;
-import com.fis.hrmservice.domain.port.output.ticket.leaveticket.LeaveRequestRepositoryPort;
-import com.fis.hrmservice.domain.port.output.ticket.remoteticket.RemoteRequestRepositoryPort;
-import com.fis.hrmservice.domain.port.output.ticket.remoteticket.WorkLocationRepositoryPort;
+import com.fis.hrmservice.domain.port.output.user.PositionRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.ticket.CreateTicketCommand;
 import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
@@ -19,7 +17,9 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import com.intern.hub.library.common.utils.Snowflake;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +42,8 @@ public class TicketUseCaseImpl {
   TicketTypeRepositoryPort ticketTypeRepositoryPort;
 
   UserRepositoryPort userRepositoryPort;
+
+  PositionRepositoryPort positionRepositoryPort;
 
   CreateAuthIdentityPort createAuthIdentityPort;
 
@@ -111,27 +113,39 @@ public class TicketUseCaseImpl {
 
   @Transactional
   public TicketModel approveRegistrationTicketByTicketId(Long ticketId) {
-
-    // 2. Update ticket status
-    TicketModel ticket =
-            ticketRepositoryPort.updateRegistrationTicketStatus(ticketId, TicketStatus.APPROVED);
+    TicketModel ticket = ticketRepositoryPort.findById(ticketId);
 
     if (ticket == null) {
       throw new NotFoundException("Ticket not found: " + ticketId);
     }
 
-    UserModel user = ticket.getRequester();
-
-    if (user == null) {
-      throw new NotFoundException("Requester user not found for ticket: " + ticketId);
+    if (ticket.getSysStatus() != TicketStatus.PENDING) {
+      throw new ConflictDataException("Only pending registration ticket can be approved");
     }
 
-    if (user.getSysStatus() != UserStatus.APPROVED) {
-      throw new ConflictDataException("User is not in APPROVED state");
+    Map<String, Object> userInfoTemp = ticket.getUserInfoTemp();
+    if (userInfoTemp == null || userInfoTemp.isEmpty()) {
+      throw new ConflictDataException("Missing user_profile_temp in registration ticket: " + ticketId);
     }
 
-    Long userId = user.getUserId();
-    String email = user.getCompanyEmail();
+    UserModel userToCreate = buildApprovedUserFromTemp(userInfoTemp);
+
+    if (userRepositoryPort.existsByEmail(userToCreate.getCompanyEmail())) {
+      throw new ConflictDataException("Tài khoản đã được đăng ký");
+    }
+
+    if (userRepositoryPort.existsByIdNumber(userToCreate.getIdNumber())) {
+      throw new ConflictDataException("Số CCCD đã được dùng để đăng ký");
+    }
+
+    UserModel savedUser = userRepositoryPort.create(userToCreate);
+
+    ticket.setRequester(savedUser);
+    ticket.setSysStatus(TicketStatus.APPROVED);
+    TicketModel approvedTicket = ticketRepositoryPort.save(ticket);
+
+    Long userId = savedUser.getUserId();
+    String email = savedUser.getCompanyEmail();
 
     log.info("Approving registration ticket {} for userId {}", ticketId, userId);
 
@@ -150,7 +164,63 @@ public class TicketUseCaseImpl {
             }
     );
 
-    return ticket;
+    return approvedTicket;
+  }
+
+  private UserModel buildApprovedUserFromTemp(Map<String, Object> userInfoTemp) {
+    String positionCode = readString(userInfoTemp, "positionCode");
+
+    PositionModel position =
+        positionRepositoryPort
+            .findByCode(positionCode)
+            .orElseThrow(() -> new ConflictDataException("Position không tồn tại"));
+
+    return UserModel.builder()
+        .userId(readLong(userInfoTemp, "userId", snowflake.next()))
+        .position(position)
+        .fullName(readString(userInfoTemp, "fullName"))
+        .idNumber(readString(userInfoTemp, "idNumber"))
+        .dateOfBirth(readLocalDate(userInfoTemp, "dateOfBirth"))
+        .companyEmail(readString(userInfoTemp, "companyEmail").toLowerCase())
+        .phoneNumber(readString(userInfoTemp, "phoneNumber"))
+        .address(readString(userInfoTemp, "address"))
+        .internshipStartDate(readLocalDate(userInfoTemp, "internshipStartDate"))
+        .internshipEndDate(readLocalDate(userInfoTemp, "internshipEndDate"))
+        .avatarUrl(readString(userInfoTemp, "avatarUrl"))
+        .cvUrl(readString(userInfoTemp, "cvUrl"))
+        .sysStatus(UserStatus.APPROVED)
+        .build();
+  }
+
+  private String readString(Map<String, Object> source, String key) {
+    Object value = source.get(key);
+    if (value == null) {
+      throw new ConflictDataException("Missing required field in user_profile_temp: " + key);
+    }
+    return String.valueOf(value);
+  }
+
+  private Long readLong(Map<String, Object> source, String key, Long defaultValue) {
+    Object value = source.get(key);
+    if (value == null) {
+      return defaultValue;
+    }
+    if (value instanceof Number number) {
+      return number.longValue();
+    }
+    try {
+      return Long.parseLong(String.valueOf(value));
+    } catch (NumberFormatException ex) {
+      throw new ConflictDataException("Invalid numeric field in user_profile_temp: " + key);
+    }
+  }
+
+  private LocalDate readLocalDate(Map<String, Object> source, String key) {
+    Object value = source.get(key);
+    if (value == null) {
+      return null;
+    }
+    return LocalDate.parse(String.valueOf(value));
   }
 
   public TicketModel rejectRegistrationTicketByTicketId(Long ticketId) {

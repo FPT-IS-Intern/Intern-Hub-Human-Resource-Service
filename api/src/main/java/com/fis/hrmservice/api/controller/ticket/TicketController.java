@@ -37,8 +37,8 @@ public class TicketController {
   TicketApiMapper ticketApiMapper;
 
   @PostMapping("/registration-ticket")
-  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
-  @Authenticated
+//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+//  @Authenticated
   public ResponseApi<PaginatedData<ListRegistrationResponse>> listRegistrationTicket(
       @RequestBody FilterRegistrationRequest request,
       @RequestParam(defaultValue = "0") int page,
@@ -81,8 +81,8 @@ public class TicketController {
   }
 
   @PutMapping("/approve/{ticketId}")
-  @Authenticated
-  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
+//  @Authenticated
+//  @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> approveRegistrationRequest(
           @PathVariable Long ticketId) {
     return ResponseApi.ok(ticketUseCaseImpl.approveRegistrationTicketByTicketId(ticketId));
