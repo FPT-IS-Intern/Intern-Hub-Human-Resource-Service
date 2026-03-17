@@ -14,5 +14,6 @@ public class InternalUserResponse {
   String email;
   String role;
   Long roleId;
+  String positionName;
   Boolean isFaceRegistry;
 }

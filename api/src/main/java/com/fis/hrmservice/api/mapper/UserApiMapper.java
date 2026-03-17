@@ -89,6 +89,7 @@ public interface UserApiMapper {
   UpdateUserProfileCommand toUpdateUserProfileCommand(UpdateProfileRequest request);
 
   @Mapping(target = "email", source = "companyEmail")
+  @Mapping(target = "positionName", source = "position.name")
   InternalUserResponse toInternalUserResponse(UserModel model);
 
   @Mapping(target = "fullName", source = "fullName")
