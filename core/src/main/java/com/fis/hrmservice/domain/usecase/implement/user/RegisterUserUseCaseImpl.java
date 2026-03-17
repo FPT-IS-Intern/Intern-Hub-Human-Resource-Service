@@ -58,26 +58,26 @@ public class RegisterUserUseCaseImpl {
 
         try {
 
-//            //Upload Avatar via DMS
-//            String avatarObjectKey =
-//                    fileStoragePort.uploadFile(
-//                            command.getAvatar(),
-//                            "avatars/" + command.getAvatar().getOriginalFilename(),
-//                            stagedUserId,
-//                            20971520L,
-//                            "image/(png|jpeg|jpg)");
-//
-//            //Upload CV via DMS
-//            String cvUrl = fileStoragePort.uploadFile(
-//                    command.getCv(),
-//                    "cvs/" + command.getCv().getOriginalFilename(),
-//                    stagedUserId,
-//                    20971520L,
-//                    "application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-//            );
+            //Upload Avatar via DMS
+            String avatarObjectKey =
+                    fileStoragePort.uploadFile(
+                            command.getAvatar(),
+                            "avatars/" + command.getAvatar().getOriginalFilename(),
+                            stagedUserId,
+                            20971520L,
+                            "image/(png|jpeg|jpg)");
+
+            //Upload CV via DMS
+            String cvObjectKey = fileStoragePort.uploadFile(
+                    command.getCv(),
+                    "cvs/" + command.getCv().getOriginalFilename(),
+                    stagedUserId,
+                    20971520L,
+                    "application/pdf|application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            );
 
             Map<String, Object> userInfoTemp =
-                    builduserInfoTemp(command, position, stagedUserId, null, null);
+                    buildUserInfoTemp(command, position, stagedUserId, avatarObjectKey, cvObjectKey);
 
             //Create registration ticket with staged profile JSON
             ticketRepositoryPort.save(
@@ -94,7 +94,7 @@ public class RegisterUserUseCaseImpl {
                             .sysStatus(TicketStatus.PENDING)
                             .build());
 
-            return buildStagedUserModel(command, position, stagedUserId, null, null);
+            return buildStagedUserModel(command, position, stagedUserId, avatarObjectKey, cvObjectKey);
 
         } catch (Exception e) {
             log.error("Register process failed. Transaction rollback triggered.", e);
@@ -179,7 +179,7 @@ public class RegisterUserUseCaseImpl {
         return builder.build();
     }
 
-    private Map<String, Object> builduserInfoTemp(
+    private Map<String, Object> buildUserInfoTemp(
             RegisterUserCommand command,
             PositionModel position,
             Long stagedUserId,
