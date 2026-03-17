@@ -1,3 +1,9 @@
-databaseChangeLog: []
-#  - include:
-#      file: db/changelog/001-init-schema-hrm.yaml
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-init-schema-hrm.yaml
+  - include:
+      file: db/changelog/002-alter-date-to-long.yml
+  - include:
+      file: db/changelog/003-attendance-performance-indexes.yaml
+  - include:
+      file: db/changelog/004-add-user-info-temp-to-tickets.yaml

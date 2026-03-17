@@ -5,8 +5,13 @@ import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
@@ -51,4 +56,9 @@ public class Ticket extends AuditEntity {
 
   @Column(name = "updated_by")
   private Long updatedBy;
+
+  @ColumnDefault("'{}'")
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "user_info_temp")
+  private Map<String, Object> userInfoTemp;
 }
