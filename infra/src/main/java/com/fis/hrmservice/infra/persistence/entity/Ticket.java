@@ -22,10 +22,6 @@ public class Ticket extends AuditEntity {
   @Column(name = "ticket_id", nullable = false)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
-
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "ticket_type_id", nullable = false)

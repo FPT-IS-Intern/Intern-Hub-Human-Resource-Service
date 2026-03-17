@@ -49,38 +49,6 @@ public class TicketUseCaseImpl {
 
   Snowflake snowflake;
 
-  /* ================= BASE TICKET ================= */
-
-  private TicketModel createBaseTicket(CreateTicketCommand command, Long userId) {
-
-    UserModel requester =
-        userRepositoryPort
-            .findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found: " + userId));
-
-    DateValidationHelper.validateDate(command.getFromDate(), command.getToDate());
-
-    TicketTypeModel ticketTypeModel =
-        ticketTypeRepositoryPort.findTicketTypeByCode(command.getTicketType());
-
-    if (ticketTypeModel == null) {
-      throw new NotFoundException("Ticket type not found: " + command.getTicketType());
-    }
-
-    TicketModel ticket =
-        TicketModel.builder()
-            .ticketId(snowflake.next())
-            .requester(requester)
-            .ticketType(ticketTypeModel)
-            .startAt(command.getFromDate())
-            .endAt(command.getToDate())
-            .reason(command.getReason())
-            .sysStatus(TicketStatus.PENDING)
-            .build();
-
-    return ticketRepositoryPort.save(ticket);
-  }
-
   public PaginatedData<TicketModel> listRegistrationTicketPaged(
       FilterRegistrationTicketCommand command, int page, int size) {
     return ticketRepositoryPort.filterRegistrationTicketPaged(command, page, size);
@@ -103,9 +71,9 @@ public class TicketUseCaseImpl {
     }
 
     log.info(
-        "Ticket found: id={}, requester={}, type={}",
+        "Ticket found: id={}, fullName={}, type={}",
         ticket.getTicketId(),
-        ticket.getRequester() != null ? ticket.getRequester().getFullName() : "null",
+        ticket.getUserInfoTemp() != null ? ticket.getUserInfoTemp().get("fullName") : "null",
         ticket.getTicketType() != null ? ticket.getTicketType().getTypeName() : "null");
 
     return ticket;
@@ -140,7 +108,6 @@ public class TicketUseCaseImpl {
 
     UserModel savedUser = userRepositoryPort.create(userToCreate);
 
-    ticket.setRequester(savedUser);
     ticket.setSysStatus(TicketStatus.APPROVED);
     TicketModel approvedTicket = ticketRepositoryPort.save(ticket);
 

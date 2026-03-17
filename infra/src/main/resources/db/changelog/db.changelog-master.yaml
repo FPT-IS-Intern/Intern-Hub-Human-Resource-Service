@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/004-add-user-info-temp-to-tickets.yaml
   - include:
       file: db/changelog/005-registration-staging-user-profile-temp.yaml
+  - include:
+      file: db/changelog/006-remove-user-id-from-tickets.yaml

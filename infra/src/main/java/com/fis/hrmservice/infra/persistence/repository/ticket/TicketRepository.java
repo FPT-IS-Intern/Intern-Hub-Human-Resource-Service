@@ -105,7 +105,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                         SELECT t
                         FROM Ticket t
                         JOIN FETCH t.ticketType tt
-                        LEFT JOIN FETCH t.user u
                         WHERE t.id = :ticketId
                           AND tt.typeName = 'REGISTRATION'
                     """)
@@ -119,11 +118,11 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       @Param("ticketStatus") TicketStatus ticketStatus, @Param("ticketId") Long ticketId);
 
   @Query(
-      """
-      SELECT COUNT(t) > 0 FROM Ticket t
-      WHERE t.user.id = :userId
-      AND :date BETWEEN t.startAt AND t.endAt
+      value = """
+      SELECT COUNT(t) > 0 FROM tickets t
+      WHERE (t.user_info_temp ->> 'userId')::bigint = :userId
+      AND :date BETWEEN t.start_at AND t.end_at
       AND t.status = 'APPROVED'
-      """)
+      """, nativeQuery = true)
   boolean existsApprovedTicketByUserIdAndDate(@Param("userId") Long userId, @Param("date") LocalDate date);
 }

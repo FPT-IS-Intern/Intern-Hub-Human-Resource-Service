@@ -64,7 +64,7 @@ public class CheckAbsentAttendanceUseCase {
                         .attendanceId(snowflake.next())
                         .user(user)
                         .workDate(today)
-                        .checkInTime(DateTimeHelper.currentTimeMillis())
+                        .checkInTime(0)
                         .checkOutTime(0)
                         .attendanceStatus(AttendanceStatus.ABSENT)
                         .checkInBranchId(null)

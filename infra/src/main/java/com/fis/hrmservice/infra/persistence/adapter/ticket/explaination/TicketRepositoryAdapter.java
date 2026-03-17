@@ -67,7 +67,6 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
             ticketRepository
                 .findById(ticketId)
                 .orElseThrow(() -> new NotFoundException("Ticket not found with id: " + ticketId)));
-    hydrateRequesterFromTemp(model);
     return model;
   }
 
@@ -76,7 +75,6 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
     System.out.println("CALLING FILTER TICKETS");
     return ticketRepository.filterTickets(keyword, ticketStatus).stream()
         .map(ticketMapper::toModel)
-        .peek(this::hydrateRequesterFromTemp)
         .toList();
   }
 
@@ -93,7 +91,6 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
     List<TicketModel> models =
         ticketPage.getContent().stream()
             .map(ticketMapper::toModel)
-            .peek(this::hydrateRequesterFromTemp)
             .toList();
 
     return PaginatedData.<TicketModel>builder()
@@ -112,15 +109,12 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   public List<TicketModel> firstThreeRegistrationTicket() {
     return ticketRepository.firstThreeRegistrationTicket().stream()
         .map(ticketMapper::toModel)
-        .peek(this::hydrateRequesterFromTemp)
         .toList();
   }
 
   @Override
   public TicketModel getDetailRegistrationTicket(Long ticketId) {
-    TicketModel model = ticketMapper.toModel(ticketRepository.getDetailRegistrationTicket(ticketId));
-    hydrateRequesterFromTemp(model);
-    return model;
+    return ticketMapper.toModel(ticketRepository.getDetailRegistrationTicket(ticketId));
   }
 
   @Override
@@ -135,30 +129,6 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
     if (updatedRows <= 0) {
       throw new ConflictDataException("Cannot update ticket status");
     }
-
-    // ✅ Update in-memory ticket
-    ticket.setSysStatus(ticketStatus);
-
-    UserModel user = ticket.getRequester();
-
-    if (user == null || user.getUserId() == null || userRepository.findById(user.getUserId()).isEmpty()) {
-      return ticket;
-    }
-
-    UserStatus newUserStatus = switch (ticket.getSysStatus()) {
-      case APPROVED -> UserStatus.APPROVED;
-      case REJECTED -> UserStatus.REJECTED;
-      case SUSPENDED -> UserStatus.SUSPENDED;
-      case PENDING -> UserStatus.PENDING;
-      default -> throw new ConflictDataException("Unsupported ticket status for user update: " + ticketStatus);
-    };
-
-    user.setSysStatus(newUserStatus);
-
-    log.info("user status after ticket update: userId={}, newStatus={}", user.getUserId(), user.getSysStatus());
-    // Use targeted update to avoid overwriting unrelated user fields with stale data
-    userRepository.updateStatus(user.getUserId(), newUserStatus);
-
     return ticket;
   }
 
@@ -185,56 +155,6 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   @Override
   public boolean existsApprovedTicketByUserIdAndDate(Long userId, LocalDate date) {
     return ticketRepository.existsApprovedTicketByUserIdAndDate(userId, date);
-  }
-
-  private void hydrateRequesterFromTemp(TicketModel ticket) {
-    if (ticket == null || ticket.getRequester() != null || ticket.getUserInfoTemp() == null) {
-      return;
-    }
-
-    Map<String, Object> temp = ticket.getUserInfoTemp();
-    UserModel.UserModelBuilder builder = UserModel.builder();
-
-    if (temp.get("userId") != null) {
-      builder.userId(toLong(temp.get("userId")));
-    }
-    if (temp.get("fullName") != null) {
-      builder.fullName(String.valueOf(temp.get("fullName")));
-    }
-    if (temp.get("companyEmail") != null) {
-      builder.companyEmail(String.valueOf(temp.get("companyEmail")));
-    }
-    if (temp.get("phoneNumber") != null) {
-      builder.phoneNumber(String.valueOf(temp.get("phoneNumber")));
-    }
-    if (temp.get("idNumber") != null) {
-      builder.idNumber(String.valueOf(temp.get("idNumber")));
-    }
-    if (temp.get("address") != null) {
-      builder.address(String.valueOf(temp.get("address")));
-    }
-    if (temp.get("dateOfBirth") != null) {
-      builder.dateOfBirth(toLocalDate(temp.get("dateOfBirth")));
-    }
-    if (temp.get("internshipStartDate") != null) {
-      builder.internshipStartDate(toLocalDate(temp.get("internshipStartDate")));
-    }
-    if (temp.get("internshipEndDate") != null) {
-      builder.internshipEndDate(toLocalDate(temp.get("internshipEndDate")));
-    }
-    if (temp.get("avatarUrl") != null) {
-      builder.avatarUrl(String.valueOf(temp.get("avatarUrl")));
-    }
-    if (temp.get("cvUrl") != null) {
-      builder.cvUrl(String.valueOf(temp.get("cvUrl")));
-    }
-
-    if (temp.get("positionCode") != null) {
-      builder.position(
-          PositionModel.builder().name(String.valueOf(temp.get("positionCode"))).build());
-    }
-
-    ticket.setRequester(builder.build());
   }
 
   private Long toLong(Object value) {

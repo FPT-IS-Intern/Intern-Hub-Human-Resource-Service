@@ -56,49 +56,52 @@ public interface TicketApiMapper {
   RemoteRequestCommand toRemoteRequestCommand(RemoteTicketRequest leaveRequest);
 
   @Mappings({
-    // User info
-    @Mapping(target = "fullName", source = "requester.fullName"),
-    @Mapping(target = "companyEmail", source = "requester.companyEmail"),
-
-    // Department (tạm assume từ position)
-    @Mapping(
-        target = "departmentName",
-        ignore = true /*source = "requester.position.department.departmentName" */),
-
-    // Ticket info
-    @Mapping(
-        target = "ticketTypeName",
-        expression = "java(ticketModel.getTicketType().getTypeName().name())"),
+    @Mapping(target = "fullName", expression = "java(readString(ticketModel.getUserInfoTemp(), \"fullName\"))"),
+    @Mapping(target = "companyEmail", expression = "java(readString(ticketModel.getUserInfoTemp(), \"companyEmail\"))"),
+    @Mapping(target = "departmentName", ignore = true),
+    @Mapping(target = "ticketTypeName", expression = "java(ticketModel.getTicketType().getTypeName().name())"),
     @Mapping(target = "ticketStatus", expression = "java(ticketModel.getSysStatus().name())"),
-
-    // no thường set ở service layer
     @Mapping(target = "no", ignore = true)
   })
   ListRegistrationResponse toRegistrationResponse(TicketModel ticketModel);
 
   @Mappings({
-    @Mapping(target = "senderFullName", source = "requester.fullName"),
+    @Mapping(target = "senderFullName", expression = "java(readString(ticketModel.getUserInfoTemp(), \"fullName\"))"),
     @Mapping(target = "registrationDate", source = "startAt"),
     @Mapping(target = "ticketStatus", expression = "java(ticketModel.getSysStatus().name())")
   })
   FirstThreeRegistrationResponse toFirstThreeRegistrationResponse(TicketModel ticketModel);
 
   @Mappings({
-          @Mapping(target = "userId", source = "requester.userId"),
-          @Mapping(target = "avatarUrl", source = "requester.avatarUrl"),
-          @Mapping(target = "positionName", source = "requester.position.name"),
-          @Mapping(target = "cvUrl", source = "requester.cvUrl"),
-          @Mapping(target = "internshipStartDate", source = "requester.internshipStartDate"),
-          @Mapping(target = "internshipEndDate", source = "requester.internshipEndDate"),
-          @Mapping(target = "fullName", source = "requester.fullName"),
-          @Mapping(target = "idNumber", source = "requester.idNumber"),
-          @Mapping(target = "dateOfBirth", source = "requester.dateOfBirth"),
-          @Mapping(target = "phoneNumber", source = "requester.phoneNumber"),
-          @Mapping(target = "companyEmail", source = "requester.companyEmail"),
-          @Mapping(target = "address", source = "requester.address"),
+          @Mapping(target = "userId", expression = "java(readString(ticketModel.getUserInfoTemp(), \"userId\"))"),
+          @Mapping(target = "avatarUrl", expression = "java(readString(ticketModel.getUserInfoTemp(), \"avatarUrl\"))"),
+          @Mapping(target = "positionName", expression = "java(readString(ticketModel.getUserInfoTemp(), \"positionCode\"))"),
+          @Mapping(target = "cvUrl", expression = "java(readString(ticketModel.getUserInfoTemp(), \"cvUrl\"))"),
+          @Mapping(target = "internshipStartDate", expression = "java(readLocalDate(ticketModel.getUserInfoTemp(), \"internshipStartDate\"))"),
+          @Mapping(target = "internshipEndDate", expression = "java(readLocalDate(ticketModel.getUserInfoTemp(), \"internshipEndDate\"))"),
+          @Mapping(target = "fullName", expression = "java(readString(ticketModel.getUserInfoTemp(), \"fullName\"))"),
+          @Mapping(target = "idNumber", expression = "java(readString(ticketModel.getUserInfoTemp(), \"idNumber\"))"),
+          @Mapping(target = "dateOfBirth", expression = "java(readLocalDate(ticketModel.getUserInfoTemp(), \"dateOfBirth\"))"),
+          @Mapping(target = "phoneNumber", expression = "java(readString(ticketModel.getUserInfoTemp(), \"phoneNumber\"))"),
+          @Mapping(target = "companyEmail", expression = "java(readString(ticketModel.getUserInfoTemp(), \"companyEmail\"))"),
+          @Mapping(target = "address", expression = "java(readString(ticketModel.getUserInfoTemp(), \"address\"))"),
           @Mapping(target = "sysStatus", source = "sysStatus")
   })
   RegistrationDetailResponse toRegistrationDetailResponse(TicketModel ticketModel);
+
+  default String readString(java.util.Map<String, Object> source, String key) {
+    if (source == null || source.get(key) == null) return null;
+    return String.valueOf(source.get(key));
+  }
+
+  default java.time.LocalDate readLocalDate(java.util.Map<String, Object> source, String key) {
+    if (source == null || source.get(key) == null) return null;
+    try {
+      return java.time.LocalDate.parse(String.valueOf(source.get(key)));
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
   // ===== Filter Registration Ticket =====
   @Mapping(target = "ticketStatus", expression = "java(toTicketStatus(request.getTicketStatus()))")

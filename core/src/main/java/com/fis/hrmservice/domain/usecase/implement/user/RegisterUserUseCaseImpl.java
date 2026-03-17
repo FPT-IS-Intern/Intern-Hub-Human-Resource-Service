@@ -83,7 +83,6 @@ public class RegisterUserUseCaseImpl {
             ticketRepositoryPort.save(
                     TicketModel.builder()
                             .ticketId(snowflake.next())
-                            .requester(null)
                             .ticketType(
                                     ticketTypeRepositoryPort.findTicketTypeByCode(
                                             String.valueOf(TicketType.REGISTRATION)))

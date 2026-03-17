@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-remove-user-id-from-tickets
+      author: copilot
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: tickets
+            constraintName: fk_tickets_user
+        - dropColumn:
+            tableName: tickets
+            columnName: user_id

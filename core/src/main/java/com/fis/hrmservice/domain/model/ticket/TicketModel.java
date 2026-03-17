@@ -19,7 +19,6 @@ import lombok.experimental.FieldDefaults;
 public class TicketModel extends BaseDomain {
 
   Long ticketId;
-  UserModel requester;
   TicketTypeModel ticketType;
   LocalDate startAt;
   LocalDate endAt;
