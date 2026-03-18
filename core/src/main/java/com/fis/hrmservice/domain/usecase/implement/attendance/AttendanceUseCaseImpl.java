@@ -174,48 +174,7 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
         LocalDate workDate = convertToLocalDate(checkInTimestamp);
 
-        // 3. Load existing record with pessimistic write lock to prevent duplicate inserts
-        //    under concurrent requests for the same user+date.
-        Optional<AttendanceLogModel> attendanceTodayOpt =
-                attendanceRepository.findByUserAndDateForUpdate(command.getUserId(), workDate);
-
-        if (attendanceTodayOpt.isPresent()) {
-            AttendanceLogModel attendance = attendanceTodayOpt.get();
-
-            // If scheduler already marked ABSENT, update that record instead of creating a new one.
-            if (AttendanceStatus.ABSENT.equals(attendance.getAttendanceStatus())) {
-                boolean isValid = validateCheckInTime(checkInTimestamp);
-
-                attendance.setCheckInTime(checkInTimestamp);
-                attendance.setCheckOutTime(0);
-                attendance.setCheckInBranchId(checkInBranchId);
-                attendance.setCheckInValid(isValid);
-                attendance.setAttendanceStatus(AttendanceStatus.CHECK_IN_LATE);
-
-                attendance = attendanceRepository.update(attendance);
-                log.info("User {} checked in after being marked ABSENT (isValid: {})",
-                        command.getUserId(), isValid);
-                return attendance;
-            }
-
-            // Any other status means user already checked in today — reject.
-            throw new BadRequestException(
-                    AttendanceError.ALREADY_CHECKED_IN.getValue(),
-                    "Bạn đã check-in trong hôm nay");
-        }
-
-        // 4. Kiểm tra xem đã check-in ở branch này chưa (guard for non-ABSENT duplicates)
-        boolean alreadyCheckedInThisBranch =
-                attendanceRepository.existsCheckedInBranchByUserAndDate(
-                        command.getUserId(), workDate, checkInBranchId);
-
-        if (alreadyCheckedInThisBranch) {
-            throw new BadRequestException(
-                    AttendanceError.ALREADY_CHECKED_IN.getValue(),
-                    "Bạn đã check-in ở văn phòng này trong hôm nay");
-        }
-
-        // 5. Kiểm tra xem có session check-in chưa checkout không
+        // 3. Reject when there is still an open session that has not been checked out.
         Optional<AttendanceLogModel> openAttendanceOpt =
                 attendanceRepository.findOpenSessionByUserAndDate(
                         command.getUserId(), workDate);
@@ -226,10 +185,21 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
                     "Bạn phải checkout địa điểm Onsite trước đó");
         }
 
-        // 6. Validate check-in time (Standard 8:45)
+        // 4. Reject only when the user has already checked in at the same branch on the same date.
+        boolean alreadyCheckedInThisBranch =
+                attendanceRepository.existsCheckedInBranchByUserAndDate(
+                        command.getUserId(), workDate, checkInBranchId);
+
+        if (alreadyCheckedInThisBranch) {
+            throw new BadRequestException(
+                    AttendanceError.ALREADY_CHECKED_IN.getValue(),
+                    "Bạn đã check-in ở văn phòng này trong hôm nay");
+        }
+
+        // 5. Validate check-in time (Standard 8:45)
         boolean isValid = validateCheckInTime(checkInTimestamp);
 
-        // 7. Tạo attendance mới
+        // 6. Always create a new attendance record for a new branch check-in.
         AttendanceLogModel attendance =
                 AttendanceLogModel.builder()
                         .attendanceId(snowflake.next())

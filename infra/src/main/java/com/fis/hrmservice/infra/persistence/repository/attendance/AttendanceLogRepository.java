@@ -96,13 +96,24 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
 
   List<AttendanceLog> findAllByUser_IdAndWorkDateOrderByCheckInTimeDesc(Long userId, LocalDate workDate);
 
-  List<AttendanceLog> findAllByWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeAsc(LocalDate workDate);
+  List<AttendanceLog> findAllByWorkDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNullOrderByCheckInTimeAsc(
+      LocalDate workDate);
 
-  Optional<AttendanceLog> findFirstByUser_IdAndWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeDesc(
+  Optional<AttendanceLog> findFirstByUser_IdAndWorkDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNullOrderByCheckInTimeDesc(
       Long userId, LocalDate workDate);
 
-  Optional<AttendanceLog> findFirstByUser_IdAndWorkDateOrderByCheckInTimeDesc(
-      Long userId, LocalDate workDate);
+  @Query("""
+      SELECT al
+      FROM AttendanceLog al
+      WHERE al.user.id = :userId
+        AND al.workDate = :workDate
+      ORDER BY
+        CASE WHEN al.checkInTime IS NULL THEN 1 ELSE 0 END,
+        al.checkInTime DESC,
+        al.id DESC
+      """)
+  List<AttendanceLog> findLatestRecordsByUserAndDate(
+      @Param("userId") Long userId, @Param("workDate") LocalDate workDate);
 
   boolean existsByUser_IdAndWorkDateAndCheckInBranchId(Long userId, LocalDate workDate, UUID branchId);
 
