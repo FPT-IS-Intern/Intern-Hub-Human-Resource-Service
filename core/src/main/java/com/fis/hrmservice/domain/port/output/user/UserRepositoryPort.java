@@ -43,4 +43,6 @@ public interface UserRepositoryPort {
   List<UserModel> findAllActiveUsers();
 
   int assignMentor(Long userId, Long mentorId);
+
+  List<Long> getAllUserId();
 }

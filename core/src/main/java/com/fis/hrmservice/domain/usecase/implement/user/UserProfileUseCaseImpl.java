@@ -215,4 +215,8 @@ public class UserProfileUseCaseImpl {
   private static String trim(CharSequence cs) {
     return cs == null ? null : cs.toString().strip();
   }
+
+  public List<Long> getUserIdList() {
+    return userRepositoryPort.getAllUserId();
+  }
 }
