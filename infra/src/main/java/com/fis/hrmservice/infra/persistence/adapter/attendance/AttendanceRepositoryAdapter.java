@@ -55,7 +55,9 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
 
   @Override
   public List<AttendanceLogModel> findAllOpenByDate(LocalDate workDate) {
-    return attendanceLogRepository.findAllByWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeAsc(workDate).stream()
+    return attendanceLogRepository
+        .findAllByWorkDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNullOrderByCheckInTimeAsc(workDate)
+        .stream()
         .map(this::toModel)
         .toList();
   }
@@ -63,14 +65,17 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
   @Override
   public Optional<AttendanceLogModel> findOpenSessionByUserAndDate(Long userId, LocalDate workDate) {
     return attendanceLogRepository
-        .findFirstByUser_IdAndWorkDateAndCheckOutTimeIsNullOrderByCheckInTimeDesc(userId, workDate)
+        .findFirstByUser_IdAndWorkDateAndCheckInTimeIsNotNullAndCheckOutTimeIsNullOrderByCheckInTimeDesc(
+            userId, workDate)
         .map(this::toModel);
   }
 
   @Override
   public Optional<AttendanceLogModel> findLatestByUserAndDate(Long userId, LocalDate workDate) {
     return attendanceLogRepository
-        .findFirstByUser_IdAndWorkDateOrderByCheckInTimeDesc(userId, workDate)
+        .findLatestRecordsByUserAndDate(userId, workDate)
+        .stream()
+        .findFirst()
         .map(this::toModel);
   }
 
