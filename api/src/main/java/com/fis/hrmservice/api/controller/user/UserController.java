@@ -7,7 +7,6 @@ import com.fis.hrmservice.api.dto.response.*;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
 import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.domain.model.user.UserModel;
-import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterFaceCommand;
 import com.fis.hrmservice.domain.usecase.command.user.RegisterUserCommand;
@@ -52,13 +51,13 @@ public class UserController {
 
   UserSuspension userSuspension;
 
-  CreateAuthIdentityPort createAuthIdentityPort;
-
   SupervisorUseCaseImpl supervisorUseCase;
 
   RegisterFaceUseCaseImpl registerFaceUseCase;
 
   SupervisorMemberUserCaseImpl supervisorMemberUserCase;
+
+  UserMeUseCaseImpl userMeUseCase;
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseApi<?> registerUser(
@@ -226,8 +225,7 @@ public class UserController {
   @Authenticated
   public ResponseApi<InternalUserResponse> getMeInternal() {
     Long userId = UserContext.requiredUserId();
-    UserModel userModel = userProfileUseCase.internalUserProfile(userId);
-    return ResponseApi.ok(userApiMapper.toInternalUserResponse(userModel));
+    return ResponseApi.ok(userApiMapper.toInternalUserResponse(userMeUseCase.getMe(userId)));
   }
 
   @GetMapping("/supervisor")
