@@ -23,7 +23,7 @@ public interface AuthIdentityFeignClient {
   @PutMapping("/auth/internal/identity/unlock/{userId}")
   void unlockAuthIdentity(@PathVariable Long userId);
 
-  @GetMapping("/auth/authz/roles/by-user/{userId}")
+  @GetMapping("/auth/internal/authz/roles/by-user/{userId}")
   ResponseApi<UserRoleInfraResponse> getRoleByUserId(@PathVariable Long userId);
 
   @PostMapping("/auth/authz/users/{userId}/role")
