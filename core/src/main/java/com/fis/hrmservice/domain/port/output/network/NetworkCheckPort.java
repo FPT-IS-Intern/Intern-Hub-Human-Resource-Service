@@ -1,5 +1,6 @@
 package com.fis.hrmservice.domain.port.output.network;
 
+import com.fis.hrmservice.domain.model.attendance.WorkingTimeConfigModel;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,4 +41,6 @@ public interface NetworkCheckPort {
   Optional<UUID> resolveCompanyLocationBranchId(Double latitude, Double longitude);
 
   Optional<String> resolveBranchName(UUID branchId);
+
+  Optional<WorkingTimeConfigModel> getWorkingTimeConfig();
 }

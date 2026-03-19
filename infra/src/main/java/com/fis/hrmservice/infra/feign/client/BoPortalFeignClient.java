@@ -2,6 +2,7 @@ package com.fis.hrmservice.infra.feign.client;
 
 import com.fis.hrmservice.infra.model.AttendanceLocationResponse;
 import com.fis.hrmservice.infra.model.BoPortalAllowedIpRangeResponse;
+import com.fis.hrmservice.infra.model.BoPortalWorkingTimeConfigResponse;
 import com.intern.hub.library.common.dto.ResponseApi;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,4 +16,7 @@ public interface BoPortalFeignClient {
 
   @GetMapping("/bo-portal/internal/attendance-locations")
   ResponseApi<List<AttendanceLocationResponse>> getAttendanceLocations();
+
+  @GetMapping("/bo-portal/internal/working-time-config")
+  ResponseApi<BoPortalWorkingTimeConfigResponse> getWorkingTimeConfig();
 }

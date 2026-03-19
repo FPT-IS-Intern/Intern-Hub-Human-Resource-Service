@@ -2,6 +2,7 @@ package com.fis.hrmservice.domain.usecase.implement.attendance;
 
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
 import com.fis.hrmservice.domain.model.attendance.AttendanceStatusModel;
+import com.fis.hrmservice.domain.model.attendance.WorkingTimeConfigModel;
 import com.fis.hrmservice.domain.model.constant.AttendanceError;
 import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
@@ -48,10 +49,8 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     @Value("${TIMEZONE_CONFIG:Asia/Ho_Chi_Minh}")
     private String timezoneConfig;
 
-    private static final int STANDARD_CHECK_IN_HOUR = 8;
-    private static final int STANDARD_CHECK_IN_MINUTE = 45;
-    private static final int STANDARD_CHECK_OUT_HOUR = 17;
-    private static final int STANDARD_CHECK_OUT_MINUTE = 15;
+    private static final LocalTime DEFAULT_CHECK_IN_TIME = LocalTime.of(8, 45);
+    private static final LocalTime DEFAULT_CHECK_OUT_TIME = LocalTime.of(17, 15);
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     /**
@@ -94,14 +93,12 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
                 attendance.getCheckInTime() > 0 ? convertToLocalTime(attendance.getCheckInTime()) : null;
         LocalTime checkOutTime =
                 attendance.getCheckOutTime() > 0 ? convertToLocalTime(attendance.getCheckOutTime()) : null;
+        WorkingTimeConfigModel workingTimeConfig = getEffectiveWorkingTimeConfig();
 
         boolean isCheckInValid =
-                checkInTime != null
-                        && !checkInTime.isAfter(LocalTime.of(STANDARD_CHECK_IN_HOUR, STANDARD_CHECK_IN_MINUTE));
+                checkInTime != null && !checkInTime.isAfter(workingTimeConfig.workStartTime());
         boolean isCheckOutValid =
-                checkOutTime != null
-                        && !checkOutTime.isBefore(
-                        LocalTime.of(STANDARD_CHECK_OUT_HOUR, STANDARD_CHECK_OUT_MINUTE));
+                checkOutTime != null && !checkOutTime.isBefore(workingTimeConfig.workEndTime());
 
         boolean isSessionOpen = openSessionOpt.isPresent();
         UUID openSessionBranchId = isSessionOpen ? openSessionOpt.get().getCheckInBranchId() : null;
@@ -365,14 +362,23 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
 
     private boolean validateCheckInTime(long checkInTimeMillis) {
         LocalTime checkIn = convertToLocalTime(checkInTimeMillis);
-        LocalTime standardTime = LocalTime.of(STANDARD_CHECK_IN_HOUR, STANDARD_CHECK_IN_MINUTE);
+        LocalTime standardTime = getEffectiveWorkingTimeConfig().workStartTime();
         return !checkIn.isAfter(standardTime);
     }
 
     private boolean validateCheckOutTime(long checkOutTimeMillis) {
         LocalTime checkOut = convertToLocalTime(checkOutTimeMillis);
-        LocalTime standardTime = LocalTime.of(STANDARD_CHECK_OUT_HOUR, STANDARD_CHECK_OUT_MINUTE);
+        LocalTime standardTime = getEffectiveWorkingTimeConfig().workEndTime();
         return !checkOut.isBefore(standardTime);
+    }
+
+    private WorkingTimeConfigModel getEffectiveWorkingTimeConfig() {
+        return networkCheckPort.getWorkingTimeConfig()
+                .map(config -> new WorkingTimeConfigModel(
+                        config.workStartTime() != null ? config.workStartTime() : DEFAULT_CHECK_IN_TIME,
+                        config.workEndTime() != null ? config.workEndTime() : DEFAULT_CHECK_OUT_TIME,
+                        config.autoCheckoutTime()))
+                .orElse(new WorkingTimeConfigModel(DEFAULT_CHECK_IN_TIME, DEFAULT_CHECK_OUT_TIME, null));
     }
 
     public static LocalTime convertToLocalTime(long millis) {
@@ -395,7 +401,7 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         }
         LocalTime checkInTime = convertToLocalTime(checkInTimeMillis);
         String timeStr = checkInTime.format(TIME_FORMATTER);
-        LocalTime standardTime = LocalTime.of(STANDARD_CHECK_IN_HOUR, STANDARD_CHECK_IN_MINUTE);
+        LocalTime standardTime = DEFAULT_CHECK_IN_TIME;
         boolean isValid = !checkInTime.isAfter(standardTime);
 
         if (isValid) {
@@ -411,7 +417,7 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         }
         LocalTime checkOutTime = convertToLocalTime(checkOutTimeMillis);
         String timeStr = checkOutTime.format(TIME_FORMATTER);
-        LocalTime standardTime = LocalTime.of(STANDARD_CHECK_OUT_HOUR, STANDARD_CHECK_OUT_MINUTE);
+        LocalTime standardTime = DEFAULT_CHECK_OUT_TIME;
         boolean isValid = !checkOutTime.isBefore(standardTime);
 
         if (isValid) {

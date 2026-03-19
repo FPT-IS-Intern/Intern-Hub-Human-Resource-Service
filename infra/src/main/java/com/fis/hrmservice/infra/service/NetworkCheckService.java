@@ -1,5 +1,6 @@
 package com.fis.hrmservice.infra.service;
 
+import com.fis.hrmservice.domain.model.attendance.WorkingTimeConfigModel;
 import com.fis.hrmservice.domain.port.output.network.NetworkCheckPort;
 import com.fis.hrmservice.infra.feign.client.BoPortalFeignClient;
 import java.util.Optional;
@@ -111,6 +112,22 @@ public class NetworkCheckService implements NetworkCheckPort {
       log.error("Error resolving branch name for branchId {}: {}", branchId, e.getMessage());
     }
 
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<WorkingTimeConfigModel> getWorkingTimeConfig() {
+    try {
+      var response = boPortalFeignClient.getWorkingTimeConfig();
+      if (response != null && response.data() != null) {
+        var data = response.data();
+        return Optional.of(
+            new WorkingTimeConfigModel(
+                data.workStartTime(), data.workEndTime(), data.autoCheckoutTime()));
+      }
+    } catch (Exception e) {
+      log.error("Error fetching working time config from bo-portal: {}", e.getMessage());
+    }
     return Optional.empty();
   }
 
