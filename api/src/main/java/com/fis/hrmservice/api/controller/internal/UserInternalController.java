@@ -49,6 +49,13 @@ public class UserInternalController {
         return ResponseApi.ok(userApiMapper.toResponse(userModel));
     }
 
+
+    @GetMapping("/get-user-id")
+    @Internal
+    public ResponseApi<List<Long>> getUserIdList() {
+        return ResponseApi.ok(userProfileUseCase.getUserIdList());
+    }
+
     @GetMapping("/me")
     @Internal
     public ResponseApi<InternalUserResponse> getMeInternal() {
