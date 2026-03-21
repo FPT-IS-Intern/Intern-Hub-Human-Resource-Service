@@ -13,13 +13,10 @@ import com.fis.hrmservice.domain.usecase.implement.user.UserProfileUseCaseImpl;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
-import com.intern.hub.starter.security.annotation.Authenticated;
-import com.intern.hub.starter.security.annotation.HasPermission;
 import com.intern.hub.starter.security.annotation.Internal;
 
 import java.util.List;
 
-import com.intern.hub.starter.security.entity.Action;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -86,9 +83,7 @@ public class UserInternalController {
     }
 
     @PostMapping("internal/filter")
-    @Authenticated
     @Internal
-    @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
     public ResponseApi<PaginatedData<FilterResponse>> filterUsers(
             @RequestBody FilterRequest request,
             @RequestParam(defaultValue = "0") int page,
@@ -107,20 +102,17 @@ public class UserInternalController {
     }
 
     @PutMapping("/{userId}/lock")
-    @Authenticated
     @Internal
-    @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
     public ResponseApi<UserResponse> lockAccountInternal(@PathVariable Long userId) {
         UserModel userModel = userProfileUseCase.lockAccountInternal(userId);
         return ResponseApi.ok(userApiMapper.toResponse(userModel));
     }
 
     @PutMapping("/{userId}/unlock")
-    @Authenticated
     @Internal
-    @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
     public ResponseApi<UserResponse> unlockAccountInternal(@PathVariable Long userId) {
         UserModel userModel = userProfileUseCase.unlockAccountInternal(userId);
         return ResponseApi.ok(userApiMapper.toResponse(userModel));
     }
 }
+
