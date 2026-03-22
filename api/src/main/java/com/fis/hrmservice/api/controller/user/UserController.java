@@ -17,6 +17,7 @@ import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.starter.security.annotation.Authenticated;
 import com.intern.hub.starter.security.annotation.HasPermission;
+import com.intern.hub.starter.security.annotation.Internal;
 import com.intern.hub.starter.security.entity.Action;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

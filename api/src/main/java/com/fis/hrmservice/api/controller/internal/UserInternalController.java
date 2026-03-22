@@ -2,6 +2,7 @@ package com.fis.hrmservice.api.controller.internal;
 
 import com.fis.hrmservice.api.dto.request.FilterRequest;
 import com.fis.hrmservice.api.dto.response.FilterResponse;
+import com.fis.hrmservice.api.dto.response.HrmUserSearchResponse;
 import com.fis.hrmservice.api.dto.response.InternalUserResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.api.mapper.UserApiMapper;
@@ -41,6 +42,13 @@ public class UserInternalController {
     UserProfileUseCaseImpl userProfileUseCase;
     UserApiMapper userApiMapper;
     FilterUseCaseImpl filterUserUseCase;
+
+    @GetMapping("/search")
+    @Internal
+    public ResponseApi<List<HrmUserSearchResponse>> searchUsers(@RequestParam("query") String query) {
+        List<UserModel> users = userProfileUseCase.searchUsers(query);
+        return ResponseApi.ok(userApiMapper.toHrmUserSearchResponseList(users));
+    }
 
     @GetMapping("/{userId}")
     @Internal

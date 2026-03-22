@@ -140,4 +140,12 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
   @Transactional
   @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id = :userId")
   int assignMentor(@Param("userId") Long userId, @Param("mentorId") Long mentorId);
+
+  @Query("""
+      SELECT u FROM User u
+      WHERE LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
+         OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :query, '%'))
+      ORDER BY u.fullName ASC
+      """)
+  List<User> searchByQuery(@Param("query") String query);
 }

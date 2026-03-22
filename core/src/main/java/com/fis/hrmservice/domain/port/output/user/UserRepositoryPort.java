@@ -45,4 +45,6 @@ public interface UserRepositoryPort {
   int assignMentor(Long userId, Long mentorId);
 
   List<Long> getAllUserId();
+
+  List<UserModel> searchByQuery(String query);
 }

@@ -141,4 +141,10 @@ public interface UserApiMapper {
   @Mapping(target = "role", ignore = true)
   @Mapping(target = "position", source = "position.name")
   SupervisorMemberResponse toSupervisorMemberResponse(UserModel model);
+
+  @Mapping(target = "id", source = "userId")
+  @Mapping(target = "email", source = "companyEmail")
+  HrmUserSearchResponse toHrmUserSearchResponse(UserModel model);
+
+  List<HrmUserSearchResponse> toHrmUserSearchResponseList(List<UserModel> models);
 }
