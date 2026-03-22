@@ -186,6 +186,27 @@ public class UserController {
     return ResponseApi.ok("Update user profile thành công");
   }
 
+  @PatchMapping(value = "/profile/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @Authenticated
+  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
+  public ResponseApi<?> updateUserProfileJson(
+          @Valid @RequestBody UpdateProfileRequest request,
+          @PathVariable String userId) {
+    Long userIdParse;
+
+    try {
+      userIdParse = Long.parseLong(userId);
+    } catch (NumberFormatException e) {
+      return ResponseApi.ok("Invalid user ID");
+    }
+
+    UserModel model = userProfileUseCase.updateProfileUser(userApiMapper.toUpdateUserProfileCommand(request), userIdParse);
+
+    if (model == null) {
+      return ResponseApi.ok("Update user profile failed");
+    }
+    return ResponseApi.ok("Update user profile succeeded");
+  }
   @PutMapping("/suspension/{userId}")
   @Authenticated
   @HasPermission(action = Action.REVIEW, resource = "quan-ly-nguoi-dung")
