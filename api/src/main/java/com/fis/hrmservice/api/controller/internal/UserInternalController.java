@@ -1,6 +1,7 @@
 package com.fis.hrmservice.api.controller.internal;
 
 import com.fis.hrmservice.api.dto.request.FilterRequest;
+import com.fis.hrmservice.api.dto.request.UpdateProfileRequest;
 import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.dto.response.InternalUserResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
@@ -20,6 +21,8 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,6 +104,13 @@ public class UserInternalController {
                         .build());
     }
 
+    @PatchMapping(value = "/{userId}/profile", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Internal
+    public ResponseApi<UserResponse> updateUserProfileInternal(@PathVariable Long userId,
+                                                               @RequestBody UpdateProfileRequest request) {
+        UserModel userModel = userProfileUseCase.updateProfileUser(userApiMapper.toUpdateUserProfileCommand(request), userId);
+        return ResponseApi.ok(userApiMapper.toResponse(userModel));
+    }
     @PutMapping("/{userId}/lock")
     @Internal
     public ResponseApi<UserResponse> lockAccountInternal(@PathVariable Long userId) {
