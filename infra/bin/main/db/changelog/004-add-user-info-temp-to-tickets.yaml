@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-add-user-info-temp-to-tickets
+      author: gwuy
+      changes:
+
+        - addColumn:
+            tableName: tickets
+            columns:
+              - column:
+                  name: user_info_temp
+                  type: jsonb
+                  defaultValueComputed: "'{}'::jsonb"
+                  remarks: Snapshot of user information when ticket is created before approval

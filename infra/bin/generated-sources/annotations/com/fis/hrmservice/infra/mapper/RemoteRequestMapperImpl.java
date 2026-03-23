@@ -9,13 +9,15 @@ import com.fis.hrmservice.domain.model.user.WorkLocationModel;
 import com.fis.hrmservice.infra.persistence.entity.RemoteRequest;
 import com.fis.hrmservice.infra.persistence.entity.Ticket;
 import com.fis.hrmservice.infra.persistence.entity.WorkLocation;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-14T15:33:02+0700",
-    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-03-22T17:23:38+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class RemoteRequestMapperImpl implements RemoteRequestMapper {
@@ -98,6 +100,10 @@ public class RemoteRequestMapperImpl implements RemoteRequestMapper {
         if ( ticketModel.getUpdatedBy() != null ) {
             ticket.setUpdatedBy( Long.parseLong( ticketModel.getUpdatedBy() ) );
         }
+        Map<String, Object> map = ticketModel.getUserInfoTemp();
+        if ( map != null ) {
+            ticket.setUserInfoTemp( new LinkedHashMap<String, Object>( map ) );
+        }
 
         return ticket;
     }
@@ -128,6 +134,10 @@ public class RemoteRequestMapperImpl implements RemoteRequestMapper {
         ticketModel.startAt( ticket.getStartAt() );
         ticketModel.endAt( ticket.getEndAt() );
         ticketModel.reason( ticket.getReason() );
+        Map<String, Object> map = ticket.getUserInfoTemp();
+        if ( map != null ) {
+            ticketModel.userInfoTemp( new LinkedHashMap<String, Object>( map ) );
+        }
 
         return ticketModel.build();
     }

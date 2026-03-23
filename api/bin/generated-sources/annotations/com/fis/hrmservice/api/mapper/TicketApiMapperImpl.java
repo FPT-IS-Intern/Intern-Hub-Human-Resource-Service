@@ -3,7 +3,6 @@ package com.fis.hrmservice.api.mapper;
 import com.fis.hrmservice.api.dto.request.CreateTicketRequest;
 import com.fis.hrmservice.api.dto.request.FilterRegistrationRequest;
 import com.fis.hrmservice.api.dto.request.RemoteTicketRequest;
-import com.fis.hrmservice.api.dto.response.FirstThreeRegistrationResponse;
 import com.fis.hrmservice.api.dto.response.ListRegistrationResponse;
 import com.fis.hrmservice.api.dto.response.RegistrationDetailResponse;
 import com.fis.hrmservice.api.dto.response.TicketResponse;
@@ -13,10 +12,6 @@ import com.fis.hrmservice.domain.model.ticket.LeaveRequestModel;
 import com.fis.hrmservice.domain.model.ticket.RemoteRequestModel;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
 import com.fis.hrmservice.domain.model.ticket.TicketTypeModel;
-import com.fis.hrmservice.domain.model.user.AvatarModel;
-import com.fis.hrmservice.domain.model.user.CvModel;
-import com.fis.hrmservice.domain.model.user.PositionModel;
-import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.ticket.CreateTicketCommand;
 import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
 import com.fis.hrmservice.domain.usecase.command.ticket.RemoteRequestCommand;
@@ -28,8 +23,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-14T15:33:10+0700",
-    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-03-22T17:23:39+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class TicketApiMapperImpl implements TicketApiMapper {
@@ -145,30 +140,14 @@ public class TicketApiMapperImpl implements TicketApiMapper {
 
         ListRegistrationResponse listRegistrationResponse = new ListRegistrationResponse();
 
-        listRegistrationResponse.setFullName( ticketModelRequesterFullName( ticketModel ) );
-        listRegistrationResponse.setCompanyEmail( ticketModelRequesterCompanyEmail( ticketModel ) );
         listRegistrationResponse.setTicketId( ticketModel.getTicketId() );
 
+        listRegistrationResponse.setFullName( readString(ticketModel.getUserInfoTemp(), "fullName") );
+        listRegistrationResponse.setCompanyEmail( readString(ticketModel.getUserInfoTemp(), "companyEmail") );
         listRegistrationResponse.setTicketTypeName( ticketModel.getTicketType().getTypeName().name() );
         listRegistrationResponse.setTicketStatus( ticketModel.getSysStatus().name() );
 
         return listRegistrationResponse;
-    }
-
-    @Override
-    public FirstThreeRegistrationResponse toFirstThreeRegistrationResponse(TicketModel ticketModel) {
-        if ( ticketModel == null ) {
-            return null;
-        }
-
-        FirstThreeRegistrationResponse firstThreeRegistrationResponse = new FirstThreeRegistrationResponse();
-
-        firstThreeRegistrationResponse.setSenderFullName( ticketModelRequesterFullName( ticketModel ) );
-        firstThreeRegistrationResponse.setRegistrationDate( ticketModel.getStartAt() );
-
-        firstThreeRegistrationResponse.setTicketStatus( ticketModel.getSysStatus().name() );
-
-        return firstThreeRegistrationResponse;
     }
 
     @Override
@@ -179,22 +158,20 @@ public class TicketApiMapperImpl implements TicketApiMapper {
 
         RegistrationDetailResponse registrationDetailResponse = new RegistrationDetailResponse();
 
-        Long userId = ticketModelRequesterUserId( ticketModel );
-        if ( userId != null ) {
-            registrationDetailResponse.setUserId( String.valueOf( userId ) );
-        }
-        registrationDetailResponse.setAvatarUrl( ticketModelRequesterAvatarAvatarUrl( ticketModel ) );
-        registrationDetailResponse.setPositionName( ticketModelRequesterPositionName( ticketModel ) );
-        registrationDetailResponse.setCvUrl( ticketModelRequesterCvCvUrl( ticketModel ) );
-        registrationDetailResponse.setInternshipStartDate( ticketModelRequesterInternshipStartDate( ticketModel ) );
-        registrationDetailResponse.setInternshipEndDate( ticketModelRequesterInternshipEndDate( ticketModel ) );
-        registrationDetailResponse.setFullName( ticketModelRequesterFullName( ticketModel ) );
-        registrationDetailResponse.setIdNumber( ticketModelRequesterIdNumber( ticketModel ) );
-        registrationDetailResponse.setDateOfBirth( ticketModelRequesterDateOfBirth( ticketModel ) );
-        registrationDetailResponse.setPhoneNumber( ticketModelRequesterPhoneNumber( ticketModel ) );
-        registrationDetailResponse.setCompanyEmail( ticketModelRequesterCompanyEmail( ticketModel ) );
-        registrationDetailResponse.setAddress( ticketModelRequesterAddress( ticketModel ) );
         registrationDetailResponse.setSysStatus( map( ticketModel.getSysStatus() ) );
+
+        registrationDetailResponse.setUserId( readString(ticketModel.getUserInfoTemp(), "userId") );
+        registrationDetailResponse.setAvatarUrl( readString(ticketModel.getUserInfoTemp(), "avatarUrl") );
+        registrationDetailResponse.setPositionName( readString(ticketModel.getUserInfoTemp(), "positionCode") );
+        registrationDetailResponse.setCvUrl( readString(ticketModel.getUserInfoTemp(), "cvUrl") );
+        registrationDetailResponse.setInternshipStartDate( readLocalDate(ticketModel.getUserInfoTemp(), "internshipStartDate") );
+        registrationDetailResponse.setInternshipEndDate( readLocalDate(ticketModel.getUserInfoTemp(), "internshipEndDate") );
+        registrationDetailResponse.setFullName( readString(ticketModel.getUserInfoTemp(), "fullName") );
+        registrationDetailResponse.setIdNumber( readString(ticketModel.getUserInfoTemp(), "idNumber") );
+        registrationDetailResponse.setDateOfBirth( readLocalDate(ticketModel.getUserInfoTemp(), "dateOfBirth") );
+        registrationDetailResponse.setPhoneNumber( readString(ticketModel.getUserInfoTemp(), "phoneNumber") );
+        registrationDetailResponse.setCompanyEmail( readString(ticketModel.getUserInfoTemp(), "companyEmail") );
+        registrationDetailResponse.setAddress( readString(ticketModel.getUserInfoTemp(), "address") );
 
         return registrationDetailResponse;
     }
@@ -294,113 +271,5 @@ public class TicketApiMapperImpl implements TicketApiMapper {
             return null;
         }
         return ticket.getStartAt();
-    }
-
-    private String ticketModelRequesterFullName(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getFullName();
-    }
-
-    private String ticketModelRequesterCompanyEmail(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getCompanyEmail();
-    }
-
-    private Long ticketModelRequesterUserId(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getUserId();
-    }
-
-    private String ticketModelRequesterAvatarAvatarUrl(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        AvatarModel avatar = requester.getAvatar();
-        if ( avatar == null ) {
-            return null;
-        }
-        return avatar.getAvatarUrl();
-    }
-
-    private String ticketModelRequesterPositionName(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        PositionModel position = requester.getPosition();
-        if ( position == null ) {
-            return null;
-        }
-        return position.getName();
-    }
-
-    private String ticketModelRequesterCvCvUrl(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        CvModel cv = requester.getCv();
-        if ( cv == null ) {
-            return null;
-        }
-        return cv.getCvUrl();
-    }
-
-    private LocalDate ticketModelRequesterInternshipStartDate(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getInternshipStartDate();
-    }
-
-    private LocalDate ticketModelRequesterInternshipEndDate(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getInternshipEndDate();
-    }
-
-    private String ticketModelRequesterIdNumber(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getIdNumber();
-    }
-
-    private LocalDate ticketModelRequesterDateOfBirth(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getDateOfBirth();
-    }
-
-    private String ticketModelRequesterPhoneNumber(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getPhoneNumber();
-    }
-
-    private String ticketModelRequesterAddress(TicketModel ticketModel) {
-        UserModel requester = ticketModel.getRequester();
-        if ( requester == null ) {
-            return null;
-        }
-        return requester.getAddress();
     }
 }

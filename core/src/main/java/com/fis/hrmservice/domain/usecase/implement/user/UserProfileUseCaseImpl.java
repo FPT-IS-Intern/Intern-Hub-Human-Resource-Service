@@ -219,4 +219,11 @@ public class UserProfileUseCaseImpl {
   public List<Long> getUserIdList() {
     return userRepositoryPort.getAllUserId();
   }
+
+  public List<UserModel> searchUsers(String query) {
+    if (query == null || query.isBlank()) {
+      return List.of();
+    }
+    return userRepositoryPort.searchByQuery(query.strip());
+  }
 }

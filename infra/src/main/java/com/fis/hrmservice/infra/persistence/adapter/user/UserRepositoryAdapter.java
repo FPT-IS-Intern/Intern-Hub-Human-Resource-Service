@@ -144,4 +144,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   public int updateIsFaceRegistry(Long userId, boolean isFaceRegistry) {
     return userJpaRepository.updateIsFaceRegistry(userId, isFaceRegistry);
   }
+
+  @Override
+  public List<UserModel> searchByQuery(String query) {
+    return userJpaRepository.searchByQuery(query).stream().map(userMapper::toModel).toList();
+  }
 }

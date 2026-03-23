@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-14T15:33:04+0700",
-    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
+    date = "2026-03-22T17:23:38+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -26,8 +26,6 @@ public class UserMapperImpl implements UserMapper {
         userModel.userId( entity.getId() );
         userModel.mentor( mentorToModel( entity.getMentor() ) );
         userModel.position( positionToModel( entity.getPosition() ) );
-        userModel.avatar( avatarToModel( entity.getAvatar() ) );
-        userModel.cv( cvToModel( entity.getCv() ) );
         userModel.department( departmentToString( entity.getDepartment() ) );
         userModel.fullName( entity.getFullName() );
         userModel.companyEmail( entity.getCompanyEmail() );
@@ -39,6 +37,8 @@ public class UserMapperImpl implements UserMapper {
         userModel.internshipStartDate( entity.getInternshipStartDate() );
         userModel.internshipEndDate( entity.getInternshipEndDate() );
         userModel.isFaceRegistry( entity.getIsFaceRegistry() );
+        userModel.avatarUrl( entity.getAvatarUrl() );
+        userModel.cvUrl( entity.getCvUrl() );
 
         return userModel.build();
     }
@@ -51,8 +51,6 @@ public class UserMapperImpl implements UserMapper {
 
         entity.setMentor( mentorToEntity( model.getMentor() ) );
         entity.setPosition( positionToEntity( model.getPosition() ) );
-        entity.setAvatar( avatarToEntity( model.getAvatar() ) );
-        entity.setCv( cvToEntity( model.getCv() ) );
         entity.setCreatedAt( model.getCreatedAt() );
         entity.setUpdatedAt( model.getUpdatedAt() );
         if ( model.getCreatedBy() != null ) {
@@ -68,7 +66,9 @@ public class UserMapperImpl implements UserMapper {
             entity.setUpdatedBy( null );
         }
         entity.setAddress( model.getAddress() );
+        entity.setAvatarUrl( model.getAvatarUrl() );
         entity.setCompanyEmail( model.getCompanyEmail() );
+        entity.setCvUrl( model.getCvUrl() );
         entity.setDateOfBirth( model.getDateOfBirth() );
         entity.setFullName( model.getFullName() );
         entity.setIdNumber( model.getIdNumber() );
@@ -103,8 +103,6 @@ public class UserMapperImpl implements UserMapper {
         user.setId( model.getUserId() );
         user.setMentor( mentorToEntity( model.getMentor() ) );
         user.setPosition( positionToEntity( model.getPosition() ) );
-        user.setAvatar( avatarToEntity( model.getAvatar() ) );
-        user.setCv( cvToEntity( model.getCv() ) );
         user.setCreatedAt( model.getCreatedAt() );
         user.setUpdatedAt( model.getUpdatedAt() );
         if ( model.getCreatedBy() != null ) {
@@ -114,7 +112,9 @@ public class UserMapperImpl implements UserMapper {
             user.setUpdatedBy( Long.parseLong( model.getUpdatedBy() ) );
         }
         user.setAddress( model.getAddress() );
+        user.setAvatarUrl( model.getAvatarUrl() );
         user.setCompanyEmail( model.getCompanyEmail() );
+        user.setCvUrl( model.getCvUrl() );
         user.setDateOfBirth( model.getDateOfBirth() );
         user.setFullName( model.getFullName() );
         user.setIdNumber( model.getIdNumber() );
