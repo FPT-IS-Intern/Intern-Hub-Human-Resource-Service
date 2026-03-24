@@ -7,10 +7,13 @@ import com.fis.hrmservice.api.dto.response.FilterResponse;
 import com.fis.hrmservice.api.dto.response.HrmUserSearchResponse;
 import com.fis.hrmservice.api.dto.response.InternalUserProfileResponse;
 import com.fis.hrmservice.api.dto.response.InternalUserResponse;
+import com.fis.hrmservice.api.dto.response.SidebarMenuResponse;
 import com.fis.hrmservice.api.dto.response.SupervisorMemberResponse;
 import com.fis.hrmservice.api.dto.response.SupervisorResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
+import com.fis.hrmservice.domain.model.resonse.InternalUserCoreResponse;
+import com.fis.hrmservice.domain.model.resonse.SidebarMenuCoreResponse;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
@@ -23,8 +26,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-22T17:23:39+0700",
-    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260128-0750, environment: Java 21.0.9 (Eclipse Adoptium)"
+    date = "2026-03-23T17:39:09+0700",
+    comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
 public class UserApiMapperImpl implements UserApiMapper {
@@ -272,6 +275,101 @@ public class UserApiMapperImpl implements UserApiMapper {
         }
 
         return internalUserResponse;
+    }
+
+    @Override
+    public InternalUserResponse toInternalUserResponse(InternalUserCoreResponse response) {
+        if ( response == null ) {
+            return null;
+        }
+
+        InternalUserResponse internalUserResponse = new InternalUserResponse();
+
+        if ( response.getAvatarUrl() != null ) {
+            internalUserResponse.setAvatarUrl( response.getAvatarUrl() );
+        }
+        if ( response.getEmail() != null ) {
+            internalUserResponse.setEmail( response.getEmail() );
+        }
+        if ( response.getFullName() != null ) {
+            internalUserResponse.setFullName( response.getFullName() );
+        }
+        if ( response.getIsFaceRegistry() != null ) {
+            internalUserResponse.setIsFaceRegistry( response.getIsFaceRegistry() );
+        }
+        if ( response.getPositionName() != null ) {
+            internalUserResponse.setPositionName( response.getPositionName() );
+        }
+        if ( response.getRole() != null ) {
+            internalUserResponse.setRole( response.getRole() );
+        }
+        if ( response.getRoleId() != null ) {
+            internalUserResponse.setRoleId( response.getRoleId() );
+        }
+        List<SidebarMenuResponse> list = toSidebarMenuResponseList( response.getSidebarMenus() );
+        if ( list != null ) {
+            internalUserResponse.setSidebarMenus( list );
+        }
+
+        return internalUserResponse;
+    }
+
+    @Override
+    public SidebarMenuResponse toSidebarMenuResponse(SidebarMenuCoreResponse response) {
+        if ( response == null ) {
+            return null;
+        }
+
+        SidebarMenuResponse.SidebarMenuResponseBuilder sidebarMenuResponse = SidebarMenuResponse.builder();
+
+        List<SidebarMenuResponse> list = toSidebarMenuResponseList( response.getChildren() );
+        if ( list != null ) {
+            sidebarMenuResponse.children( list );
+        }
+        if ( response.getCode() != null ) {
+            sidebarMenuResponse.code( response.getCode() );
+        }
+        if ( response.getIcon() != null ) {
+            sidebarMenuResponse.icon( response.getIcon() );
+        }
+        if ( response.getId() != null ) {
+            sidebarMenuResponse.id( response.getId() );
+        }
+        if ( response.getParentId() != null ) {
+            sidebarMenuResponse.parentId( response.getParentId() );
+        }
+        if ( response.getPath() != null ) {
+            sidebarMenuResponse.path( response.getPath() );
+        }
+        List<String> list1 = response.getRoleCodes();
+        if ( list1 != null ) {
+            sidebarMenuResponse.roleCodes( new ArrayList<String>( list1 ) );
+        }
+        if ( response.getSortOrder() != null ) {
+            sidebarMenuResponse.sortOrder( response.getSortOrder() );
+        }
+        if ( response.getStatus() != null ) {
+            sidebarMenuResponse.status( response.getStatus() );
+        }
+        if ( response.getTitle() != null ) {
+            sidebarMenuResponse.title( response.getTitle() );
+        }
+
+        return sidebarMenuResponse.build();
+    }
+
+    @Override
+    public List<SidebarMenuResponse> toSidebarMenuResponseList(List<SidebarMenuCoreResponse> responses) {
+        if ( responses == null ) {
+            return null;
+        }
+
+        List<SidebarMenuResponse> list = new ArrayList<SidebarMenuResponse>( responses.size() );
+        for ( SidebarMenuCoreResponse sidebarMenuCoreResponse : responses ) {
+            list.add( toSidebarMenuResponse( sidebarMenuCoreResponse ) );
+        }
+
+        return list;
     }
 
     @Override

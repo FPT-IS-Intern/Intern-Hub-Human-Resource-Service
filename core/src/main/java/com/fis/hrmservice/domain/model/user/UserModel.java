@@ -35,6 +35,8 @@ public class UserModel extends BaseDomain {
   String roleId;
   String role;
 
+  String authIdentityStatus;
+
   String avatarUrl;
   String cvUrl;
 }

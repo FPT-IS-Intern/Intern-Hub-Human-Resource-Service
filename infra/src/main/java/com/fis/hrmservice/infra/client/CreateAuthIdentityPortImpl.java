@@ -1,7 +1,7 @@
 package com.fis.hrmservice.infra.client;
 
+import com.fis.hrmservice.domain.model.resonse.AuthIdentityStatusCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.ListRoleCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.SetUserRoleCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.UserRoleCoreResponse;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.infra.feign.client.AuthIdentityFeignClient;
@@ -53,6 +53,13 @@ public class CreateAuthIdentityPortImpl implements CreateAuthIdentityPort {
   public List<ListRoleCoreResponse> getAllRoles() {
     return authIdentityFeignClient.getAllRoles().data().stream()
         .map(feignInfraMapper::toListRoleCoreResponse)
+        .toList();
+  }
+
+  @Override
+  public List<AuthIdentityStatusCoreResponse> getIdentityStatuses(List<Long> userIds) {
+    return authIdentityFeignClient.getIdentityStatuses(userIds).data().stream()
+        .map(feignInfraMapper::toAuthIdentityStatusCoreResponse)
         .toList();
   }
 }

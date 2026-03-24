@@ -35,6 +35,7 @@ public interface UserApiMapper {
   @Mapping(source = "avatarUrl", target = "avatarUrl")
   @Mapping(source = "fullName", target = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
+  @Mapping(source = "authIdentityStatus", target = "authIdentityStatus")
   FilterResponse toFilterResponse(UserModel model);
 
   default String getDisplayRole(PositionModel positionModel) {

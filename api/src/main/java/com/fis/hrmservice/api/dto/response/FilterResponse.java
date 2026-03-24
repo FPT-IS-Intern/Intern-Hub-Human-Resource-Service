@@ -19,4 +19,6 @@ public class FilterResponse {
   String email;
   String role;
   String position;
+
+  String authIdentityStatus;
 }

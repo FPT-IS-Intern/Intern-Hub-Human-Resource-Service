@@ -1,6 +1,7 @@
 package com.fis.hrmservice.infra.feign.client;
 
 import com.fis.hrmservice.infra.feign.request.AssignRoleRequest;
+import com.fis.hrmservice.infra.feign.response.AuthIdentityStatusInfraResponse;
 import com.fis.hrmservice.infra.feign.response.ListRoleInfraResponse;
 import com.fis.hrmservice.infra.feign.response.SetUserRoleResponse;
 import com.fis.hrmservice.infra.feign.response.UserRoleInfraResponse;
@@ -31,4 +32,7 @@ public interface AuthIdentityFeignClient {
 
   @GetMapping("/auth/internal/authz/roles")
   ResponseApi<List<ListRoleInfraResponse>> getAllRoles();
+
+  @PostMapping("/identity/statuses")
+  ResponseApi<List<AuthIdentityStatusInfraResponse>> getIdentityStatuses(@RequestBody List<Long> userIds);
 }
