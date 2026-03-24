@@ -33,6 +33,6 @@ public interface AuthIdentityFeignClient {
   @GetMapping("/auth/internal/authz/roles")
   ResponseApi<List<ListRoleInfraResponse>> getAllRoles();
 
-  @PostMapping("/identity/statuses")
+  @PostMapping("/auth/internal/identity/statuses")
   ResponseApi<List<AuthIdentityStatusInfraResponse>> getIdentityStatuses(@RequestBody List<Long> userIds);
 }
