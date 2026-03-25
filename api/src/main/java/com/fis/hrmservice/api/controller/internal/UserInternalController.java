@@ -114,6 +114,29 @@ public class UserInternalController {
                         .build());
     }
 
+    /**
+     * Endpoint dành riêng cho Ticket Service — trả về danh sách user rút gọn (id, fullName, email)
+     * với phân trang. Dùng khi Ticket Service cần lọc tickets theo nameOrEmail
+     * mà không muốn nhận toàn bộ dữ liệu user.
+     */
+    @PostMapping("internal/filter-for-ticket")
+    @Internal
+    public ResponseApi<PaginatedData<HrmUserSearchResponse>> filterUsersForTicket(
+            @RequestBody FilterRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        FilterUserCommand command = userApiMapper.toCommand(request);
+        PaginatedData<UserModel> result = filterUserUseCase.filterUsers(command, page, size);
+
+        return ResponseApi.ok(
+                PaginatedData.<HrmUserSearchResponse>builder()
+                        .items(userApiMapper.toHrmUserSearchResponseList((List<UserModel>) result.getItems()))
+                        .totalItems(result.getTotalItems())
+                        .totalPages(result.getTotalPages())
+                        .build());
+    }
+
     @PatchMapping(value = "/{userId}/profile", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Internal
     public ResponseApi<UserResponse> updateUserProfileInternal(

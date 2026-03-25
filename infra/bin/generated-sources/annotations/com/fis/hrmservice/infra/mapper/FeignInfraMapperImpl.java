@@ -1,8 +1,10 @@
 package com.fis.hrmservice.infra.mapper;
 
+import com.fis.hrmservice.domain.model.resonse.AuthIdentityStatusCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.ListRoleCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.SetUserRoleCoreResponse;
 import com.fis.hrmservice.domain.model.resonse.UserRoleCoreResponse;
+import com.fis.hrmservice.infra.feign.response.AuthIdentityStatusInfraResponse;
 import com.fis.hrmservice.infra.feign.response.ListRoleInfraResponse;
 import com.fis.hrmservice.infra.feign.response.SetUserRoleResponse;
 import com.fis.hrmservice.infra.feign.response.UserRoleInfraResponse;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-23T17:39:04+0700",
+    date = "2026-03-25T11:23:30+0700",
     comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component
@@ -59,5 +61,22 @@ public class FeignInfraMapperImpl implements FeignInfraMapper {
         listRoleCoreResponse.name( listRoleInfraResponse.getName() );
 
         return listRoleCoreResponse.build();
+    }
+
+    @Override
+    public AuthIdentityStatusCoreResponse toAuthIdentityStatusCoreResponse(AuthIdentityStatusInfraResponse response) {
+        if ( response == null ) {
+            return null;
+        }
+
+        Long userId = null;
+        String sysStatus = null;
+
+        userId = response.userId();
+        sysStatus = response.sysStatus();
+
+        AuthIdentityStatusCoreResponse authIdentityStatusCoreResponse = new AuthIdentityStatusCoreResponse( userId, sysStatus );
+
+        return authIdentityStatusCoreResponse;
     }
 }
