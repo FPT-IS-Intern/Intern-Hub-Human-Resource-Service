@@ -1,9 +1,9 @@
 package com.fis.hrmservice.infra.feign.client;
 
-import com.fis.hrmservice.infra.feign.request.CreateTicketRequest;
 import com.fis.hrmservice.infra.feign.response.TicketResponse;
 import com.intern.hub.library.common.dto.ResponseApi;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +16,7 @@ public interface TicketFeignClient {
     @PostMapping(value = "/internal/tickets", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseApi<TicketResponse> createTicketInternal(
             @RequestParam("creatorId") Long creatorId,
-            @RequestPart("request") String request,
-            @RequestPart("evidences") MultipartFile[] evidences
+            @RequestPart("request") HttpEntity<String> request,
+            @RequestPart(value = "evidences", required = false) MultipartFile[] evidences
     );
 }
