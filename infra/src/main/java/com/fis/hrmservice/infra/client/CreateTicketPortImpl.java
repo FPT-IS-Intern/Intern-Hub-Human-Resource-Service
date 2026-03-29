@@ -1,7 +1,6 @@
 package com.fis.hrmservice.infra.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.fis.hrmservice.domain.model.dto.request.CreateTicketInternalRequest;
 import com.fis.hrmservice.domain.model.dto.resonse.CreateTicketInternalResponse;
 import com.fis.hrmservice.domain.port.output.feign.CreateTicketPort;
@@ -31,7 +30,7 @@ public class CreateTicketPortImpl implements CreateTicketPort {
     public CreateTicketInternalResponse createTicket(Long userId, CreateTicketInternalRequest request, MultipartFile[] evidenceFiles) {
         try {
             // Serialize ticketTypeId + payload into JSON bytes.
-            // MultipartFile[] is not serialized — it goes through as a separate part.
+            // MultipartFile[] cannot be serialized — it goes through as a separate multipart part.
             MultiValueMap<String, Object> jsonPart = new LinkedMultiValueMap<>();
             jsonPart.add("ticketTypeId", request.ticketTypeId());
             jsonPart.add("payload", request.payload());
@@ -40,9 +39,8 @@ public class CreateTicketPortImpl implements CreateTicketPort {
 
             // Build headers for the "request" multipart part. SpringEncoder checks for
             // HttpEntity values in a MultiValueMap and uses the entity's headers as the
-            // part's headers (including Content-Type: application/json). We also need to
-            // set Content-Disposition so @RequestPart("request") on the receiving side
-            // resolves correctly.
+            // part's headers (including Content-Type: application/json). Content-Disposition
+            // is needed so @RequestPart("request") on the receiving side resolves correctly.
             HttpHeaders partHeaders = new HttpHeaders();
             partHeaders.setContentType(MediaType.APPLICATION_JSON);
             partHeaders.set("Content-Disposition", "form-data; name=\"request\"; filename=\"request\"");
@@ -58,7 +56,7 @@ public class CreateTicketPortImpl implements CreateTicketPort {
             );
 
             // Build the multipart body for the Feign call.
-            MultiValueMap<String, Object> requestParts = new LinkedMultiValueMap<>();
+            LinkedMultiValueMap<String, Object> requestParts = new LinkedMultiValueMap<>();
             requestParts.add("request", partEntity);
 
             log.debug("[CreateTicketPort] Sending multipart ticket request. ticketTypeId={}, payloadKeys={}",
@@ -66,17 +64,14 @@ public class CreateTicketPortImpl implements CreateTicketPort {
                     request.payload() != null ? request.payload().keySet() : "null");
 
             ResponseApi<TicketResponse> response =
-                    ticketFeignClient.createTicketInternal(userId, requestParts, evidenceFiles);
+                    ticketFeignClient.createTicketInternal(userId, requestParts, null);
 
             TicketResponse ticketResponse = response.data();
             return new CreateTicketInternalResponse(ticketResponse.ticketId(), ticketResponse.status());
 
-        } catch (JsonProcessingException e) {
-            log.error("[CreateTicketPort] Failed to serialize ticket request. userId={}: {}", userId, e.getMessage());
-            throw new RuntimeException("Error serialize ticket request", e);
         } catch (Exception e) {
             log.error("[CreateTicketPort] Failed to create ticket. userId={}: {}", userId, e.getMessage(), e);
-            throw new RuntimeException("Error creating ticket: " + e.getMessage(), e);
+            throw new RuntimeException("Error creating ticket", e);
         }
     }
 }
