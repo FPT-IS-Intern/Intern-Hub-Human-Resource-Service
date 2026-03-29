@@ -21,8 +21,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CreateTicketPortImpl implements CreateTicketPort {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private final TicketFeignClient ticketFeignClient;
-    private final ObjectMapper objectMapper;
 
     @Override
     public CreateTicketInternalResponse createTicket(
