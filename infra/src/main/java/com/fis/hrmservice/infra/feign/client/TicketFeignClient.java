@@ -5,10 +5,13 @@ import com.intern.hub.library.common.dto.ResponseApi;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @FeignClient(name = "ticket", url = "${services.ticket.url}")
 public interface TicketFeignClient {
@@ -16,7 +19,7 @@ public interface TicketFeignClient {
     @PostMapping(value = "/internal/tickets", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseApi<TicketResponse> createTicketInternal(
             @RequestParam("creatorId") Long creatorId,
-            @RequestPart("request") Object request, // ✅ FIX
+            @RequestPart("request") Object request,
             @RequestPart(value = "evidences", required = false) MultipartFile[] evidences
     );
 }
