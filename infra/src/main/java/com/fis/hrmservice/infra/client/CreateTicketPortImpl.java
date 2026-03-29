@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -19,15 +20,28 @@ import org.springframework.web.multipart.MultipartFile;
 public class CreateTicketPortImpl implements CreateTicketPort {
 
     TicketFeignClient ticketFeignClient;
+    ObjectMapper objectMapper;
 
     @Override
     public CreateTicketInternalResponse createTicket(Long userId, CreateTicketInternalRequest request, MultipartFile[] evidenceFiles) {
-        CreateTicketRequest feignRequest = new CreateTicketRequest(
-                request.ticketTypeId(),
-                request.payload(),
-                request.evidences());
-        ResponseApi<TicketResponse> response = ticketFeignClient.createTicketInternal(userId, feignRequest, evidenceFiles);
-        TicketResponse ticketResponse = response.data();
-        return new CreateTicketInternalResponse(ticketResponse.ticketId(), ticketResponse.status());
+
+        try {
+            CreateTicketRequest feignRequest = new CreateTicketRequest(
+                    request.ticketTypeId(),
+                    request.payload(),
+                    request.evidences()
+            );
+
+            String requestJson = objectMapper.writeValueAsString(feignRequest); // 🔥
+
+            ResponseApi<TicketResponse> response =
+                    ticketFeignClient.createTicketInternal(userId, requestJson, evidenceFiles);
+
+            TicketResponse ticketResponse = response.data();
+            return new CreateTicketInternalResponse(ticketResponse.ticketId(), ticketResponse.status());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error serialize request", e);
+        }
     }
 }

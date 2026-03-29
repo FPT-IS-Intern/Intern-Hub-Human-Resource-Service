@@ -16,7 +16,7 @@ public interface TicketFeignClient {
     @PostMapping(value = "/internal/tickets", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseApi<TicketResponse> createTicketInternal(
             @RequestParam("creatorId") Long creatorId,
-            @RequestPart("request") CreateTicketRequest request,
+            @RequestPart("request") String request,
             @RequestPart("evidences") MultipartFile[] evidences
     );
 }
