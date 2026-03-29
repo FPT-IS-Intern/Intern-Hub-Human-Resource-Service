@@ -13,10 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 @FeignClient(name = "ticket", url = "${services.ticket.url}", configuration = FeignMultipartConfig.class)
 public interface TicketFeignClient {
 
-    @PostMapping(value = "/internal/tickets", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/ticket/internal", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseApi<TicketResponse> createTicketInternal(
             @RequestParam("creatorId") Long creatorId,
             @RequestPart("request") MultipartFile request,
-            @RequestPart(value = "evidences", required = false) MultipartFile[] evidences
-    );
+            @RequestPart(value = "evidences", required = false) MultipartFile[] evidences);
 }
