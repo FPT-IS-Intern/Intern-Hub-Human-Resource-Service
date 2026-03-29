@@ -6,7 +6,6 @@ import com.fis.hrmservice.domain.usecase.command.attendance.FilterAttendanceComm
 import com.intern.hub.library.common.dto.PaginatedData;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +33,8 @@ public interface AttendanceRepositoryPort {
 
   /**
    * Finds the attendance record with a pessimistic write lock.
-   * Must be used inside a transaction when modifying the record (e.g. ABSENT → CHECK_IN_LATE).
+   * Must be used inside a transaction when modifying the record (e.g. ABSENT →
+   * CHECK_IN_LATE).
    */
   Optional<AttendanceLogModel> findByUserAndDateForUpdate(Long userId, LocalDate workDate);
 
@@ -51,6 +51,6 @@ public interface AttendanceRepositoryPort {
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 
   Integer totalWorkDate(Long userId);
+
   Integer totalLateTime(Long userId);
 }
-

@@ -1,14 +1,10 @@
 package com.fis.hrmservice.infra.persistence.adapter.ticket.explaination;
 
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
-import com.fis.hrmservice.domain.model.constant.UserStatus;
 import com.fis.hrmservice.domain.model.ticket.TicketModel;
-import com.fis.hrmservice.domain.model.user.PositionModel;
-import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.ticket.TicketRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.ticket.FilterRegistrationTicketCommand;
 import com.fis.hrmservice.infra.mapper.TicketMapper;
-import com.fis.hrmservice.infra.persistence.adapter.user.UserRepositoryAdapter;
 import com.fis.hrmservice.infra.persistence.entity.Ticket;
 import com.fis.hrmservice.infra.persistence.entity.TicketType;
 import com.fis.hrmservice.infra.persistence.repository.ticket.TicketRepository;
@@ -17,9 +13,7 @@ import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,8 +32,6 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
 
   private final EntityManager entityManager;
 
-  private final UserRepositoryAdapter userRepository;
-
   @Override
   @Transactional
   public TicketModel save(TicketModel ticket) {
@@ -48,8 +40,7 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
 
     // ================= FIX TRANSIENT TicketType =================
     if (ticket.getTicketType() != null) {
-      TicketType managedType =
-          entityManager.getReference(TicketType.class, ticket.getTicketType().getTicketTypeId());
+      TicketType managedType = entityManager.getReference(TicketType.class, ticket.getTicketType().getTicketTypeId());
 
       ticketEntity.setTicketType(managedType);
     }
@@ -62,11 +53,10 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
 
   @Override
   public TicketModel findById(Long ticketId) {
-    TicketModel model =
-        ticketMapper.toModel(
-            ticketRepository
-                .findById(ticketId)
-                .orElseThrow(() -> new NotFoundException("Ticket not found with id: " + ticketId)));
+    TicketModel model = ticketMapper.toModel(
+        ticketRepository
+            .findById(ticketId)
+            .orElseThrow(() -> new NotFoundException("Ticket not found with id: " + ticketId)));
     return model;
   }
 
@@ -82,16 +72,14 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   public PaginatedData<TicketModel> filterRegistrationTicketPaged(
       FilterRegistrationTicketCommand command, int page, int size) {
 
-    Page<Ticket> ticketPage =
-        ticketRepository.filterRegistrationTicketPaged(
-            command.getKeyword(),
-            command.getTicketStatus() == null ? null : command.getTicketStatus().name(),
-            PageRequest.of(page, size));
+    Page<Ticket> ticketPage = ticketRepository.filterRegistrationTicketPaged(
+        command.getKeyword(),
+        command.getTicketStatus() == null ? null : command.getTicketStatus().name(),
+        PageRequest.of(page, size));
 
-    List<TicketModel> models =
-        ticketPage.getContent().stream()
-            .map(ticketMapper::toModel)
-            .toList();
+    List<TicketModel> models = ticketPage.getContent().stream()
+        .map(ticketMapper::toModel)
+        .toList();
 
     return PaginatedData.<TicketModel>builder()
         .items(models)
@@ -121,7 +109,8 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   @Transactional
   public TicketModel updateRegistrationTicketStatus(Long ticketId, TicketStatus ticketStatus) {
 
-    // findById already throws NotFoundException if not found, no need for null check
+    // findById already throws NotFoundException if not found, no need for null
+    // check
     TicketModel ticket = findById(ticketId);
 
     int updatedRows = ticketRepository.updateRegistrationTicketStatus(ticketStatus, ticketId);
@@ -155,20 +144,5 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
   @Override
   public boolean existsApprovedTicketByUserIdAndDate(Long userId, LocalDate date) {
     return ticketRepository.existsApprovedTicketByUserIdAndDate(userId, date);
-  }
-
-  private Long toLong(Object value) {
-    if (value instanceof Number number) {
-      return number.longValue();
-    }
-    return Long.parseLong(String.valueOf(value));
-  }
-
-  private LocalDate toLocalDate(Object value) {
-    try {
-      return LocalDate.parse(String.valueOf(value));
-    } catch (DateTimeParseException ex) {
-      return null;
-    }
   }
 }

@@ -1,7 +1,6 @@
 package com.fis.hrmservice.infra.persistence.adapter.attendance;
 
 import com.fis.hrmservice.domain.model.attendance.AttendanceLogModel;
-import com.fis.hrmservice.domain.model.constant.AttendanceStatus;
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.port.output.attendance.AttendanceRepositoryPort;
 import com.fis.hrmservice.domain.usecase.command.attendance.AttendanceInWeekCommand;
@@ -26,7 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 /**
- * Mock implementation of AttendanceRepositoryPort using in-memory storage. TODO: Replace with real
+ * Mock implementation of AttendanceRepositoryPort using in-memory storage.
+ * TODO: Replace with real
  * JPA repository implementation when database is ready.
  */
 @Slf4j
@@ -44,7 +44,6 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
     AttendanceLog savedEntity = attendanceLogRepository.save(entity);
     return toModel(savedEntity);
   }
-
 
   @Override
   public List<AttendanceLogModel> findAllByUserIdAndDate(Long userId, LocalDate workDate) {
@@ -91,32 +90,30 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
 
   @Override
   public PaginatedData<AttendanceLogModel> filterAttendanceLogs(
-          FilterAttendanceCommand command,
-          int page,
-          int size) {
+      FilterAttendanceCommand command,
+      int page,
+      int size) {
 
     Pageable pageable = PageRequest.of(page, size);
 
     String statusStr = command.getAttendanceStatus() != null ? command.getAttendanceStatus().name() : null;
 
-    Page<AttendanceLog> result =
-            attendanceLogRepository.filterAttendanceLogs(
-                    command.getNameOrEmail(),
-                    statusStr,
-                    command.getStartDate(),
-                    command.getEndDate(),
-                    pageable);
+    Page<AttendanceLog> result = attendanceLogRepository.filterAttendanceLogs(
+        command.getNameOrEmail(),
+        statusStr,
+        command.getStartDate(),
+        command.getEndDate(),
+        pageable);
 
-    List<AttendanceLogModel> items =
-            result.getContent().stream()
-                    .map(attendanceInfraMapper::toModel)
-                    .toList();
+    List<AttendanceLogModel> items = result.getContent().stream()
+        .map(attendanceInfraMapper::toModel)
+        .toList();
 
     return PaginatedData.<AttendanceLogModel>builder()
-            .items(items)
-            .totalItems(result.getTotalElements())
-            .totalPages(result.getTotalPages())
-            .build();
+        .items(items)
+        .totalItems(result.getTotalElements())
+        .totalPages(result.getTotalPages())
+        .build();
   }
 
   @Override
@@ -136,7 +133,8 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
 
   @Override
   public List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId) {
-    return attendanceLogRepository.getAttendanceInWeek(userId).stream().map(attendanceInfraMapper::toAttendanceInWeekCommand).toList();
+    return attendanceLogRepository.getAttendanceInWeek(userId).stream()
+        .map(attendanceInfraMapper::toAttendanceInWeekCommand).toList();
   }
 
   @Override

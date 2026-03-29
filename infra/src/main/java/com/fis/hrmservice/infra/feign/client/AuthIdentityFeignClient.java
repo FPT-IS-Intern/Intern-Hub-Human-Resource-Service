@@ -3,7 +3,6 @@ package com.fis.hrmservice.infra.feign.client;
 import com.fis.hrmservice.infra.feign.request.AssignRoleRequest;
 import com.fis.hrmservice.infra.feign.response.AuthIdentityStatusInfraResponse;
 import com.fis.hrmservice.infra.feign.response.ListRoleInfraResponse;
-import com.fis.hrmservice.infra.feign.response.SetUserRoleResponse;
 import com.fis.hrmservice.infra.feign.response.UserRoleInfraResponse;
 import com.fis.hrmservice.infra.model.CreateUserPassIdentityRequest;
 import com.intern.hub.library.common.dto.ResponseApi;
