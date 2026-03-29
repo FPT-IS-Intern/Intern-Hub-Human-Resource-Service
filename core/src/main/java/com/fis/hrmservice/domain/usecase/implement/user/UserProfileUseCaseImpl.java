@@ -154,7 +154,7 @@ public class UserProfileUseCaseImpl {
       payload.put("newProfile", newProfile);
 
       CreateTicketInternalRequest ticketRequest = new CreateTicketInternalRequest(
-              CoreConstant.PROFILE_UPDATE_TICKET_TYPE_ID,
+              6L,
               payload,
               null);
 
