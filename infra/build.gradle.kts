@@ -12,6 +12,9 @@ dependencies {
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.feign.core)
 
+    // Jackson (for JSON serialization in Feign multipart)
+    implementation(libs.jackson.databind)
+
     // AWS S3 SDK (Cloudflare R2)
     implementation(libs.s3.sdk)
 

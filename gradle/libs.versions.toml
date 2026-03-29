@@ -11,6 +11,7 @@ feign-version = "5.0.1"
 springDoc = "3.0.1"
 jib = "3.5.2"
 feign-core = "13.11"
+jackson-databind = "2.20.1"
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -26,6 +27,7 @@ spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-
 spring-boot-starter-feign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version.ref = "feign-version" }
 openapi-doc = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
 spring-boot-feign-core = { module = "io.github.openfeign:feign-core", version.ref = "feign-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
 
 # Database
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgres" }
