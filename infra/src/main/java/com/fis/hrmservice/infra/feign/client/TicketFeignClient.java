@@ -1,5 +1,7 @@
 package com.fis.hrmservice.infra.feign.client;
 
+import com.fis.hrmservice.domain.model.dto.request.CreateTicketInternalRequest;
+import com.fis.hrmservice.infra.configuration.FeignMultipartConfig;
 import com.fis.hrmservice.infra.feign.response.TicketResponse;
 import com.intern.hub.library.common.dto.ResponseApi;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,13 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-@FeignClient(name = "ticket", url = "${services.ticket.url}")
+@FeignClient(name = "ticket", url = "${services.ticket.url}", configuration = FeignMultipartConfig.class)
 public interface TicketFeignClient {
 
     @PostMapping(value = "/internal/tickets", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseApi<TicketResponse> createTicketInternal(
             @RequestParam("creatorId") Long creatorId,
-            @RequestPart("request") Object request,
+            @RequestPart("request") CreateTicketInternalRequest request,
             @RequestPart(value = "evidences", required = false) MultipartFile[] evidences
     );
 }

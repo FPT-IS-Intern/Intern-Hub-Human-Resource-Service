@@ -10,6 +10,7 @@ dependencies {
     // Feign client
     implementation(libs.spring.boot.starter.feign)
     implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.feign.core)
 
     // AWS S3 SDK (Cloudflare R2)
     implementation(libs.s3.sdk)
