@@ -2,14 +2,18 @@ package com.fis.hrmservice.domain.usecase.implement.user;
 
 import com.fis.hrmservice.domain.model.constant.CoreConstant;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
+import com.fis.hrmservice.domain.model.dto.request.CreateTicketInternalRequest;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
+import com.fis.hrmservice.domain.port.output.feign.CreateTicketPort;
 import com.fis.hrmservice.domain.port.output.user.*;
 import com.fis.hrmservice.domain.service.UserValidationService;
 import com.fis.hrmservice.domain.usecase.command.user.UpdateUserProfileCommand;
 import com.fis.hrmservice.domain.utils.helper.UpdateHelper;
 import com.intern.hub.library.common.exception.NotFoundException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -30,6 +34,7 @@ public class UserProfileUseCaseImpl {
   FileStoragePort fileStoragePort;
   PositionRepositoryPort positionRepositoryPort;
   CreateAuthIdentityPort createAuthIdentityPort;
+  CreateTicketPort createTicketPort;
 
   public UserModel getUserProfile(Long userId) {
     return userRepositoryPort
@@ -44,6 +49,8 @@ public class UserProfileUseCaseImpl {
             .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
 
     userValidationService.validateUpdate(command);
+
+    Map<String, Object> oldProfile = buildCurrentProfileMap(user);
 
     boolean userFieldChanged = false;
 
@@ -100,11 +107,9 @@ public class UserProfileUseCaseImpl {
       UserStatus oldStatus = user.getSysStatus();
 
       if (!Objects.equals(oldStatus, newStatus)) {
-
         user.setSysStatus(newStatus);
         userFieldChanged = true;
 
-        // call auth service
         if (newStatus == UserStatus.SUSPENDED) {
           createAuthIdentityPort.lockAuthIdentity(user.getUserId());
         } else if (newStatus == UserStatus.APPROVED) {
@@ -142,12 +147,37 @@ public class UserProfileUseCaseImpl {
     }
 
     if (userFieldChanged) {
-      userRepositoryPort.save(user);
+      Map<String, Object> newProfile = buildCurrentProfileMap(user);
+      Map<String, Object> payload = new LinkedHashMap<>();
+      payload.put("userId", userId);
+      payload.put("oldProfile", oldProfile);
+      payload.put("newProfile", newProfile);
+
+      CreateTicketInternalRequest ticketRequest = new CreateTicketInternalRequest(
+              CoreConstant.PROFILE_UPDATE_TICKET_TYPE_ID,
+              payload,
+              null);
+
+      createTicketPort.createTicket(userId, ticketRequest, null);
     }
 
-    // Luôn reload lại user để trả về data mới nhất (bao gồm cv/avatar/position/sysStatus đã update)
-    return userRepositoryPort.findById(userId)
-            .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+    return user;
+  }
+
+  private Map<String, Object> buildCurrentProfileMap(UserModel user) {
+    Map<String, Object> profile = new LinkedHashMap<>();
+    profile.put("userId", user.getUserId());
+    profile.put("fullName", user.getFullName());
+    profile.put("companyEmail", user.getCompanyEmail());
+    profile.put("dateOfBirth", user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null);
+    profile.put("idNumber", user.getIdNumber());
+    profile.put("address", user.getAddress());
+    profile.put("phoneNumber", user.getPhoneNumber());
+    profile.put("positionId", user.getPosition() != null ? user.getPosition().getPositionId() : null);
+    profile.put("sysStatus", user.getSysStatus() != null ? user.getSysStatus().name() : null);
+    profile.put("cvUrl", user.getCvUrl());
+    profile.put("avatarUrl", user.getAvatarUrl());
+    return profile;
   }
 
   public UserModel internalUserProfile(Long userId) {

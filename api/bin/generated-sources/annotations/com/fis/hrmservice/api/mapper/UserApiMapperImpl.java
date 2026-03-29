@@ -12,8 +12,8 @@ import com.fis.hrmservice.api.dto.response.SupervisorMemberResponse;
 import com.fis.hrmservice.api.dto.response.SupervisorResponse;
 import com.fis.hrmservice.api.dto.response.UserResponse;
 import com.fis.hrmservice.domain.model.constant.UserStatus;
-import com.fis.hrmservice.domain.model.resonse.InternalUserCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.SidebarMenuCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.InternalUserCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.SidebarMenuCoreResponse;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-25T11:23:35+0700",
+    date = "2026-03-29T13:05:10+0700",
     comments = "version: 1.7.0.Beta1, compiler: Eclipse JDT (IDE) 3.45.0.v20260224-0835, environment: Java 21.0.10 (Eclipse Adoptium)"
 )
 @Component

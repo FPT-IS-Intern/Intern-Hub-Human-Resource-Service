@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 security:
   internal-secret: ${INTERNAL_SECRET_KEY:defaultSecretValue}
@@ -56,6 +56,8 @@ services:
     url: ${GATEWAY_URL:http://localhost:8765}
   dms:
     url: ${DMS_SERVICE_URL:http://localhost:8084}
+  ticket:
+    url: ${TICKET_SERVICE_URL:http://localhost:8081}
 
 feign:
   client:

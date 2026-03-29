@@ -1,6 +1,6 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
-import com.fis.hrmservice.domain.model.resonse.AuthIdentityStatusCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.AuthIdentityStatusCoreResponse;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;

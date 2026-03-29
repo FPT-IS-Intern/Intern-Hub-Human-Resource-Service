@@ -37,4 +37,7 @@ public final class CoreConstant {
   public static final String DATE_FORMAT = "dd/MM/yyyy";
   public static final String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
   public static final String S3_PREFIX_URL = "https://s3.vn-hcm-1.vietnix.cloud/bravos/";
+
+  // === Ticket Type IDs ===
+  public static final Long PROFILE_UPDATE_TICKET_TYPE_ID = 3L;
 }

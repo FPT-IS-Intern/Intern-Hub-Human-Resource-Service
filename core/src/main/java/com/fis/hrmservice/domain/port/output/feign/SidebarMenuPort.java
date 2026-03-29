@@ -1,6 +1,6 @@
 package com.fis.hrmservice.domain.port.output.feign;
 
-import com.fis.hrmservice.domain.model.resonse.SidebarMenuCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.SidebarMenuCoreResponse;
 
 import java.util.List;
 

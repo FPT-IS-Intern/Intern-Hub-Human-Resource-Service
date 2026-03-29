@@ -1,6 +1,7 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
-import com.fis.hrmservice.domain.model.resonse.InternalUserCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.InternalUserCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.SidebarMenuCoreResponse;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.feign.SidebarMenuPort;
 import java.util.List;
@@ -34,7 +35,7 @@ public class UserMeUseCaseImpl {
         .build();
   }
 
-  private List<com.fis.hrmservice.domain.model.resonse.SidebarMenuCoreResponse> resolveSidebarMenus(
+  private List<SidebarMenuCoreResponse> resolveSidebarMenus(
       String roleName) {
     if (roleName == null || roleName.isBlank()) {
       return List.of();

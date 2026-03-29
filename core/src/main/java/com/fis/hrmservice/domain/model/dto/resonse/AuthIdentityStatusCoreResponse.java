@@ -1,4 +1,4 @@
-package com.fis.hrmservice.domain.model.resonse;
+package com.fis.hrmservice.domain.model.dto.resonse;
 
 public record AuthIdentityStatusCoreResponse(
         Long userId,

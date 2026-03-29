@@ -1,9 +1,9 @@
 package com.fis.hrmservice.infra.mapper;
 
-import com.fis.hrmservice.domain.model.resonse.AuthIdentityStatusCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.ListRoleCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.SetUserRoleCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.UserRoleCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.AuthIdentityStatusCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.ListRoleCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.SetUserRoleCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.UserRoleCoreResponse;
 import com.fis.hrmservice.infra.feign.response.AuthIdentityStatusInfraResponse;
 import com.fis.hrmservice.infra.feign.response.ListRoleInfraResponse;
 import com.fis.hrmservice.infra.feign.response.SetUserRoleResponse;

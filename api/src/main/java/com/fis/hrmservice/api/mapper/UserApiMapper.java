@@ -2,8 +2,8 @@ package com.fis.hrmservice.api.mapper;
 
 import com.fis.hrmservice.api.dto.request.*;
 import com.fis.hrmservice.api.dto.response.*;
-import com.fis.hrmservice.domain.model.resonse.InternalUserCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.SidebarMenuCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.InternalUserCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.SidebarMenuCoreResponse;
 import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;

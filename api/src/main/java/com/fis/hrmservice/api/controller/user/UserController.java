@@ -161,8 +161,8 @@ public class UserController {
   }
 
   @PatchMapping(value = "/profile/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Authenticated
-  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
+//  @Authenticated
+//  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> updateUserProfile(
           @Valid @RequestPart("userInfo") UpdateProfileRequest request,
           @RequestPart(value = "cvFile", required = false) MultipartFile cvFile,
@@ -188,8 +188,8 @@ public class UserController {
   }
 
   @PatchMapping(value = "/profile/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  @Authenticated
-  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
+//  @Authenticated
+//  @HasPermission(action = Action.UPDATE, resource = "quan-ly-nguoi-dung")
   public ResponseApi<?> updateUserProfileJson(
           @Valid @RequestBody UpdateProfileRequest request,
           @PathVariable String userId) {

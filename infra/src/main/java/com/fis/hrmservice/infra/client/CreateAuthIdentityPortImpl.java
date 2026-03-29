@@ -1,8 +1,8 @@
 package com.fis.hrmservice.infra.client;
 
-import com.fis.hrmservice.domain.model.resonse.AuthIdentityStatusCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.ListRoleCoreResponse;
-import com.fis.hrmservice.domain.model.resonse.UserRoleCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.AuthIdentityStatusCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.ListRoleCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.UserRoleCoreResponse;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.infra.feign.client.AuthIdentityFeignClient;
 import com.fis.hrmservice.infra.feign.request.AssignRoleRequest;

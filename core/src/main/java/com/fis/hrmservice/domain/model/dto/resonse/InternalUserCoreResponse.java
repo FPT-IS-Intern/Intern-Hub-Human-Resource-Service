@@ -1,4 +1,4 @@
-package com.fis.hrmservice.domain.model.resonse;
+package com.fis.hrmservice.domain.model.dto.resonse;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

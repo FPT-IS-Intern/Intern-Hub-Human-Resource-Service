@@ -1,6 +1,6 @@
 package com.fis.hrmservice.infra.client;
 
-import com.fis.hrmservice.domain.model.resonse.SidebarMenuCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.SidebarMenuCoreResponse;
 import com.fis.hrmservice.domain.port.output.feign.SidebarMenuPort;
 import com.fis.hrmservice.infra.feign.client.BoPortalFeignClient;
 import com.fis.hrmservice.infra.model.BoPortalSidebarMenuRequest;
