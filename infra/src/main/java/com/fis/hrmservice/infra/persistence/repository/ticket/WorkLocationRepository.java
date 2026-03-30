@@ -3,6 +3,7 @@ package com.fis.hrmservice.infra.persistence.repository.ticket;
 import com.fis.hrmservice.infra.persistence.entity.WorkLocation;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkLocationRepository extends JpaRepository<WorkLocation, Long> {
 
-  @Query("SELECT w.name FROM WorkLocation w")
+  @Query("SELECT w.name FROM WorkLocation w where w.isActive = true")
   List<String> getAllWorkLocationName();
 
   @Query(
@@ -18,4 +19,20 @@ public interface WorkLocationRepository extends JpaRepository<WorkLocation, Long
   boolean existsByName(@Param("locationName") String locationName);
 
   WorkLocation findByName(String name);
+
+  @Modifying
+  @Query("""
+        UPDATE WorkLocation w
+        SET w.isActive = false
+        WHERE w.id = :id
+""")
+  int disableWorkLocation(@Param("id") Long id);
+
+  @Modifying
+  @Query("""
+                  UPDATE WorkLocation w
+                  SET w.isActive = true
+                  WHERE w.id = :id
+          """)
+  int enableWorkLocation(@Param("id") Long id);
 }

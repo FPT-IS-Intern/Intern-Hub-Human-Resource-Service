@@ -9,4 +9,18 @@ public interface WorkLocationRepositoryPort {
   List<String> findAllLocationNames();
 
   WorkLocationModel findByLocationName(String locationName);
+
+  List<WorkLocationModel> findAll();
+
+  WorkLocationModel findById(Long id);
+
+  WorkLocationModel save(WorkLocationModel workLocation);
+
+  WorkLocationModel create(WorkLocationModel workLocation);
+
+  WorkLocationModel update(WorkLocationModel workLocation);
+
+  int disableWorkLocation(Long id);
+
+  int enableWorkLocation(Long id);
 }
