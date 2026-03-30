@@ -8,7 +8,10 @@ import com.fis.hrmservice.infra.mapper.UserMapper;
 import com.fis.hrmservice.infra.persistence.entity.User;
 import com.fis.hrmservice.infra.persistence.repository.user.UserJpaRepository;
 import com.intern.hub.library.common.dto.PaginatedData;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -148,5 +151,69 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   @Override
   public List<UserModel> searchByQuery(String query) {
     return userJpaRepository.searchByQuery(query).stream().map(userMapper::toModel).toList();
+  }
+
+  @Override
+  public Optional<UserModel> findOrgChartRoot() {
+    return userJpaRepository.findOrgChartRoots(PageRequest.of(0, 1)).stream()
+        .findFirst()
+        .map(userMapper::toModel);
+  }
+
+  @Override
+  public PaginatedData<UserModel> findDirectSubordinates(Long managerId, int page, int size) {
+    Page<User> userPage = userJpaRepository.findDirectSubordinates(managerId, PageRequest.of(page, size));
+    return PaginatedData.<UserModel>builder()
+        .items(userMapper.toResponseList(userPage.getContent()))
+        .totalItems(userPage.getTotalElements())
+        .totalPages(userPage.getTotalPages())
+        .build();
+  }
+
+  @Override
+  public long countDirectSubordinates(Long managerId) {
+    return userJpaRepository.countByMentorId(managerId);
+  }
+
+  @Override
+  public List<UserModel> findDirectSubordinatesLimited(Long managerId, int limit) {
+    if (limit <= 0) {
+      return List.of();
+    }
+    if (limit >= 20) {
+      return userJpaRepository.findTop20ByMentorIdOrderByFullNameAsc(managerId).stream()
+          .map(userMapper::toModel)
+          .toList();
+    }
+
+    return userJpaRepository.findDirectSubordinates(managerId, PageRequest.of(0, limit)).stream()
+        .map(userMapper::toModel)
+        .toList();
+  }
+
+  @Override
+  public PaginatedData<UserModel> searchOrgChartUsers(
+      String query, String department, String status, int page, int size) {
+    Page<User> userPage =
+        userJpaRepository.searchOrgChartUsers(query, department, status, PageRequest.of(page, size));
+
+    return PaginatedData.<UserModel>builder()
+        .items(userMapper.toResponseList(userPage.getContent()))
+        .totalItems(userPage.getTotalElements())
+        .totalPages(userPage.getTotalPages())
+        .build();
+  }
+
+  @Override
+  public Map<Long, Long> countDirectSubordinatesByManagerIds(List<Long> managerIds) {
+    if (managerIds == null || managerIds.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    Map<Long, Long> result = new LinkedHashMap<>();
+    for (Object[] row : userJpaRepository.countDirectSubordinatesByManagerIds(managerIds)) {
+      result.put((Long) row[0], (Long) row[1]);
+    }
+    return result;
   }
 }

@@ -23,6 +23,12 @@ public interface UserMapper {
   @Mapping(target = "mentor", qualifiedByName = "mentorToModel")
   @Mapping(target = "position", qualifiedByName = "positionToModel")
   @Mapping(target = "department", source = "department", qualifiedByName = "departmentToString")
+  @Mapping(target = "departmentId", source = "department", qualifiedByName = "departmentToId")
+  @Mapping(target = "departmentCode", source = "department", qualifiedByName = "departmentToCode")
+  @Mapping(target = "roleId", ignore = true)
+  @Mapping(target = "role", ignore = true)
+  @Mapping(target = "authIdentityStatus", ignore = true)
+  @Mapping(target = "children", ignore = true)
   UserModel toModel(User entity);
 
   @Mapping(target = "id", ignore = true)
@@ -100,6 +106,18 @@ public interface UserMapper {
   default String departmentToString(Department department) {
     if (department == null) return null;
     return department.getName();
+  }
+
+  @Named("departmentToId")
+  default Long departmentToId(Department department) {
+    if (department == null) return null;
+    return department.getId();
+  }
+
+  @Named("departmentToCode")
+  default String departmentToCode(Department department) {
+    if (department == null) return null;
+    return department.getCode();
   }
 
   @Named("stringToDepartment")

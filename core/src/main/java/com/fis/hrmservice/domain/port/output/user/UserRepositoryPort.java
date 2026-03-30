@@ -47,4 +47,17 @@ public interface UserRepositoryPort {
   List<Long> getAllUserId();
 
   List<UserModel> searchByQuery(String query);
+
+  Optional<UserModel> findOrgChartRoot();
+
+  PaginatedData<UserModel> findDirectSubordinates(Long managerId, int page, int size);
+
+  long countDirectSubordinates(Long managerId);
+
+  List<UserModel> findDirectSubordinatesLimited(Long managerId, int limit);
+
+  PaginatedData<UserModel> searchOrgChartUsers(
+      String query, String department, String status, int page, int size);
+
+  java.util.Map<Long, Long> countDirectSubordinatesByManagerIds(List<Long> managerIds);
 }

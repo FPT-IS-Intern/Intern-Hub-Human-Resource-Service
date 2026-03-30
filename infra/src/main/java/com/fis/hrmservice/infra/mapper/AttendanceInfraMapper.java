@@ -23,6 +23,12 @@ public interface AttendanceInfraMapper {
 
     // FIX mentor recursion
     @Mapping(target = "mentor", ignore = true)
+    @Mapping(target = "departmentId", ignore = true)
+    @Mapping(target = "departmentCode", ignore = true)
+    @Mapping(target = "roleId", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "authIdentityStatus", ignore = true)
+    @Mapping(target = "children", ignore = true)
     UserModel userToUserModel(User user);
 
     @Named("toEpoch")
