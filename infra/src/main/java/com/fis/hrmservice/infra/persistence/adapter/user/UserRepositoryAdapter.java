@@ -167,6 +167,14 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
+  public List<UserModel> findOrgChartRootCandidates(int limit) {
+    int safeLimit = Math.max(limit, 1);
+    return userJpaRepository.findOrgChartRoots(PageRequest.of(0, safeLimit)).stream()
+        .map(userMapper::toModel)
+        .toList();
+  }
+
+  @Override
   public PaginatedData<UserModel> findDirectSubordinates(Long managerId, int page, int size) {
     Page<User> userPage = userJpaRepository.findDirectSubordinates(managerId, PageRequest.of(page, size));
     return PaginatedData.<UserModel>builder()

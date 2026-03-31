@@ -28,9 +28,15 @@ public class OrgChartUseCaseImpl {
       return getUserOrThrow(rootId);
     }
 
-    return userRepositoryPort
-        .findOrgChartRoot()
-        .orElseThrow(() -> new NotFoundException("Org chart root user not found"));
+    List<UserModel> rootCandidates = userRepositoryPort.findOrgChartRootCandidates(2);
+    if (rootCandidates.isEmpty()) {
+      throw new NotFoundException("Org chart root user not found");
+    }
+    if (rootCandidates.size() > 1) {
+      throw new ConflictDataException("Multiple org chart root candidates found; rootId is required");
+    }
+
+    return rootCandidates.get(0);
   }
 
   public UserModel getUserOrThrow(Long userId) {

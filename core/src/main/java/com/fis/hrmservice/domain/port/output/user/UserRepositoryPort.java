@@ -52,6 +52,8 @@ public interface UserRepositoryPort {
 
   Optional<UserModel> findOrgChartRoot();
 
+  List<UserModel> findOrgChartRootCandidates(int limit);
+
   PaginatedData<UserModel> findDirectSubordinates(Long managerId, int page, int size);
 
   long countDirectSubordinates(Long managerId);
