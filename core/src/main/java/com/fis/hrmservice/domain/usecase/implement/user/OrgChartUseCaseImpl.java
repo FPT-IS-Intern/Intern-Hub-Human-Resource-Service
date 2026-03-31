@@ -224,10 +224,10 @@ public class OrgChartUseCaseImpl {
 
   private String normalize(String value) {
     if (value == null) {
-      return null;
+      return "";
     }
     String trimmed = value.trim();
-    return trimmed.isEmpty() ? null : trimmed;
+    return trimmed.isEmpty() ? "" : trimmed;
   }
 
   private void validateManagerAssignment(Long userId, Long managerId) {
