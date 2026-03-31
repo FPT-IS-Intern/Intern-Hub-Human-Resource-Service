@@ -1,6 +1,7 @@
 package com.fis.hrmservice.api.controller.internal;
 
 import com.fis.hrmservice.api.dto.request.OrgChartBulkManagerUpdateRequest;
+import com.fis.hrmservice.api.dto.request.OrgChartInitializeRootRequest;
 import com.fis.hrmservice.api.dto.response.OrgChartBulkManagerUpdateResponse;
 import com.fis.hrmservice.api.dto.response.OrgChartPagedResponse;
 import com.fis.hrmservice.api.dto.response.OrgChartPathResponse;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +71,13 @@ public class OrgChartInternalController {
   @Internal
   public ResponseApi<OrgChartUserDetailResponse> getUserDetail(@PathVariable Long userId) {
     return ResponseApi.ok(toDetailResponse(orgChartUseCase.getUserOrThrow(userId)));
+  }
+
+  @PostMapping("/root")
+  @Internal
+  public ResponseApi<OrgChartUserDetailResponse> initializeRoot(
+      @RequestBody OrgChartInitializeRootRequest request) {
+    return ResponseApi.ok(toDetailResponse(orgChartUseCase.initializeRoot(request.getUserId())));
   }
 
   @GetMapping("/users")

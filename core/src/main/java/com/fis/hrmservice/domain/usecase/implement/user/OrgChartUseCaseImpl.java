@@ -39,6 +39,23 @@ public class OrgChartUseCaseImpl {
         .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
   }
 
+  @Transactional
+  public UserModel initializeRoot(Long userId) {
+    userRepositoryPort
+        .findOrgChartRoot()
+        .ifPresent(root -> {
+          throw new ConflictDataException("Org chart root already exists with id: " + root.getUserId());
+        });
+
+    UserModel user = getUserOrThrow(userId);
+    int updatedRows = userRepositoryPort.clearMentor(userId);
+    if (updatedRows == 0) {
+      throw new NotFoundException("User not found with id: " + userId);
+    }
+
+    return getUserOrThrow(user.getUserId());
+  }
+
   public List<UserModel> getDirectSubordinates(Long userId, int page, int limit) {
     return castItems(userRepositoryPort.findDirectSubordinates(userId, page, limit));
   }
