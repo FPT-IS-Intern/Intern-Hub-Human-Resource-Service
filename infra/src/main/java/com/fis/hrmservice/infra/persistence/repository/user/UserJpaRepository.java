@@ -206,8 +206,11 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
 
   @Query("""
       SELECT u FROM User u
-      WHERE u.mentor IS NULL
-        AND (:rootUserId IS NULL OR u.id <> :rootUserId)
+      WHERE NOT EXISTS (
+              SELECT 1
+              FROM OrgChartNode n
+              WHERE n.user.id = u.id
+            )
         AND (:query IS NULL OR :query = ''
               OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
               OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :query, '%'))

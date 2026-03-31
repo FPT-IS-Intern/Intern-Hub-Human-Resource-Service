@@ -1,6 +1,7 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.port.output.orgchart.OrgChartNodeRepositoryPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.exception.ConflictDataException;
@@ -22,24 +23,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrgChartUseCaseImpl {
 
   UserRepositoryPort userRepositoryPort;
+  OrgChartNodeRepositoryPort orgChartNodeRepositoryPort;
 
   public UserModel getRootUser(Long rootId) {
     if (rootId != null) {
-      return getUserOrThrow(rootId);
+      return orgChartNodeRepositoryPort
+          .findUserInOrgChart(rootId)
+          .orElseThrow(() -> new NotFoundException("Org chart root node not found with id: " + rootId));
     }
 
-    List<UserModel> rootCandidates = userRepositoryPort.findOrgChartRootCandidates(2);
-    if (rootCandidates.isEmpty()) {
-      throw new NotFoundException("Org chart root user not found");
-    }
-    if (rootCandidates.size() > 1) {
-      throw new ConflictDataException("Multiple org chart root candidates found; rootId is required");
-    }
-
-    return rootCandidates.get(0);
+    return orgChartNodeRepositoryPort
+        .findRootUser()
+        .orElseThrow(() -> new NotFoundException("Org chart root user not found"));
   }
 
   public UserModel getUserOrThrow(Long userId) {
+    return orgChartNodeRepositoryPort
+        .findUserInOrgChart(userId)
+        .orElseThrow(() -> new NotFoundException("Org chart node not found with id: " + userId));
+  }
+
+  private UserModel getRawUserOrThrow(Long userId) {
     return userRepositoryPort
         .findById(userId)
         .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
@@ -47,49 +51,49 @@ public class OrgChartUseCaseImpl {
 
   @Transactional
   public UserModel initializeRoot(Long userId) {
-    userRepositoryPort
-        .findOrgChartRoot()
-        .ifPresent(root -> {
+    orgChartNodeRepositoryPort.findRootUser().ifPresent(root -> {
           throw new ConflictDataException("Org chart root already exists with id: " + root.getUserId());
         });
 
-    UserModel user = getUserOrThrow(userId);
-    int updatedRows = userRepositoryPort.clearMentor(userId);
-    if (updatedRows == 0) {
-      throw new NotFoundException("User not found with id: " + userId);
-    }
-
-    return getUserOrThrow(user.getUserId());
+    getRawUserOrThrow(userId);
+    orgChartNodeRepositoryPort.initializeRoot(userId);
+    return orgChartNodeRepositoryPort
+        .findUserInOrgChart(userId)
+        .orElseThrow(() -> new NotFoundException("Org chart root user not found with id: " + userId));
   }
 
   public List<UserModel> getDirectSubordinates(Long userId, int page, int limit) {
-    return castItems(userRepositoryPort.findDirectSubordinates(userId, page, limit));
+    return castItems(orgChartNodeRepositoryPort.findDirectSubordinates(userId, page, limit));
   }
 
   public PaginatedData<UserModel> getDirectSubordinatesPage(Long userId, int page, int limit) {
-    return userRepositoryPort.findDirectSubordinates(userId, page, limit);
+    return orgChartNodeRepositoryPort.findDirectSubordinates(userId, page, limit);
   }
 
   public List<UserModel> getPreviewSubordinates(Long userId, int limit) {
-    return userRepositoryPort.findDirectSubordinatesLimited(userId, limit);
+    return orgChartNodeRepositoryPort.findDirectSubordinatesLimited(userId, limit);
   }
 
   public PaginatedData<UserModel> searchUsers(
       String query, String department, String status, int page, int limit) {
-    return userRepositoryPort.searchOrgChartUsers(normalize(query), normalize(department), normalize(status), page, limit);
+    return orgChartNodeRepositoryPort.searchOrgChartUsers(
+        normalize(query),
+        normalize(department),
+        normalize(status),
+        page,
+        limit);
   }
 
   public PaginatedData<UserModel> searchAssignableUsers(String query, int page, int limit) {
-    Long rootUserId = userRepositoryPort.findOrgChartRoot().map(UserModel::getUserId).orElse(null);
-    return userRepositoryPort.findAssignableOrgChartUsers(rootUserId, normalize(query), page, limit);
+    return orgChartNodeRepositoryPort.findAssignableUsers(normalize(query), page, limit);
   }
 
   public long countDirectSubordinates(Long userId) {
-    return userRepositoryPort.countDirectSubordinates(userId);
+    return orgChartNodeRepositoryPort.countDirectSubordinates(userId);
   }
 
   public Map<Long, Long> countDirectSubordinates(List<Long> userIds) {
-    return userRepositoryPort.countDirectSubordinatesByManagerIds(userIds);
+    return orgChartNodeRepositoryPort.countDirectSubordinatesByManagerIds(userIds);
   }
 
   @Transactional
@@ -103,16 +107,22 @@ public class OrgChartUseCaseImpl {
       throw new ConflictDataException("User ids are required");
     }
 
-    UserModel manager = managerId != null ? getUserOrThrow(managerId) : null;
-    for (Long userId : normalizedUserIds) {
-      UserModel user = getUserOrThrow(userId);
-      validateManagerAssignment(user, manager);
-    }
-
     if (managerId == null) {
-      userRepositoryPort.bulkClearMentor(normalizedUserIds);
+      for (Long userId : normalizedUserIds) {
+        validateRemoval(userId);
+      }
+      orgChartNodeRepositoryPort.removeUsers(normalizedUserIds);
     } else {
-      userRepositoryPort.bulkAssignMentor(normalizedUserIds, managerId);
+      UserModel manager =
+          orgChartNodeRepositoryPort
+              .findUserInOrgChart(managerId)
+              .orElseThrow(
+                  () -> new NotFoundException("Manager node not found with id: " + managerId));
+      for (Long userId : normalizedUserIds) {
+        getRawUserOrThrow(userId);
+        validateManagerAssignment(userId, manager.getUserId());
+      }
+      orgChartNodeRepositoryPort.assignUsersToManager(normalizedUserIds, managerId);
     }
     return normalizedUserIds;
   }
@@ -124,8 +134,7 @@ public class OrgChartUseCaseImpl {
     while (currentUserId != null) {
       UserModel currentUser = getUserOrThrow(currentUserId);
       path.addFirst(currentUser);
-      currentUserId =
-          currentUser.getMentor() != null ? currentUser.getMentor().getUserId() : null;
+      currentUserId = orgChartNodeRepositoryPort.findParentUserId(currentUserId).orElse(null);
     }
 
     return path;
@@ -195,22 +204,30 @@ public class OrgChartUseCaseImpl {
     return trimmed.isEmpty() ? null : trimmed;
   }
 
-  private void validateManagerAssignment(UserModel user, UserModel manager) {
-    if (user == null || manager == null) {
+  private void validateManagerAssignment(Long userId, Long managerId) {
+    if (userId == null || managerId == null) {
       return;
     }
 
-    if (user.getUserId().equals(manager.getUserId())) {
+    if (userId.equals(managerId)) {
       throw new ConflictDataException("User cannot be assigned as their own manager");
     }
 
-    Long cursorId = manager.getUserId();
+    Long cursorId = managerId;
     while (cursorId != null) {
-      if (cursorId.equals(user.getUserId())) {
+      if (cursorId.equals(userId)) {
         throw new ConflictDataException("Manager assignment creates a cycle");
       }
-      UserModel current = getUserOrThrow(cursorId);
-      cursorId = current.getMentor() != null ? current.getMentor().getUserId() : null;
+      cursorId = orgChartNodeRepositoryPort.findParentUserId(cursorId).orElse(null);
+    }
+  }
+
+  private void validateRemoval(Long userId) {
+    if (orgChartNodeRepositoryPort.isRoot(userId)) {
+      throw new ConflictDataException("Root node cannot be removed from org chart");
+    }
+    if (orgChartNodeRepositoryPort.existsChildren(userId)) {
+      throw new ConflictDataException("Cannot remove org chart node that still has direct subordinates");
     }
   }
 }
