@@ -121,6 +121,26 @@ public class OrgChartInternalController {
             .build());
   }
 
+  @GetMapping("/nodes")
+  @Internal
+  public ResponseApi<OrgChartPagedResponse<com.fis.hrmservice.api.dto.response.OrgChartUserLiteResponse>> getParentCandidates(
+      @RequestParam Long userId,
+      @RequestParam(required = false, name = "q") String query,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int limit) {
+    int safePage = Math.max(page, 1);
+    int safeLimit = Math.max(limit, 1);
+    PaginatedData<UserModel> candidatePage =
+        orgChartUseCase.searchParentCandidates(userId, query, safePage - 1, safeLimit);
+    List<UserModel> users = getItems(candidatePage);
+
+    return ResponseApi.ok(
+        OrgChartPagedResponse.<com.fis.hrmservice.api.dto.response.OrgChartUserLiteResponse>builder()
+            .data(users.stream().map(orgChartApiMapper::toLite).toList())
+            .meta(orgChartApiMapper.toMeta(safePage, safeLimit, candidatePage.getTotalItems()))
+            .build());
+  }
+
   @PutMapping("/users/manager")
   @Internal
   public ResponseApi<OrgChartBulkManagerUpdateResponse> bulkUpdateManager(

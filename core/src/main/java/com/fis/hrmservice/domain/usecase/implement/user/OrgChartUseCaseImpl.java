@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrgChartUseCaseImpl {
+  private static final int PARENT_CANDIDATE_FETCH_LIMIT = 500;
 
   UserRepositoryPort userRepositoryPort;
   OrgChartNodeRepositoryPort orgChartNodeRepositoryPort;
@@ -86,6 +87,31 @@ public class OrgChartUseCaseImpl {
 
   public PaginatedData<UserModel> searchAssignableUsers(String query, int page, int limit) {
     return orgChartNodeRepositoryPort.findAssignableUsers(normalize(query), page, limit);
+  }
+
+  public PaginatedData<UserModel> searchParentCandidates(Long userId, String query, int page, int limit) {
+    int safePage = Math.max(page, 0);
+    int safeLimit = Math.max(limit, 1);
+
+    getUserOrThrow(userId);
+
+    PaginatedData<UserModel> searchPage =
+        orgChartNodeRepositoryPort.searchOrgChartUsers(normalize(query), null, null, 0, PARENT_CANDIDATE_FETCH_LIMIT);
+
+    List<UserModel> validCandidates =
+        castItems(searchPage).stream()
+            .filter(candidate -> isValidParentCandidate(userId, candidate.getUserId()))
+            .toList();
+
+    int fromIndex = Math.min(safePage * safeLimit, validCandidates.size());
+    int toIndex = Math.min(fromIndex + safeLimit, validCandidates.size());
+    List<UserModel> pagedCandidates = validCandidates.subList(fromIndex, toIndex);
+
+    return PaginatedData.<UserModel>builder()
+        .items(pagedCandidates)
+        .totalItems((long) validCandidates.size())
+        .totalPages(validCandidates.isEmpty() ? 0 : (int) Math.ceil((double) validCandidates.size() / safeLimit))
+        .build();
   }
 
   public long countDirectSubordinates(Long userId) {
@@ -220,6 +246,26 @@ public class OrgChartUseCaseImpl {
       }
       cursorId = orgChartNodeRepositoryPort.findParentUserId(cursorId).orElse(null);
     }
+  }
+
+  private boolean isValidParentCandidate(Long userId, Long managerId) {
+    if (userId == null || managerId == null) {
+      return false;
+    }
+
+    if (userId.equals(managerId)) {
+      return false;
+    }
+
+    Long cursorId = managerId;
+    while (cursorId != null) {
+      if (cursorId.equals(userId)) {
+        return false;
+      }
+      cursorId = orgChartNodeRepositoryPort.findParentUserId(cursorId).orElse(null);
+    }
+
+    return true;
   }
 
   private void validateRemoval(Long userId) {
