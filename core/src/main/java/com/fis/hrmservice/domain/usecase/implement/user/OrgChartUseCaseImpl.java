@@ -96,7 +96,7 @@ public class OrgChartUseCaseImpl {
     getUserOrThrow(userId);
 
     PaginatedData<UserModel> searchPage =
-        orgChartNodeRepositoryPort.searchOrgChartUsers(normalize(query), null, null, 0, PARENT_CANDIDATE_FETCH_LIMIT);
+        orgChartNodeRepositoryPort.searchOrgChartUsers(normalize(query), "", "", 0, PARENT_CANDIDATE_FETCH_LIMIT);
 
     List<UserModel> validCandidates =
         castItems(searchPage).stream()

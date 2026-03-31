@@ -53,6 +53,7 @@ public interface OrgChartNodeJpaRepository extends JpaRepository<OrgChartNode, L
   @Query("SELECT CASE WHEN COUNT(n) > 0 THEN true ELSE false END FROM OrgChartNode n WHERE n.user.id = :userId AND n.isRoot = true")
   boolean isRoot(@Param("userId") Long userId);
 
+  @EntityGraph(attributePaths = {"user", "user.position", "user.department", "parentUser"})
   @Query(
       value = """
       SELECT n FROM OrgChartNode n

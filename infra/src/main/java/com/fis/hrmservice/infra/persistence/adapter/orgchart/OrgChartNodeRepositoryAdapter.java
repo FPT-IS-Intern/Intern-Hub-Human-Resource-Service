@@ -1,6 +1,7 @@
 package com.fis.hrmservice.infra.persistence.adapter.orgchart;
 
 import com.fis.hrmservice.domain.model.user.UserModel;
+import com.fis.hrmservice.domain.model.user.PositionModel;
 import com.fis.hrmservice.domain.port.output.orgchart.OrgChartNodeRepositoryPort;
 import com.fis.hrmservice.infra.mapper.UserMapper;
 import com.fis.hrmservice.infra.persistence.entity.OrgChartNode;
@@ -163,7 +164,35 @@ public class OrgChartNodeRepositoryAdapter implements OrgChartNodeRepositoryPort
   }
 
   private UserModel toUserModel(OrgChartNode node) {
-    UserModel userModel = userMapper.toModel(node.getUser());
+    com.fis.hrmservice.infra.persistence.entity.User user = node.getUser();
+    UserModel userModel =
+        UserModel.builder()
+            .userId(user.getId())
+            .fullName(user.getFullName())
+            .companyEmail(user.getCompanyEmail())
+            .phoneNumber(user.getPhoneNumber())
+            .idNumber(user.getIdNumber())
+            .dateOfBirth(user.getDateOfBirth())
+            .address(user.getAddress())
+            .sysStatus(user.getSysStatus())
+            .internshipStartDate(user.getInternshipStartDate())
+            .internshipEndDate(user.getInternshipEndDate())
+            .position(
+                user.getPosition() != null
+                    ? PositionModel.builder()
+                        .positionId(user.getPosition().getId())
+                        .name(user.getPosition().getName())
+                        .description(user.getPosition().getDescription())
+                        .build()
+                    : null)
+            .department(user.getDepartment() != null ? user.getDepartment().getName() : null)
+            .departmentId(user.getDepartment() != null ? user.getDepartment().getId() : null)
+            .departmentCode(user.getDepartment() != null ? user.getDepartment().getCode() : null)
+            .isFaceRegistry(user.getIsFaceRegistry())
+            .avatarUrl(user.getAvatarUrl())
+            .cvUrl(user.getCvUrl())
+            .children(List.of())
+            .build();
     if (node.getParentUser() != null) {
       userModel.setMentor(
           UserModel.builder()
