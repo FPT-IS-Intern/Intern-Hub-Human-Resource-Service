@@ -70,6 +70,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
   }
 
   @Override
+  @Transactional
+  public int clearMentor(Long userId) {
+    return userJpaRepository.clearMentor(userId);
+  }
+
+  @Override
   public List<Long> getAllUserId() {
       return userJpaRepository.findAll().stream().map(User::getId).toList();
   }
@@ -202,6 +208,36 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         .totalItems(userPage.getTotalElements())
         .totalPages(userPage.getTotalPages())
         .build();
+  }
+
+  @Override
+  public PaginatedData<UserModel> findAssignableOrgChartUsers(Long rootUserId, String query, int page, int size) {
+    Page<User> userPage =
+        userJpaRepository.findAssignableOrgChartUsers(rootUserId, query, PageRequest.of(page, size));
+
+    return PaginatedData.<UserModel>builder()
+        .items(userMapper.toResponseList(userPage.getContent()))
+        .totalItems(userPage.getTotalElements())
+        .totalPages(userPage.getTotalPages())
+        .build();
+  }
+
+  @Override
+  @Transactional
+  public int bulkAssignMentor(List<Long> userIds, Long mentorId) {
+    if (userIds == null || userIds.isEmpty()) {
+      return 0;
+    }
+    return userJpaRepository.bulkAssignMentor(userIds, mentorId);
+  }
+
+  @Override
+  @Transactional
+  public int bulkClearMentor(List<Long> userIds) {
+    if (userIds == null || userIds.isEmpty()) {
+      return 0;
+    }
+    return userJpaRepository.bulkClearMentor(userIds);
   }
 
   @Override

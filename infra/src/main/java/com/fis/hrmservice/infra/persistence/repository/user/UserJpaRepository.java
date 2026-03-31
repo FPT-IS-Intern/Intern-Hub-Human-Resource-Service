@@ -79,8 +79,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
                   ELSE 1
               END,
               u.fullName ASC
-          """
-  )
+          """)
   Page<User> filterUser(@Param("command") FilterUserCommand command, Pageable pageable);
 
   @Modifying
@@ -141,6 +140,21 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
   @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id = :userId")
   int assignMentor(@Param("userId") Long userId, @Param("mentorId") Long mentorId);
 
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.mentor = null WHERE u.id = :userId")
+  int clearMentor(@Param("userId") Long userId);
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id IN :userIds")
+  int bulkAssignMentor(@Param("userIds") List<Long> userIds, @Param("mentorId") Long mentorId);
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.mentor = null WHERE u.id IN :userIds")
+  int bulkClearMentor(@Param("userIds") List<Long> userIds);
+
   @Query("""
       SELECT u FROM User u
       WHERE LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
@@ -188,6 +202,21 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
       @Param("query") String query,
       @Param("department") String department,
       @Param("status") String status,
+      Pageable pageable);
+
+  @Query("""
+      SELECT u FROM User u
+      WHERE u.mentor IS NULL
+        AND (:rootUserId IS NULL OR u.id <> :rootUserId)
+        AND (:query IS NULL OR :query = ''
+              OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
+              OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :query, '%'))
+              OR LOWER(COALESCE(u.position.name, '')) LIKE LOWER(CONCAT('%', :query, '%')))
+      ORDER BY u.fullName ASC
+      """)
+  Page<User> findAssignableOrgChartUsers(
+      @Param("rootUserId") Long rootUserId,
+      @Param("query") String query,
       Pageable pageable);
 
   @Query("""

@@ -11,15 +11,14 @@ import com.fis.hrmservice.api.util.UserContext;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.usecase.command.user.FilterUserCommand;
 import com.fis.hrmservice.domain.usecase.implement.user.FilterUseCaseImpl;
+import com.fis.hrmservice.domain.usecase.implement.user.SupervisorUseCaseImpl;
 import com.fis.hrmservice.domain.usecase.implement.user.UserProfileUseCaseImpl;
 import com.fis.hrmservice.domain.usecase.implement.user.UserSuspension;
 import com.intern.hub.library.common.dto.PaginatedData;
 import com.intern.hub.library.common.dto.ResponseApi;
 import com.intern.hub.library.common.exception.BadRequestException;
 import com.intern.hub.starter.security.annotation.Internal;
-
 import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,6 +43,7 @@ public class UserInternalController {
     UserApiMapper userApiMapper;
     FilterUseCaseImpl filterUserUseCase;
     UserSuspension userSuspension;
+    SupervisorUseCaseImpl supervisorUseCase;
 
     @GetMapping("/search")
     @Internal
@@ -144,6 +144,15 @@ public class UserInternalController {
             @RequestBody UpdateProfileRequest request) {
         UserModel userModel = userProfileUseCase.updateProfileUser(userApiMapper.toUpdateUserProfileCommand(request), userId);
         return ResponseApi.ok(userApiMapper.toResponse(userModel));
+    }
+
+    @PutMapping("/{userId}/mentor")
+    @Internal
+    public ResponseApi<Void> assignMentorInternal(
+            @PathVariable Long userId,
+            @RequestParam(required = false) Long mentorId) {
+        supervisorUseCase.assignMentor(userId, mentorId);
+        return ResponseApi.ok(null);
     }
 
     @PutMapping("/{userId}/lock")

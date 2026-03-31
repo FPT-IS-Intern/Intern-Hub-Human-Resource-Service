@@ -3,6 +3,7 @@ package com.fis.hrmservice.domain.usecase.implement.user;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.intern.hub.library.common.dto.PaginatedData;
+import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,12 +56,42 @@ public class OrgChartUseCaseImpl {
     return userRepositoryPort.searchOrgChartUsers(normalize(query), normalize(department), normalize(status), page, limit);
   }
 
+  public PaginatedData<UserModel> searchAssignableUsers(String query, int page, int limit) {
+    Long rootUserId = userRepositoryPort.findOrgChartRoot().map(UserModel::getUserId).orElse(null);
+    return userRepositoryPort.findAssignableOrgChartUsers(rootUserId, normalize(query), page, limit);
+  }
+
   public long countDirectSubordinates(Long userId) {
     return userRepositoryPort.countDirectSubordinates(userId);
   }
 
   public Map<Long, Long> countDirectSubordinates(List<Long> userIds) {
     return userRepositoryPort.countDirectSubordinatesByManagerIds(userIds);
+  }
+
+  @Transactional
+  public List<Long> bulkUpdateManager(List<Long> userIds, Long managerId) {
+    if (userIds == null || userIds.isEmpty()) {
+      throw new ConflictDataException("User ids are required");
+    }
+
+    List<Long> normalizedUserIds = userIds.stream().filter(java.util.Objects::nonNull).distinct().toList();
+    if (normalizedUserIds.isEmpty()) {
+      throw new ConflictDataException("User ids are required");
+    }
+
+    UserModel manager = managerId != null ? getUserOrThrow(managerId) : null;
+    for (Long userId : normalizedUserIds) {
+      UserModel user = getUserOrThrow(userId);
+      validateManagerAssignment(user, manager);
+    }
+
+    if (managerId == null) {
+      userRepositoryPort.bulkClearMentor(normalizedUserIds);
+    } else {
+      userRepositoryPort.bulkAssignMentor(normalizedUserIds, managerId);
+    }
+    return normalizedUserIds;
   }
 
   public List<UserModel> getPathToRoot(Long userId) {
@@ -133,6 +165,29 @@ public class OrgChartUseCaseImpl {
   }
 
   private String normalize(String value) {
-    return value == null ? null : value.trim();
+    if (value == null) {
+      return null;
+    }
+    String trimmed = value.trim();
+    return trimmed.isEmpty() ? null : trimmed;
+  }
+
+  private void validateManagerAssignment(UserModel user, UserModel manager) {
+    if (user == null || manager == null) {
+      return;
+    }
+
+    if (user.getUserId().equals(manager.getUserId())) {
+      throw new ConflictDataException("User cannot be assigned as their own manager");
+    }
+
+    Long cursorId = manager.getUserId();
+    while (cursorId != null) {
+      if (cursorId.equals(user.getUserId())) {
+        throw new ConflictDataException("Manager assignment creates a cycle");
+      }
+      UserModel current = getUserOrThrow(cursorId);
+      cursorId = current.getMentor() != null ? current.getMentor().getUserId() : null;
+    }
   }
 }

@@ -1,5 +1,7 @@
 package com.fis.hrmservice.api.controller.internal;
 
+import com.fis.hrmservice.api.dto.request.OrgChartBulkManagerUpdateRequest;
+import com.fis.hrmservice.api.dto.response.OrgChartBulkManagerUpdateResponse;
 import com.fis.hrmservice.api.dto.response.OrgChartPagedResponse;
 import com.fis.hrmservice.api.dto.response.OrgChartPathResponse;
 import com.fis.hrmservice.api.dto.response.OrgChartUserDetailResponse;
@@ -17,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,14 +68,7 @@ public class OrgChartInternalController {
   @GetMapping("/users/{userId}")
   @Internal
   public ResponseApi<OrgChartUserDetailResponse> getUserDetail(@PathVariable Long userId) {
-    UserModel user = orgChartUseCase.getUserOrThrow(userId);
-    UserModel manager =
-        user.getMentor() != null ? orgChartUseCase.getUserOrThrow(user.getMentor().getUserId()) : null;
-    long subordinateCount = orgChartUseCase.countDirectSubordinates(userId);
-    List<UserModel> previewSubordinates = orgChartUseCase.getPreviewSubordinates(userId, 20);
-
-    return ResponseApi.ok(
-        orgChartApiMapper.toDetailResponse(user, manager, previewSubordinates, subordinateCount));
+    return ResponseApi.ok(toDetailResponse(orgChartUseCase.getUserOrThrow(userId)));
   }
 
   @GetMapping("/users")
@@ -96,6 +93,38 @@ public class OrgChartInternalController {
             users, counts, safePage, safeLimit, searchPage.getTotalItems()));
   }
 
+  @GetMapping("/assignable-users")
+  @Internal
+  public ResponseApi<OrgChartPagedResponse<com.fis.hrmservice.api.dto.response.OrgChartUserLiteResponse>> getAssignableUsers(
+      @RequestParam(required = false, name = "q") String query,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int limit) {
+    int safePage = Math.max(page, 1);
+    int safeLimit = Math.max(limit, 1);
+    PaginatedData<UserModel> assignablePage =
+        orgChartUseCase.searchAssignableUsers(query, safePage - 1, safeLimit);
+    List<UserModel> users = getItems(assignablePage);
+
+    return ResponseApi.ok(
+        OrgChartPagedResponse.<com.fis.hrmservice.api.dto.response.OrgChartUserLiteResponse>builder()
+            .data(users.stream().map(orgChartApiMapper::toLite).toList())
+            .meta(orgChartApiMapper.toMeta(safePage, safeLimit, assignablePage.getTotalItems()))
+            .build());
+  }
+
+  @PutMapping("/users/manager")
+  @Internal
+  public ResponseApi<OrgChartBulkManagerUpdateResponse> bulkUpdateManager(
+      @RequestBody OrgChartBulkManagerUpdateRequest request) {
+    List<Long> updatedUserIds = orgChartUseCase.bulkUpdateManager(request.getUserIds(), request.getManagerId());
+    return ResponseApi.ok(
+        OrgChartBulkManagerUpdateResponse.builder()
+            .updatedUserIds(updatedUserIds)
+            .managerId(request.getManagerId())
+            .updatedCount(updatedUserIds.size())
+            .build());
+  }
+
   @GetMapping("/users/{userId}/path")
   @Internal
   public ResponseApi<OrgChartPathResponse> getPathToRoot(@PathVariable Long userId) {
@@ -107,6 +136,14 @@ public class OrgChartInternalController {
     List<OrgChartUserNodeResponse> children =
         user.getChildren().stream().map(this::toTreeResponse).toList();
     return orgChartApiMapper.toNodeResponse(user, subordinateCount, children);
+  }
+
+  private OrgChartUserDetailResponse toDetailResponse(UserModel user) {
+    UserModel manager =
+        user.getMentor() != null ? orgChartUseCase.getUserOrThrow(user.getMentor().getUserId()) : null;
+    long subordinateCount = orgChartUseCase.countDirectSubordinates(user.getUserId());
+    List<UserModel> previewSubordinates = orgChartUseCase.getPreviewSubordinates(user.getUserId(), 20);
+    return orgChartApiMapper.toDetailResponse(user, manager, previewSubordinates, subordinateCount);
   }
 
   @SuppressWarnings("unchecked")
