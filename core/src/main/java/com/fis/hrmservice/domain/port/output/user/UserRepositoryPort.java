@@ -44,7 +44,30 @@ public interface UserRepositoryPort {
 
   int assignMentor(Long userId, Long mentorId);
 
+  int clearMentor(Long userId);
+
   List<Long> getAllUserId();
 
   List<UserModel> searchByQuery(String query);
+
+  Optional<UserModel> findOrgChartRoot();
+
+  List<UserModel> findOrgChartRootCandidates(int limit);
+
+  PaginatedData<UserModel> findDirectSubordinates(Long managerId, int page, int size);
+
+  long countDirectSubordinates(Long managerId);
+
+  List<UserModel> findDirectSubordinatesLimited(Long managerId, int limit);
+
+  PaginatedData<UserModel> searchOrgChartUsers(
+      String query, String department, String status, int page, int size);
+
+  PaginatedData<UserModel> findAssignableOrgChartUsers(Long rootUserId, String query, int page, int size);
+
+  int bulkAssignMentor(List<Long> userIds, Long mentorId);
+
+  int bulkClearMentor(List<Long> userIds);
+
+  java.util.Map<Long, Long> countDirectSubordinatesByManagerIds(List<Long> managerIds);
 }

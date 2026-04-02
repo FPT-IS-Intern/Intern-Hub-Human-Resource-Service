@@ -79,8 +79,7 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
                   ELSE 1
               END,
               u.fullName ASC
-          """
-  )
+          """)
   Page<User> filterUser(@Param("command") FilterUserCommand command, Pageable pageable);
 
   @Modifying
@@ -141,6 +140,21 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
   @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id = :userId")
   int assignMentor(@Param("userId") Long userId, @Param("mentorId") Long mentorId);
 
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.mentor = null WHERE u.id = :userId")
+  int clearMentor(@Param("userId") Long userId);
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.mentor.id = :mentorId WHERE u.id IN :userIds")
+  int bulkAssignMentor(@Param("userIds") List<Long> userIds, @Param("mentorId") Long mentorId);
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.mentor = null WHERE u.id IN :userIds")
+  int bulkClearMentor(@Param("userIds") List<Long> userIds);
+
   @Query("""
       SELECT u FROM User u
       WHERE LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
@@ -148,4 +162,71 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
       ORDER BY u.fullName ASC
       """)
   List<User> searchByQuery(@Param("query") String query);
+
+  @Query("""
+      SELECT u FROM User u
+      WHERE u.mentor IS NULL
+      ORDER BY
+        CASE WHEN u.sysStatus = 'APPROVED' THEN 0 ELSE 1 END,
+        u.id ASC
+      """)
+  Page<User> findOrgChartRoots(Pageable pageable);
+
+  @Query("""
+      SELECT u FROM User u
+      WHERE u.mentor.id = :managerId
+      ORDER BY u.fullName ASC
+      """)
+  Page<User> findDirectSubordinates(@Param("managerId") Long managerId, Pageable pageable);
+
+  long countByMentorId(Long mentorId);
+
+  List<User> findTop20ByMentorIdOrderByFullNameAsc(Long mentorId);
+
+  @Query("""
+      SELECT u FROM User u
+      WHERE (:query IS NULL OR :query = ''
+              OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
+              OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :query, '%'))
+              OR LOWER(COALESCE(u.position.name, '')) LIKE LOWER(CONCAT('%', :query, '%')))
+        AND (:department IS NULL OR :department = ''
+              OR LOWER(COALESCE(u.department.name, '')) LIKE LOWER(CONCAT('%', :department, '%'))
+              OR function('str', u.department.id) = :department)
+        AND (:status IS NULL OR :status = ''
+              OR (:status = 'active' AND u.sysStatus = 'APPROVED' AND UPPER(COALESCE(u.position.name, '')) NOT LIKE '%INTERN%')
+              OR (:status = 'intern' AND u.sysStatus = 'APPROVED' AND UPPER(COALESCE(u.position.name, '')) LIKE '%INTERN%')
+              OR (:status = 'inactive' AND u.sysStatus IN ('REJECTED', 'SUSPENDED')))
+      ORDER BY u.fullName ASC
+      """)
+  Page<User> searchOrgChartUsers(
+      @Param("query") String query,
+      @Param("department") String department,
+      @Param("status") String status,
+      Pageable pageable);
+
+  @Query("""
+      SELECT u FROM User u
+      WHERE NOT EXISTS (
+              SELECT 1
+              FROM OrgChartNode n
+              WHERE n.user.id = u.id
+            )
+        AND (:query IS NULL OR :query = ''
+              OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :query, '%'))
+              OR LOWER(u.companyEmail) LIKE LOWER(CONCAT('%', :query, '%'))
+              OR LOWER(COALESCE(u.position.name, '')) LIKE LOWER(CONCAT('%', :query, '%')))
+      ORDER BY u.fullName ASC
+      """)
+  Page<User> findAssignableOrgChartUsers(
+      @Param("rootUserId") Long rootUserId,
+      @Param("query") String query,
+      Pageable pageable);
+
+  @Query("""
+      SELECT u.mentor.id, COUNT(u)
+      FROM User u
+      WHERE u.mentor.id IN :managerIds
+      GROUP BY u.mentor.id
+      """)
+  List<Object[]> countDirectSubordinatesByManagerIds(@Param("managerIds") List<Long> managerIds);
 }
