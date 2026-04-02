@@ -68,7 +68,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
   @Override
   public List<Long> getAllUserId() {
-      return userJpaRepository.findAll().stream().map(User::getId).toList();
+    return userJpaRepository.findAll()
+            .stream()
+            .filter(user -> user.getSysStatus() != UserStatus.SUSPENDED)
+            .map(User::getId)
+            .toList();
   }
 
   @Override

@@ -1,17 +1,20 @@
 package com.fis.hrmservice.infra.persistence.entity;
 
 import com.intern.hub.starter.security.entity.AuditEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "work_locations")
 public class WorkLocation extends AuditEntity {
   @Id
