@@ -133,22 +133,34 @@ public class OrgChartUseCaseImpl {
       throw new ConflictDataException("User ids are required");
     }
 
+    boolean movingRootNode = normalizedUserIds.stream().anyMatch(orgChartNodeRepositoryPort::isRoot);
+
     if (managerId == null) {
       for (Long userId : normalizedUserIds) {
         validateRemoval(userId);
       }
       orgChartNodeRepositoryPort.removeUsers(normalizedUserIds);
+      userRepositoryPort.bulkClearMentor(normalizedUserIds);
     } else {
-      UserModel manager =
-          orgChartNodeRepositoryPort
-              .findUserInOrgChart(managerId)
-              .orElseThrow(
-                  () -> new NotFoundException("Manager node not found with id: " + managerId));
+      getRawUserOrThrow(managerId);
+      boolean managerInOrgChart = orgChartNodeRepositoryPort.findUserInOrgChart(managerId).isPresent();
+
+      // Allow adding a new parent for the current root:
+      // when manager has no org chart node yet, bootstrap them as root first.
+      if (!managerInOrgChart) {
+        if (!movingRootNode) {
+          throw new NotFoundException("Manager node not found with id: " + managerId);
+        }
+        orgChartNodeRepositoryPort.initializeRoot(managerId);
+        userRepositoryPort.clearMentor(managerId);
+      }
+
       for (Long userId : normalizedUserIds) {
         getRawUserOrThrow(userId);
-        validateManagerAssignment(userId, manager.getUserId());
+        validateManagerAssignment(userId, managerId);
       }
       orgChartNodeRepositoryPort.assignUsersToManager(normalizedUserIds, managerId);
+      userRepositoryPort.bulkAssignMentor(normalizedUserIds, managerId);
     }
     return normalizedUserIds;
   }

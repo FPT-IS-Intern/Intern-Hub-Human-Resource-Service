@@ -51,6 +51,16 @@ public class OrgChartNodeRepositoryAdapter implements OrgChartNodeRepositoryPort
   @Override
   @Transactional
   public void initializeRoot(Long userId) {
+    // Keep single-root invariant: if another root exists, demote it first.
+    orgChartNodeJpaRepository.findRootNode().ifPresent(existingRoot -> {
+      Long existingRootUserId = existingRoot.getUser() != null ? existingRoot.getUser().getId() : null;
+      if (existingRootUserId != null && !existingRootUserId.equals(userId)) {
+        existingRoot.setIsRoot(Boolean.FALSE);
+        existingRoot.setParentUser(userJpaRepository.getReferenceById(userId));
+        orgChartNodeJpaRepository.save(existingRoot);
+      }
+    });
+
     OrgChartNode node = orgChartNodeJpaRepository.findByUserId(userId).orElseGet(OrgChartNode::new);
     node.setUser(userJpaRepository.getReferenceById(userId));
     node.setParentUser(null);
