@@ -116,28 +116,34 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
   boolean existsByUser_IdAndWorkDateAndCheckInBranchId(Long userId, LocalDate workDate, UUID branchId);
 
   @Query(value = """
-      SELECT COALESCE((COUNT(DISTINCT user_id) * 100) / NULLIF((SELECT COUNT(*) FROM users), 0), 0)
-      FROM attendance_logs
-      WHERE work_date BETWEEN :fromDate AND :toDate
-        AND attendance_status = 'ABSENT'
+      SELECT COALESCE(
+        (SELECT COUNT(*) FROM attendance_logs 
+         WHERE work_date BETWEEN :fromDate AND :toDate 
+           AND attendance_status = 'ABSENT') * 100 / 
+        NULLIF((SELECT COUNT(*) FROM attendance_logs 
+                WHERE work_date BETWEEN :fromDate AND :toDate), 0), 0)
       """, nativeQuery = true)
   Long getAbsentPercentage(@Param("fromDate") LocalDate fromDate,
       @Param("toDate") LocalDate toDate);
 
   @Query(value = """
-      SELECT COALESCE((COUNT(DISTINCT user_id) * 100) / NULLIF((SELECT COUNT(*) FROM users), 0), 0)
-      FROM attendance_logs
-      WHERE work_date BETWEEN :fromDate AND :toDate
-        AND attendance_status = 'CHECK_IN_LATE'
+      SELECT COALESCE(
+        (SELECT COUNT(*) FROM attendance_logs 
+         WHERE work_date BETWEEN :fromDate AND :toDate 
+           AND attendance_status = 'CHECK_IN_LATE') * 100 / 
+        NULLIF((SELECT COUNT(*) FROM attendance_logs 
+                WHERE work_date BETWEEN :fromDate AND :toDate), 0), 0)
       """, nativeQuery = true)
   Long getLatePercentage(@Param("fromDate") LocalDate fromDate,
       @Param("toDate") LocalDate toDate);
 
   @Query(value = """
-      SELECT COALESCE((COUNT(DISTINCT user_id) * 100) / NULLIF((SELECT COUNT(*) FROM users), 0), 0)
-      FROM attendance_logs
-      WHERE work_date BETWEEN :fromDate AND :toDate
-        AND attendance_status = 'CHECK_IN_ON_TIME'
+      SELECT COALESCE(
+        (SELECT COUNT(*) FROM attendance_logs 
+         WHERE work_date BETWEEN :fromDate AND :toDate 
+           AND attendance_status = 'CHECK_IN_ON_TIME') * 100 / 
+        NULLIF((SELECT COUNT(*) FROM attendance_logs 
+                WHERE work_date BETWEEN :fromDate AND :toDate), 0), 0)
       """, nativeQuery = true)
   Long getOnTimePercentage(@Param("fromDate") LocalDate fromDate,
       @Param("toDate") LocalDate toDate);

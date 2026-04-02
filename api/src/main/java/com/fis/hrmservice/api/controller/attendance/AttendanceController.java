@@ -165,8 +165,8 @@ public class AttendanceController {
   }
 
   @PostMapping("/attendance-statistic-graph")
-  @Authenticated
-  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
+//  @Authenticated
+//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<AttendanceStatisticGraph> getAttendanceStatisticGraph(
           @RequestBody AttendanceStatisticGraphRequest request
           ) {
