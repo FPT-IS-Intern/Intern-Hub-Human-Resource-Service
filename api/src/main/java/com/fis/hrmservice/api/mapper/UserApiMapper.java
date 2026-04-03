@@ -26,6 +26,7 @@ public interface UserApiMapper {
   // ===== Response =====
   @Mapping(target = "email", source = "companyEmail")
   @Mapping(target = "positionCode", source = "position.name")
+  @Mapping(target = "superVisorName", source = "mentor.fullName")
   @Mapping(target = "superVisorId", source = "mentor.userId")
   UserResponse toResponse(UserModel model);
 

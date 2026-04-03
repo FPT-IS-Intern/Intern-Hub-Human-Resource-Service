@@ -29,6 +29,7 @@ public class UserResponse {
   /** Công việc */
   String positionCode;
   String cvUrl;
+  String superVisorName;
   String superVisorId;
   LocalDate internshipStartDate;
   LocalDate internshipEndDate;
