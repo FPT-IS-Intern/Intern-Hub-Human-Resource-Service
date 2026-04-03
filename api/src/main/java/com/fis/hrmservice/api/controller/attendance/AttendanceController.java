@@ -175,11 +175,11 @@ public class AttendanceController {
     Double absent = attendanceUseCase.getAbsentPercentage(request.getFromDate(), request.getToDate());
 
     double total = onTime + late + absent;
-    if (total > 0 && Math.abs(total - 100.0) > 1e-9) {
+    if (total > 0) {
       double factor = 100.0 / total;
-      onTime *= factor;
-      late *= factor;
-      absent = 100.0 - onTime - late;
+      onTime = Math.round(onTime * factor * 100.0) / 100.0;
+      late = Math.round(late * factor * 100.0) / 100.0;
+      absent = Math.round((100.0 - onTime - late) * 100.0) / 100.0;
     }
 
     AttendanceStatisticGraph attendanceStatisticGraph = AttendanceStatisticGraph.builder()
