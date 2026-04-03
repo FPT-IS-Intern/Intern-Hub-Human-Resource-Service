@@ -148,6 +148,16 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
   }
 
   @Override
+  public Integer absentWithLicense(Long userId) {
+    return attendanceLogRepository.absentWithLicense(userId);
+  }
+
+  @Override
+  public Integer absentWithoutLicense(Long userId) {
+    return attendanceLogRepository.absentWithoutLicense(userId);
+  }
+
+  @Override
   public boolean existsByUserIdAndWorkDate(Long userId, LocalDate workDate) {
     return attendanceLogRepository.existsByUserIdAndWorkDate(userId, workDate);
   }

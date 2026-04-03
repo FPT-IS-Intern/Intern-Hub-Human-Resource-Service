@@ -193,11 +193,12 @@ public class AttendanceController {
   @GetMapping("/attendance-section")
   @Authenticated
   public ResponseApi<SectionCardResponse> getAttendanceSection() {
+    Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(SectionCardResponse.builder()
-                    .absentWithLicense(0)
-                    .absentWithoutLicense(0)
-                    .totalWorkDate(attendanceUseCase.totalWorkDate(UserContext.requiredUserId()))
-                    .totalLateDate(attendanceUseCase.totalLateTime(UserContext.requiredUserId()))
+                    .absentWithLicense(attendanceUseCase.absentWithLicense(userId))
+                    .absentWithoutLicense(attendanceUseCase.absentWithoutLicense(userId))
+                    .totalWorkDate(attendanceUseCase.totalWorkDate(userId))
+                    .totalLateDate(attendanceUseCase.totalLateTime(userId))
             .build());
   }
 
@@ -206,8 +207,8 @@ public class AttendanceController {
   @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<SectionCardResponse> getAttendanceSection(@PathVariable Long userId) {
     return ResponseApi.ok(SectionCardResponse.builder()
-            .absentWithLicense(0)
-            .absentWithoutLicense(0)
+            .absentWithLicense(attendanceUseCase.absentWithLicense(userId))
+            .absentWithoutLicense(attendanceUseCase.absentWithoutLicense(userId))
             .totalWorkDate(attendanceUseCase.totalWorkDate(userId))
             .totalLateDate(attendanceUseCase.totalLateTime(userId))
             .build());

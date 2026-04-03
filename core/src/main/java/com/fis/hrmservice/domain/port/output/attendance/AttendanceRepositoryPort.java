@@ -51,4 +51,8 @@ public interface AttendanceRepositoryPort {
   Integer totalWorkDate(Long userId);
 
   Integer totalLateTime(Long userId);
+
+  Integer absentWithLicense(Long userId);
+
+  Integer absentWithoutLicense(Long userId);
 }

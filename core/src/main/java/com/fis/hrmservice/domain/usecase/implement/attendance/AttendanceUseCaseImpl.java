@@ -327,6 +327,16 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
         return attendanceRepository.totalLateTime(userId);
     }
 
+    @Override
+    public Integer absentWithLicense(Long userId) {
+        return attendanceRepository.absentWithLicense(userId);
+    }
+
+    @Override
+    public Integer absentWithoutLicense(Long userId) {
+        return attendanceRepository.absentWithoutLicense(userId);
+    }
+
     // ==================== Helper Methods ====================
 
     private UUID validateCompanyAccess(

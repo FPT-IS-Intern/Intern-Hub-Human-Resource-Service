@@ -164,4 +164,38 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
       AND a.user.id = :userId
       """)
   int totalLateTime(@Param("userId") Long userId);
+
+  @Query(value = """
+      SELECT COUNT(*)
+      FROM attendance_logs a
+      WHERE a.user_id = :userId
+        AND a.attendance_status = 'ABSENT'
+        AND EXISTS (
+          SELECT 1
+          FROM tickets t
+          JOIN ticket_types tt ON tt.ticket_type_id = t.ticket_type_id
+          WHERE tt.type_name = 'LEAVE'
+            AND t.status = 'APPROVED'
+            AND (t.user_info_temp ->> 'userId')::bigint = :userId
+            AND a.work_date BETWEEN t.start_at AND t.end_at
+        )
+      """, nativeQuery = true)
+  int absentWithLicense(@Param("userId") Long userId);
+
+  @Query(value = """
+      SELECT COUNT(*)
+      FROM attendance_logs a
+      WHERE a.user_id = :userId
+        AND a.attendance_status = 'ABSENT'
+        AND NOT EXISTS (
+          SELECT 1
+          FROM tickets t
+          JOIN ticket_types tt ON tt.ticket_type_id = t.ticket_type_id
+          WHERE tt.type_name = 'LEAVE'
+            AND t.status = 'APPROVED'
+            AND (t.user_info_temp ->> 'userId')::bigint = :userId
+            AND a.work_date BETWEEN t.start_at AND t.end_at
+        )
+      """, nativeQuery = true)
+  int absentWithoutLicense(@Param("userId") Long userId);
 }
