@@ -157,12 +157,13 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
       """, nativeQuery = true)
   int totalWorkDate(@Param("userId") Long userId);
 
-  @Query("""
-      SELECT COUNT(a)
-      FROM AttendanceLog a
-      WHERE a.attendanceStatus = 'CHECK_IN_LATE'
-      AND a.user.id = :userId
-      """)
+  @Query(value = """
+      SELECT COUNT(DISTINCT a.work_date)
+      FROM attendance_logs a
+      WHERE a.user_id = :userId
+        AND a.check_in_time IS NOT NULL
+        AND CAST(a.check_in_time AS time) > TIME '08:45:00'
+      """, nativeQuery = true)
   int totalLateTime(@Param("userId") Long userId);
 
   @Query(value = """
