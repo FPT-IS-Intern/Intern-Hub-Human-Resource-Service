@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendanceStatisticGraph {
-    Long onTimePercentage;
-    Long latePercentage;
-    Long absentPercentage;
+    Double onTimePercentage;
+    Double latePercentage;
+    Double absentPercentage;
 }

@@ -117,35 +117,35 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
 
   @Query(value = """
       SELECT COALESCE(
-        (SELECT COUNT(*) FROM attendance_logs 
+        CAST((SELECT COUNT(*) FROM attendance_logs 
          WHERE work_date BETWEEN :fromDate AND :toDate 
-           AND attendance_status = 'ABSENT') * 100 / 
+           AND attendance_status = 'ABSENT') AS DOUBLE PRECISION) * 100 / 
         NULLIF((SELECT COUNT(*) FROM attendance_logs 
                 WHERE work_date BETWEEN :fromDate AND :toDate), 0), 0)
       """, nativeQuery = true)
-  Long getAbsentPercentage(@Param("fromDate") LocalDate fromDate,
+  Double getAbsentPercentage(@Param("fromDate") LocalDate fromDate,
       @Param("toDate") LocalDate toDate);
 
   @Query(value = """
       SELECT COALESCE(
-        (SELECT COUNT(*) FROM attendance_logs 
+        CAST((SELECT COUNT(*) FROM attendance_logs 
          WHERE work_date BETWEEN :fromDate AND :toDate 
-           AND attendance_status = 'CHECK_IN_LATE') * 100 / 
+           AND attendance_status = 'CHECK_IN_LATE') AS DOUBLE PRECISION) * 100 / 
         NULLIF((SELECT COUNT(*) FROM attendance_logs 
                 WHERE work_date BETWEEN :fromDate AND :toDate), 0), 0)
       """, nativeQuery = true)
-  Long getLatePercentage(@Param("fromDate") LocalDate fromDate,
+  Double getLatePercentage(@Param("fromDate") LocalDate fromDate,
       @Param("toDate") LocalDate toDate);
 
   @Query(value = """
       SELECT COALESCE(
-        (SELECT COUNT(*) FROM attendance_logs 
+        CAST((SELECT COUNT(*) FROM attendance_logs 
          WHERE work_date BETWEEN :fromDate AND :toDate 
-           AND attendance_status = 'CHECK_IN_ON_TIME') * 100 / 
+           AND attendance_status = 'CHECK_IN_ON_TIME') AS DOUBLE PRECISION) * 100 / 
         NULLIF((SELECT COUNT(*) FROM attendance_logs 
                 WHERE work_date BETWEEN :fromDate AND :toDate), 0), 0)
       """, nativeQuery = true)
-  Long getOnTimePercentage(@Param("fromDate") LocalDate fromDate,
+  Double getOnTimePercentage(@Param("fromDate") LocalDate fromDate,
       @Param("toDate") LocalDate toDate);
 
   @Query(value = """

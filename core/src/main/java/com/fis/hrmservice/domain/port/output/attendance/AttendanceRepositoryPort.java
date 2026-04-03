@@ -42,11 +42,9 @@ public interface AttendanceRepositoryPort {
 
   PaginatedData<AttendanceLogModel> filterAttendanceLogs(FilterAttendanceCommand command, int page, int size);
 
-  Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
-
-  Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
-
-  Long getNotAttendancePercent(LocalDate fromDate, LocalDate toDate);
+  Double getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
+  Double getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
+  Double getNotAttendancePercent(LocalDate fromDate, LocalDate toDate);
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 

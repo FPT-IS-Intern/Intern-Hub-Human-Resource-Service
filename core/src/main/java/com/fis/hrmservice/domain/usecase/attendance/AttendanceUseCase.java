@@ -25,9 +25,9 @@ public interface AttendanceUseCase {
 
   List<AttendanceInWeekCommand> getAttendanceInWeekByUserId(Long userId);
 
-  Long getAbsentPercentage(LocalDate fromDate, LocalDate toDate);
-  Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
-  Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
+  Double getAbsentPercentage(LocalDate fromDate, LocalDate toDate);
+  Double getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate);
+  Double getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate);
 
   Integer totalWorkDate(Long userId);
   Integer totalLateTime(Long userId);

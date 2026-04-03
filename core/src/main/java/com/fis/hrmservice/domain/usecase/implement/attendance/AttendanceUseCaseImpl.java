@@ -303,17 +303,17 @@ public class AttendanceUseCaseImpl implements AttendanceUseCase {
     }
 
     @Override
-    public Long getAbsentPercentage(LocalDate fromDate, LocalDate toDate) {
+    public Double getAbsentPercentage(LocalDate fromDate, LocalDate toDate) {
         return attendanceRepository.getNotAttendancePercent(fromDate, toDate);
     }
 
     @Override
-    public Long getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate) {
+    public Double getCheckInOnTimePercent(LocalDate fromDate, LocalDate toDate) {
         return attendanceRepository.getCheckInOnTimePercent(fromDate, toDate);
     }
 
     @Override
-    public Long getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate) {
+    public Double getCheckInLateTimePercent(LocalDate fromDate, LocalDate toDate) {
         return attendanceRepository.getCheckInLateTimePercent(fromDate, toDate);
     }
 
