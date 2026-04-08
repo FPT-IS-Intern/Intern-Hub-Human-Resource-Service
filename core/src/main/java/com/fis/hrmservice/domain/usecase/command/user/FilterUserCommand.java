@@ -15,4 +15,5 @@ public class FilterUserCommand {
   List<UserStatus> sysStatuses;
   List<String> roles;
   List<String> positions;
+  List<Long> roleUserIds;
 }
