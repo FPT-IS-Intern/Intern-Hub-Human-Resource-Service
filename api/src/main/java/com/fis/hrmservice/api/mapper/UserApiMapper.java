@@ -32,12 +32,25 @@ public interface UserApiMapper {
 
   @Mapping(source = "companyEmail", target = "email")
   @Mapping(target = "position", expression = "java(getDisplayPosition(model.getPosition()))")
-  @Mapping(target = "role", expression = "java(getDisplayRole(model.getPosition()))")
+  @Mapping(target = "role", expression = "java(resolveDisplayRole(model))")
   @Mapping(source = "avatarUrl", target = "avatarUrl")
   @Mapping(source = "fullName", target = "fullName")
   @Mapping(source = "sysStatus", target = "sysStatus")
   @Mapping(source = "authIdentityStatus", target = "authIdentityStatus")
   FilterResponse toFilterResponse(UserModel model);
+
+  default String resolveDisplayRole(UserModel model) {
+    if (model == null) {
+      return null;
+    }
+
+    String authRole = model.getRole();
+    if (authRole != null && !authRole.isBlank()) {
+      return authRole;
+    }
+
+    return getDisplayRole(model.getPosition());
+  }
 
   default String getDisplayRole(PositionModel positionModel) {
     String rawName = positionModel != null ? positionModel.getName() : null;

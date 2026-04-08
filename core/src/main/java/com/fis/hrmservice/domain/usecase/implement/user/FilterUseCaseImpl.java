@@ -1,6 +1,7 @@
 package com.fis.hrmservice.domain.usecase.implement.user;
 
 import com.fis.hrmservice.domain.model.dto.resonse.AuthIdentityStatusCoreResponse;
+import com.fis.hrmservice.domain.model.dto.resonse.UserRoleCoreResponse;
 import com.fis.hrmservice.domain.model.user.UserModel;
 import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
@@ -59,6 +60,14 @@ public class FilterUseCaseImpl {
 
     for (UserModel user : users) {
       user.setAuthIdentityStatus(statusMap.get(user.getUserId()));
+      UserRoleCoreResponse authRole = createAuthIdentityPort.getRoleByUserId(user.getUserId());
+      if (authRole != null) {
+        user.setRole(authRole.getName());
+        user.setRoleId(authRole.getId());
+      } else {
+        user.setRole(null);
+        user.setRoleId(null);
+      }
     }
 
     return result;
