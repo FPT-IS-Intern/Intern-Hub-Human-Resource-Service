@@ -71,7 +71,11 @@ public class FilterUseCaseImpl {
 
     Set<String> requestedRoles = command.getRoles().stream()
         .filter(role -> role != null && !role.isBlank())
-        .map(this::normalizeToken)
+        .map(String::trim)
+        .collect(Collectors.toSet());
+
+    Set<String> normalizedRequestedRoles = requestedRoles.stream()
+        .map(this::normalizeRoleToken)
         .collect(Collectors.toSet());
 
     if (requestedRoles.isEmpty()) {
@@ -80,7 +84,8 @@ public class FilterUseCaseImpl {
 
     List<String> matchedRoleIds = createAuthIdentityPort.getAllRoles().stream()
         .filter(role -> role != null && role.getName() != null && role.getId() != null)
-        .filter(role -> requestedRoles.contains(normalizeToken(role.getName())))
+        .filter(role -> requestedRoles.contains(role.getId().trim())
+            || normalizedRequestedRoles.contains(normalizeRoleToken(role.getName())))
         .map(role -> role.getId().trim())
         .filter(roleId -> !roleId.isBlank())
         .toList();
@@ -107,7 +112,16 @@ public class FilterUseCaseImpl {
         .build();
   }
 
-  private String normalizeToken(String value) {
-    return value == null ? "" : value.trim().toUpperCase();
+  private String normalizeRoleToken(String value) {
+    if (value == null) {
+      return "";
+    }
+    String normalized = value.trim().toUpperCase()
+        .replace(' ', '_')
+        .replace('-', '_');
+    if (normalized.startsWith("ROLE_")) {
+      normalized = normalized.substring(5);
+    }
+    return normalized;
   }
 }
