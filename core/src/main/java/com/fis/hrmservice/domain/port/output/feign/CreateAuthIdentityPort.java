@@ -20,5 +20,7 @@ public interface CreateAuthIdentityPort {
 
   List<ListRoleCoreResponse> getAllRoles();
 
+  List<Long> getUsersByRoleId(String roleId);
+
   List<AuthIdentityStatusCoreResponse> getIdentityStatuses(List<Long> userIds);
 }

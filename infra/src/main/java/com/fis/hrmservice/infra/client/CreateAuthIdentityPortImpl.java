@@ -9,6 +9,7 @@ import com.fis.hrmservice.infra.feign.request.AssignRoleRequest;
 import com.fis.hrmservice.infra.mapper.FeignInfraMapper;
 import com.fis.hrmservice.infra.model.CreateUserPassIdentityRequest;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,21 @@ public class CreateAuthIdentityPortImpl implements CreateAuthIdentityPort {
   public List<ListRoleCoreResponse> getAllRoles() {
     return authIdentityFeignClient.getAllRoles().data().stream()
         .map(feignInfraMapper::toListRoleCoreResponse)
+        .toList();
+  }
+
+  @Override
+  public List<Long> getUsersByRoleId(String roleId) {
+    var response = authIdentityFeignClient.getUsersByRoleId(roleId);
+    if (response == null || response.data() == null) {
+      return List.of();
+    }
+
+    return response.data().stream()
+        .filter(Objects::nonNull)
+        .map(String::trim)
+        .filter(id -> !id.isBlank())
+        .map(Long::parseLong)
         .toList();
   }
 

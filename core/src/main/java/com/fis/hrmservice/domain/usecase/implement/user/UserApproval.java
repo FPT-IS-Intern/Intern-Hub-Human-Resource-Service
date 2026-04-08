@@ -6,6 +6,7 @@ import com.fis.hrmservice.domain.port.output.feign.CreateAuthIdentityPort;
 import com.fis.hrmservice.domain.port.output.user.UserRepositoryPort;
 import com.intern.hub.library.common.exception.ConflictDataException;
 import com.intern.hub.library.common.exception.NotFoundException;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -57,7 +58,27 @@ public class UserApproval {
   }
 
   public int totalIntern() {
-    return userRepositoryPort.totalIntern();
+    var internRole = createAuthIdentityPort.getAllRoles().stream()
+        .filter(role -> role != null && role.getName() != null)
+        .filter(role -> "INTERN".equalsIgnoreCase(role.getName().trim()))
+        .findFirst()
+        .orElse(null);
+
+    if (internRole == null || internRole.getId() == null || internRole.getId().isBlank()) {
+      return 0;
+    }
+
+    Set<Long> hrmApprovedUserIds = userRepositoryPort.findAllActiveUsers().stream()
+        .map(UserModel::getUserId)
+        .collect(java.util.stream.Collectors.toSet());
+
+    if (hrmApprovedUserIds.isEmpty()) {
+      return 0;
+    }
+
+    return (int) createAuthIdentityPort.getUsersByRoleId(internRole.getId()).stream()
+        .filter(hrmApprovedUserIds::contains)
+        .count();
   }
 
   public Integer internshipChanging() {
