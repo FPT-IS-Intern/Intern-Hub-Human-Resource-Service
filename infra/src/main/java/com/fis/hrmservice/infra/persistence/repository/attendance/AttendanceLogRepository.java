@@ -74,22 +74,24 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
       Pageable pageable);
 
   @Query(value = """
-      SELECT
-          TO_CHAR(d.day, 'DY') AS dayInWeek,
-          CASE
-              WHEN a.attendance_id IS NOT NULL THEN 'CHECK'
-              ELSE 'ABSENT'
-          END AS status
-      FROM generate_series(
-              DATE_TRUNC('week', CURRENT_DATE)::date,
-              (DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '4 days')::date,
-              INTERVAL '1 day'
-           ) AS d(day)
-      LEFT JOIN attendance_logs a
-             ON a.work_date = d.day
-            AND a.user_id = :userId
-      ORDER BY d.day
-      """, nativeQuery = true)
+    SELECT 
+        TO_CHAR(d.day, 'DY') AS dayInWeek,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1 FROM attendance_logs a 
+                WHERE a.work_date = d.day 
+                AND a.user_id = :userId 
+                AND a.attendance_status LIKE '%CHECK%'
+            ) THEN 'CHECK'
+            ELSE 'ABSENT'
+        END AS status
+    FROM generate_series(
+            DATE_TRUNC('week', CURRENT_DATE)::date, 
+            (DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '4 days')::date, 
+            INTERVAL '1 day'
+         ) AS d(day)
+    ORDER BY d.day
+    """, nativeQuery = true)
   List<AttendanceInWeekResponse> getAttendanceInWeek(@Param("userId") Long userId);
 
   List<AttendanceLog> findAllByUser_IdAndWorkDateOrderByCheckInTimeDesc(Long userId, LocalDate workDate);
