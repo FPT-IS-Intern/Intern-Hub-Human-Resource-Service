@@ -66,7 +66,7 @@ public class RegisterUserUseCaseImpl {
                             "avatars/" + command.getAvatar().getOriginalFilename(),
                             stagedUserId,
                             20971520L,
-                            "image/(png|jpeg|jpg)");
+                            "image/(png|jpeg|jpg|webp)");
 
             //Upload CV via DMS
             String cvObjectKey = fileStoragePort.uploadFile(
