@@ -162,12 +162,10 @@ public class UserValidationService {
       throw new ConflictDataException("File ảnh đại diện không được để trống");
     }
 
-    boolean validType =
-        CoreConstant.MIME_TYPE_PNG.equals(contentType)
-            || CoreConstant.MIME_TYPE_JPG.equals(contentType);
+    boolean validType = contentType.startsWith("image/");
 
     if (!validType) {
-      throw new ConflictDataException("Ảnh đại diện phải có định dạng PNG hoặc JPG");
+      throw new ConflictDataException("Ảnh đại diện sai định dạng");
     }
 
     if (size > CoreConstant.MAX_FILE_SIZE_BYTES) {
