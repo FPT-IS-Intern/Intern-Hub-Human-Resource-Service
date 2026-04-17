@@ -50,32 +50,6 @@ public class UserValidationService {
   }
 
   public void validateIdNumber(String idNumber, LocalDate dateOfBirth, String address) {
-
-    // TODO: cái này từ từ tính sau
-    // if (idNumber == null || idNumber.isBlank()) {
-    // throw new ConflictDataException("Số CCCD/CMND không được để trống");
-    // }
-    //
-    // if (!ID_NUMBER_PATTERN.matcher(idNumber).matches()) {
-    // throw new ConflictDataException("Sai định dạng CCCD/CMND");
-    // }
-    //
-    // // Validate province code (first 3 digits)
-    // Integer provinceCode = ProvinceCode.getProvinceCode(address);
-    // if (provinceCode == null) {
-    // throw new ConflictDataException("address", "Không tìm thấy mã tỉnh/thành phố
-    // từ
-    // địa chỉ");
-    // }
-    //
-    // String firstThreeDigits = idNumber.substring(0, 3);
-    // String expectedProvinceCode = String.format("%03d", provinceCode);
-    // if (!firstThreeDigits.equals(expectedProvinceCode)) {
-    // throw new ConflictDataException("Mã tỉnh/thành phố trên CCCD không khớp với
-    // địa
-    // chỉ");
-    // }
-
     if (idNumber == null || idNumber.isBlank()) {
       throw new ConflictDataException("Số CCCD/CMND không được để trống");
     }
@@ -84,22 +58,22 @@ public class UserValidationService {
       throw new ConflictDataException("Số CCCD/CMND không hợp lệ");
     }
 
-    // Validate century and gender code (4th digit)
-    validateCenturyCode(idNumber, dateOfBirth);
+    if (idNumber.length() == 12) {
+      validateNationalId12(idNumber, dateOfBirth);
+    }
   }
 
-  private void validateCenturyCode(String idNumber, LocalDate dateOfBirth) {
+  private void validateNationalId12(String idNumber, LocalDate dateOfBirth) {
     if (dateOfBirth == null) {
       throw new ConflictDataException("Ngày sinh không được để trống");
     }
 
     int sexCode = Character.getNumericValue(idNumber.charAt(3));
     int birthYear = dateOfBirth.getYear();
-    int century = (birthYear - 1) / 100 + 1;
+    int centuryBlock = birthYear / 100 + 1;
 
-    // Century code validation based on Vietnamese ID card rules
     boolean validCentury =
-        switch (century) {
+        switch (centuryBlock) {
           case 20 -> sexCode == 0 || sexCode == 1; // 1900-1999: 0 (male), 1 (female)
           case 21 -> sexCode == 2 || sexCode == 3; // 2000-2099: 2 (male), 3 (female)
           case 22 -> sexCode == 4 || sexCode == 5; // 2100-2199: 4 (male), 5 (female)
@@ -109,7 +83,16 @@ public class UserValidationService {
     if (!validCentury) {
       throw new ConflictDataException("Mã thế kỷ trên CCCD không khớp với năm sinh");
     }
+
+    String birthYearCode = idNumber.substring(4, 6);
+    int birthYearCodeNumber = Integer.parseInt(birthYearCode);
+    boolean validBirthYear = (dateOfBirth.getYear() % 100) == birthYearCodeNumber;
+
+    if (!validBirthYear) {
+      throw new ConflictDataException("Mã năm sinh trên CCCD không khớp với năm sinh");
+    }
   }
+
 
   public void validateFileMetadata(RegisterUserCommand command) {
 
