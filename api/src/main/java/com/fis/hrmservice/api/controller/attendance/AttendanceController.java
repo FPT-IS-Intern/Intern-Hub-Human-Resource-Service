@@ -158,15 +158,12 @@ public class AttendanceController {
 
   @GetMapping("/attendance-in-week")
   @Authenticated
-  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<List<AttendanceInWeekApiResponse>> getAttendanceInWeekByUserId() {
     Long userId = UserContext.requiredUserId();
     return ResponseApi.ok(attendanceUseCase.getAttendanceInWeekByUserId(userId).stream().map(attendanceApiMapper::toApiResponse).toList());
   }
 
   @PostMapping("/attendance-statistic-graph")
-//  @Authenticated
-//  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<AttendanceStatisticGraph> getAttendanceStatisticGraph(
           @RequestBody AttendanceStatisticGraphRequest request
           ) {

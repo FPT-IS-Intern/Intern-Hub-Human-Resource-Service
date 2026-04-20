@@ -252,7 +252,6 @@ public class UserController {
 
   @GetMapping("/supervisor")
   @Authenticated
-  @HasPermission(action = Action.READ, resource = "quan-ly-nguoi-dung")
   public ResponseApi<List<SupervisorResponse>> listAllSupervisor() {
     return ResponseApi.ok(
         supervisorUseCase.listAllSupervisor().stream()
