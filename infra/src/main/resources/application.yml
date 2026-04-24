@@ -50,7 +50,9 @@ spring:
           time_zone: ${TIMEZONE_CONFIG:Asia/Ho_Chi_Minh}
   application:
     name: hrm-service
-
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
 services:
   gateway:
     url: ${GATEWAY_URL:http://localhost:8765}
