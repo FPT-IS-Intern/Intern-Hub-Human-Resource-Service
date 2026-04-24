@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-remote_requests
+      author: cline
+      changes:
+        - createTable:
+            tableName: remote_requests
+            columns:
+              - column:
+                  name: ticket_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: work_location_id
+                  type: bigint
+              - column:
+                  name: remote_type
+                  type: varchar(50)
+              - column:
+                  name: start_time
+                  type: time
+              - column:
+                  name: end_time
+                  type: time
+
+        - addForeignKeyConstraint:
+            baseTableName: remote_requests
+            baseColumnNames: ticket_id
+            referencedTableName: tickets
+            referencedColumnNames: ticket_id
+            constraintName: fk_remote_requests_ticket
+        - addForeignKeyConstraint:
+            baseTableName: remote_requests
+            baseColumnNames: work_location_id
+            referencedTableName: work_locations
+            referencedColumnNames: work_location_id
+            constraintName: fk_remote_requests_work_location

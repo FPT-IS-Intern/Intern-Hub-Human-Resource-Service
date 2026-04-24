@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 019-indexes
+      author: cline
+      changes:
+        # ============================
+        # INDEXES for attendance_logs
+        # ============================
+        - createIndex:
+            tableName: attendance_logs
+            indexName: idx_attendance_user_work_date
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: work_date
+
+        - createIndex:
+            tableName: attendance_logs
+            indexName: idx_attendance_user_work_date_check_in_time
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: work_date
+              - column:
+                  name: check_in_time
+
+        - createIndex:
+            tableName: attendance_logs
+            indexName: idx_attendance_user_work_date_check_out_time
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: work_date
+              - column:
+                  name: check_out_time
+
+        - createIndex:
+            tableName: attendance_logs
+            indexName: idx_attendance_user_work_date_check_in_branch
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: work_date
+              - column:
+                  name: check_in_branch_id
+
+        # ============================
+        # UNIQUE INDEX for org_chart_nodes root
+        # ============================
+        - sql:
+            sql: |
+              CREATE UNIQUE INDEX IF NOT EXISTS uk_org_chart_nodes_root
+              ON org_chart_nodes (is_root)
+              WHERE is_root = TRUE;

@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-work_locations
+      author: cline
+      changes:
+        - createTable:
+            tableName: work_locations
+            columns:
+              - column:
+                  name: work_location_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: address
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: is_active
+                  type: boolean
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: status
+                  type: varchar(50)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_by
+                  type: varchar(255)

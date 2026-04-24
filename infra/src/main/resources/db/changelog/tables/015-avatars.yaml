@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 015-avatars
+      author: cline
+      changes:
+        - createTable:
+            tableName: avatars
+            columns:
+              - column:
+                  name: avatar_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: avatar_url
+                  type: text
+              - column:
+                  name: file_type
+                  type: varchar(100)
+              - column:
+                  name: file_size
+                  type: bigint
+              - column:
+                  name: avatar_file_name
+                  type: varchar(255)
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: status
+                  type: varchar(50)
+
+        - addForeignKeyConstraint:
+            baseTableName: avatars
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: user_id
+            constraintName: fk_avatars_user

@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-tickets
+      author: cline
+      changes:
+        - createTable:
+            tableName: tickets
+            columns:
+              - column:
+                  name: ticket_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: ticket_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_at
+                  type: date
+              - column:
+                  name: end_at
+                  type: date
+              - column:
+                  name: reason
+                  type: text
+              - column:
+                  name: user_info_temp
+                  type: jsonb
+                  defaultValueComputed: "'{}'::jsonb"
+              - column:
+                  name: sys_status
+                  type: varchar(20)
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: status
+                  type: varchar(50)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+
+        - addForeignKeyConstraint:
+            baseTableName: tickets
+            baseColumnNames: ticket_type_id
+            referencedTableName: ticket_types
+            referencedColumnNames: ticket_type_id
+            constraintName: fk_tickets_ticket_type

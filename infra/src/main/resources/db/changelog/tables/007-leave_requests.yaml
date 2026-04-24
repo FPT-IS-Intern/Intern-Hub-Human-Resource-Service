@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-leave_requests
+      author: cline
+      changes:
+        - createTable:
+            tableName: leave_requests
+            columns:
+              - column:
+                  name: ticket_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: leave_type_id
+                  type: bigint
+              - column:
+                  name: total_days
+                  type: integer
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: status
+                  type: varchar(50)
+              - column:
+                  name: created_by
+                  type: varchar(255)
+              - column:
+                  name: updated_by
+                  type: varchar(255)
+
+        - addForeignKeyConstraint:
+            baseTableName: leave_requests
+            baseColumnNames: ticket_id
+            referencedTableName: tickets
+            referencedColumnNames: ticket_id
+            constraintName: fk_leave_requests_ticket
+        - addForeignKeyConstraint:
+            baseTableName: leave_requests
+            baseColumnNames: leave_type_id
+            referencedTableName: leave_types
+            referencedColumnNames: leave_type_id
+            constraintName: fk_leave_requests_leave_type
