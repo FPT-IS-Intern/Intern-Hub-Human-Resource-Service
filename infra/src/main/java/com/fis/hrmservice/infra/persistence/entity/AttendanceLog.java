@@ -5,7 +5,6 @@ import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,10 +26,10 @@ public class AttendanceLog extends AuditEntity {
   private LocalDate workDate;
 
   @Column(name = "check_in_time")
-  private LocalDateTime checkInTime;
+  private Long checkInTime;
 
   @Column(name = "check_out_time")
-  private LocalDateTime checkOutTime;
+  private Long checkOutTime;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "attendance_status", length = 20)

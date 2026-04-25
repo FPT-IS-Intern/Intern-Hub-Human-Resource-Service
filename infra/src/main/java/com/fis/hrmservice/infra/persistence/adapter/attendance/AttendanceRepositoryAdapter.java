@@ -11,7 +11,6 @@ import com.fis.hrmservice.infra.persistence.repository.attendance.AttendanceLogR
 import com.fis.hrmservice.infra.persistence.repository.user.UserJpaRepository;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -184,17 +183,8 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
       userJpaRepository.findById(model.getUser().getUserId()).ifPresent(entity::setUser);
     }
     entity.setWorkDate(model.getWorkDate());
-    // Convert long timestamp to LocalDateTime using Vietnam timezone
-    if (model.getCheckInTime() > 0) {
-      entity.setCheckInTime(
-          LocalDateTime.ofInstant(
-              Instant.ofEpochMilli(model.getCheckInTime()), CoreConstant.VIETNAM_ZONE));
-    }
-    if (model.getCheckOutTime() > 0) {
-      entity.setCheckOutTime(
-          LocalDateTime.ofInstant(
-              Instant.ofEpochMilli(model.getCheckOutTime()), CoreConstant.VIETNAM_ZONE));
-    }
+    entity.setCheckInTime(model.getCheckInTime() > 0 ? model.getCheckInTime() : null);
+    entity.setCheckOutTime(model.getCheckOutTime() > 0 ? model.getCheckOutTime() : null);
     entity.setAttendanceStatus(model.getAttendanceStatus());
     entity.setSource(model.getSource());
     entity.setCheckInBranchId(model.getCheckInBranchId());
@@ -221,22 +211,8 @@ public class AttendanceRepositoryAdapter implements AttendanceRepositoryPort {
                     .build()
                 : null)
         .workDate(entity.getWorkDate())
-        .checkInTime(
-            entity.getCheckInTime() != null
-                ? entity
-                    .getCheckInTime()
-                    .atZone(CoreConstant.VIETNAM_ZONE)
-                    .toInstant()
-                    .toEpochMilli()
-                : 0L)
-        .checkOutTime(
-            entity.getCheckOutTime() != null
-                ? entity
-                    .getCheckOutTime()
-                    .atZone(CoreConstant.VIETNAM_ZONE)
-                    .toInstant()
-                    .toEpochMilli()
-                : 0L)
+        .checkInTime(entity.getCheckInTime() != null ? entity.getCheckInTime() : 0L)
+        .checkOutTime(entity.getCheckOutTime() != null ? entity.getCheckOutTime() : 0L)
         .attendanceStatus(entity.getAttendanceStatus())
         .source(entity.getSource())
         .checkInBranchId(entity.getCheckInBranchId())

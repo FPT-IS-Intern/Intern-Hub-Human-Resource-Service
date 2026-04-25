@@ -7,18 +7,15 @@ import com.fis.hrmservice.infra.model.AttendanceInWeekResponse;
 import com.fis.hrmservice.infra.persistence.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 @Mapper(componentModel = "spring")
 public interface AttendanceInfraMapper {
 
     AttendanceInWeekCommand toAttendanceInWeekCommand(AttendanceInWeekResponse response);
 
     @Mapping(target = "attendanceId", source = "id")
-    @Mapping(target = "checkInTime", source = "checkInTime", qualifiedByName = "toEpoch")
-    @Mapping(target = "checkOutTime", source = "checkOutTime", qualifiedByName = "toEpoch")
+    @Mapping(target = "isCheckInValid", ignore = true)
+    @Mapping(target = "isCheckOutValid", ignore = true)
     AttendanceLogModel toModel(AttendanceLog attendanceLog);
 
     // FIX mentor recursion
@@ -30,12 +27,6 @@ public interface AttendanceInfraMapper {
     @Mapping(target = "authIdentityStatus", ignore = true)
     @Mapping(target = "children", ignore = true)
     UserModel userToUserModel(User user);
-
-    @Named("toEpoch")
-    default long toEpoch(LocalDateTime time) {
-        if (time == null) return 0L;
-        return time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-    }
 
     default String map(Department department) {
         if (department == null) return null;

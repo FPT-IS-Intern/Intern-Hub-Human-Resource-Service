@@ -37,3 +37,5 @@ databaseChangeLog:
       file: db/changelog/tables/018-org_chart_nodes.yaml
   - include:
       file: db/changelog/tables/019-indexes.yaml
+  - include:
+      file: db/changelog/tables/020-fix-missing-columns.yaml
