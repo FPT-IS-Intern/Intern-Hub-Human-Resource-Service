@@ -20,7 +20,6 @@ public class SidebarMenuResponse {
   private String path;
   private String icon;
   private Integer parentId;
-  private List<String> roleCodes;
   private Integer sortOrder;
   private String status;
   private List<SidebarMenuResponse> children;
