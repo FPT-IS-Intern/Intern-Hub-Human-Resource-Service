@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-departments-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: departments
+            columns:
+              - column:
+                  name: department_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(100)
+              - column:
+                  name: code
+                  type: varchar(50)
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: status
+                  type: varchar(50)
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint

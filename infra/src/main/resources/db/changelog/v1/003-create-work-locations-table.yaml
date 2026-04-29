@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-work-locations-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: work_locations
+            columns:
+              - column:
+                  name: work_location_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: address
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: is_active
+                  type: boolean

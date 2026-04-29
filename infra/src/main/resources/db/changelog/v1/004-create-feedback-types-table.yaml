@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-feedback-types-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: feedback_types
+            columns:
+              - column:
+                  name: feedback_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: code
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint
+              - column:
+                  name: status
+                  type: varchar(50)

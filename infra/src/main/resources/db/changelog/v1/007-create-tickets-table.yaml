@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-tickets-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: tickets
+            columns:
+              - column:
+                  name: ticket_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: ticket_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_at
+                  type: date
+              - column:
+                  name: end_at
+                  type: date
+              - column:
+                  name: reason
+                  type: text
+              - column:
+                  name: status
+                  type: varchar(20)
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint
+              - column:
+                  name: user_info_temp
+                  type: jsonb
+                  defaultValue: "{}"
+        - addForeignKeyConstraint:
+            constraintName: fk_tickets_ticket_type
+            baseTableName: tickets
+            baseColumnNames: ticket_type_id
+            referencedTableName: ticket_types
+            referencedColumnNames: ticket_type_id

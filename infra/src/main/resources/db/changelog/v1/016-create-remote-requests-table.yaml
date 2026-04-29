@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-create-remote-requests-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: remote_requests
+            columns:
+              - column:
+                  name: ticket_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: work_location_id
+                  type: bigint
+              - column:
+                  name: start_time
+                  type: time
+              - column:
+                  name: end_time
+                  type: time
+              - column:
+                  name: remote_type
+                  type: text
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint
+        - addForeignKeyConstraint:
+            constraintName: fk_remote_requests_ticket
+            baseTableName: remote_requests
+            baseColumnNames: ticket_id
+            referencedTableName: tickets
+            referencedColumnNames: ticket_id
+        - addForeignKeyConstraint:
+            constraintName: fk_remote_requests_work_location
+            baseTableName: remote_requests
+            baseColumnNames: work_location_id
+            referencedTableName: work_locations
+            referencedColumnNames: work_location_id

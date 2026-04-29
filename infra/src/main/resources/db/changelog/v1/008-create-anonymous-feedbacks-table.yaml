@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-anonymous-feedbacks-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: anonymous_feedbacks
+            columns:
+              - column:
+                  name: feedback_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: feedback_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: content
+                  type: text
+              - column:
+                  name: sender_id
+                  type: bigint
+              - column:
+                  name: creator
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint
+        - addForeignKeyConstraint:
+            constraintName: fk_anonymous_feedbacks_feedback_type
+            baseTableName: anonymous_feedbacks
+            baseColumnNames: feedback_type_id
+            referencedTableName: feedback_types
+            referencedColumnNames: feedback_type_id
+        - addForeignKeyConstraint:
+            constraintName: fk_anonymous_feedbacks_sender
+            baseTableName: anonymous_feedbacks
+            baseColumnNames: sender_id
+            referencedTableName: users
+            referencedColumnNames: user_id
+        - addForeignKeyConstraint:
+            constraintName: fk_anonymous_feedbacks_creator
+            baseTableName: anonymous_feedbacks
+            baseColumnNames: creator
+            referencedTableName: users
+            referencedColumnNames: user_id

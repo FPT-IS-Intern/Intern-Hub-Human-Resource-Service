@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-create-evidences-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: evidences
+            columns:
+              - column:
+                  name: evidence_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: ticket_id
+                  type: bigint
+              - column:
+                  name: evidence_folder
+                  type: varchar(255)
+              - column:
+                  name: evidence_url
+                  type: text
+              - column:
+                  name: uploaded_at
+                  type: date
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint
+              - column:
+                  name: status
+                  type: varchar(50)
+              - column:
+                  name: create_at
+                  type: bigint
+              - column:
+                  name: created_at
+                  type: bigint
+        - addForeignKeyConstraint:
+            constraintName: fk_evidences_ticket
+            baseTableName: evidences
+            baseColumnNames: ticket_id
+            referencedTableName: tickets
+            referencedColumnNames: ticket_id

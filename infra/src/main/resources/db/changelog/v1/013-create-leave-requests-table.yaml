@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-create-leave-requests-table
+      author: hrm-service
+      changes:
+        - createTable:
+            tableName: leave_requests
+            columns:
+              - column:
+                  name: ticket_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: leave_type_id
+                  type: bigint
+              - column:
+                  name: total_days
+                  type: integer
+              - column:
+                  name: created_at
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: bigint
+              - column:
+                  name: version
+                  type: integer
+              - column:
+                  name: created_by
+                  type: bigint
+              - column:
+                  name: updated_by
+                  type: bigint
+              - column:
+                  name: status
+                  type: varchar(50)
+        - addForeignKeyConstraint:
+            constraintName: fk_leave_requests_ticket
+            baseTableName: leave_requests
+            baseColumnNames: ticket_id
+            referencedTableName: tickets
+            referencedColumnNames: ticket_id
