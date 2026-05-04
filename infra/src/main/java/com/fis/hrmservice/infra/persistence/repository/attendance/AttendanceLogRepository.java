@@ -164,7 +164,7 @@ public interface AttendanceLogRepository extends JpaRepository<AttendanceLog, Lo
       FROM attendance_logs a
       WHERE a.user_id = :userId
         AND a.check_in_time IS NOT NULL
-        AND CAST(a.check_in_time AS time) > TIME '08:45:00'
+        AND CAST(to_timestamp(a.check_in_time / 1000.0) AS time) > TIME '08:45:00'
       """, nativeQuery = true)
   int totalLateTime(@Param("userId") Long userId);
 
