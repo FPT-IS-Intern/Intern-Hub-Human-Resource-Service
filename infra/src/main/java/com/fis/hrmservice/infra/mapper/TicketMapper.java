@@ -22,7 +22,7 @@ public interface TicketMapper {
   @Mapping(source = "ticketId", target = "id")
   @Mapping(source = "userInfoTemp", target = "userInfoTemp")
   @Mapping(source = "sysStatus", target = "status")
-  @Mapping(source = "ticketType", target = "ticketType") // 🔥 THIẾU DÒNG NÀY
+  @Mapping(target = "ticketType", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "createdBy", ignore = true)

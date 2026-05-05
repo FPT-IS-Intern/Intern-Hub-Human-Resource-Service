@@ -39,9 +39,12 @@ public class TicketRepositoryAdapter implements TicketRepositoryPort {
     Ticket ticketEntity = ticketMapper.toEntity(ticket);
 
     // ================= FIX TRANSIENT TicketType =================
+    // Always fetch managed TicketType from the model's type reference
+    // (MapStruct now ignores ticketType in toEntity, so we set it manually)
     if (ticket.getTicketType() != null) {
-      TicketType managedType = entityManager.getReference(TicketType.class, ticket.getTicketType().getTicketTypeId());
-
+      TicketType managedType = entityManager.getReference(
+          TicketType.class,
+          ticket.getTicketType().getTicketTypeId());
       ticketEntity.setTicketType(managedType);
     }
     // ============================================================
