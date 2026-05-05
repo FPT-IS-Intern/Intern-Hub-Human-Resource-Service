@@ -3,7 +3,7 @@ package com.fis.hrmservice.infra.persistence.entity;
 import com.fis.hrmservice.domain.model.constant.TicketStatus;
 import com.intern.hub.starter.security.entity.AuditEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -18,11 +18,11 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Table(name = "tickets")
 public class Ticket extends AuditEntity {
+
   @Id
   @Column(name = "ticket_id", nullable = false)
   private Long id;
 
-  @NotNull
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "ticket_type_id", nullable = false)
   private TicketType ticketType;
@@ -56,4 +56,5 @@ public class Ticket extends AuditEntity {
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "user_info_temp")
   private Map<String, Object> userInfoTemp;
+
 }
